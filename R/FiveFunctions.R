@@ -1,19 +1,66 @@
+## Prelim Functions  ###################################################
+########################################################################
+
+###############################
+## local.file.path ############  creates a file path in the local data  
+###############################  directory (to be used internally)	
+
+local.file.path <- function(db,key){
+	file.path(db[["dir"]],"data",key)
+}
+
+#######################
+## getlist ############  reads the 'keys' file from the server 
+#######################
+
+## wasn't sure if we wanted this to just return the list 
+## or to also save a 'list' file, so I included an option
+
+getlist <- function(db, save=FALSE){
+	con <- gzcon(url(file.path(db[["url"]],"keys")))
+	open(con, "rb")
+	on.exit(close(con))
+	mylist <- unserialize(con)
+	if (save) save(mylist, file = file.path(db[["dir"]],"list"))
+	mylist 
+	}
+
+#######################
+## lookup #############  checks to see if a given key is in the local database 
+#######################
+
+lookup <- function(db,key){
+	key %in% getlist(db.test, save=FALSE)
+	}
+
+
+## Five Functions ##########################################################
+############################################################################
+
 ####################
 ## 1) create #######
 ####################
 
 create <- function(myurl,dir){	
+	## remove trailing "/" on dir and myurl ##
+	if (length(grep("/$",list(dir),perl=T))==1) dir <- sub("/$","", dir)
+	if (length(grep("/$",list(myurl),perl=T))==1) myurl <- sub("/$","", myurl)
+	## create the local main directory and data sub-directory to store the data files ##
 	dir.create(dir)
-	save(myurl, file = paste(dir,"/url.R",sep=""))
-}
+	dir.create(file.path(dir,"data"))
+	## save myurl in the R workspace format in the main directory ## 
+	save(myurl, file = file.path(dir,"url"))
+	}
 
 ####################
 ## 2) init #########
 ####################
 
 init <- function(dir){
-	load(paste(dir,"/url.R",sep=""))
-	list(myurl,dir)
+	## remove trailing "/" on dir ##
+	if (length(grep("/$",list(dir),perl=T))==1) dir <- sub("/$","", dir)
+	load(file.path(dir,"url"))
+	list(url=myurl,dir=dir)
 	}
 
 ####################
@@ -21,11 +68,11 @@ init <- function(dir){
 ####################
 
 fetch <- function(db,key){
-	con <- gzcon(url(paste(db[[1]],key,sep="")))
+	con <- gzcon(url(file.path(db[["url"]],"db",key)))
 	open(con, "rb")
+	on.exit(close(con))
 	dat <- unserialize(con)
-	close(con)
-	save(dat, file = paste(db[[2]],"/",key,".R",sep=""))
+	save(dat, file = local.file.path(db,key))
 }
 
 ####################
@@ -33,7 +80,7 @@ fetch <- function(db,key){
 ####################
 
 read <- function(db,key){
-	load(paste(db[[2]],"/",key,".R",sep=""))
+	load(local.file.path(db,key))
 	dat
 	}
 
@@ -43,15 +90,14 @@ read <- function(db,key){
 
 #note that value is an R object#
 
-insert <- function(db,key,value){
-	if(file.exists(paste(db[[2]],"/",key,".R",sep="")))
+insert <- function(db,key,value,overwrite=FALSE){
+	if(file.exists(local.file.path(db,key)) & !overwrite)
 		stop("cannot overwrite previously saved file")
-	else	{save(value, file = paste(db[[2]],"/",key,".R",sep=""))}
+	else	{save(value, file = local.file.path(db,key))}
 	}
 
-############################################
-## Testing the functions ###################
-############################################
+## Testing the functions ############################################################
+#####################################################################################
 
 #### testing the create function ####
 myurl.test <- "http://www.biostat.jhsph.edu/MCAPS/data/"
@@ -70,18 +116,31 @@ mydat <- read(db.test,key.test)
 
 #### testing the insert function ####
 ## when the file is already saved ##
-insert(db.test,key.test,value=dat)
+insert(db.test,key.test,value=dat,overwrite=FALSE)
+
+## when the file is already saved, overwrite=TRUE ##
+insert(db.test,key.test,value=dat,overwrite=TRUE)
 
 ## when a new file is to be saved ##	
 key.test2 <- "01027"
 	# get the key.test2 data #
-	con <- gzcon(url(paste(db.test[[1]],key.test2,sep="")))
+	con <- gzcon(url(file.path(db.test[["url"]],"db",key.test2)))
 	open(con, "rb")
 	dat <- unserialize(con)
 	close(con)
 insert(db.test,key.test2,value=dat)
 
-	
+
+#### testing local.file.path ####
+local.file.path(db.test,key.test)
+
+#### testing getlist ####
+getlist(db.test, save=FALSE)
+
+#### testing lookup ####
+lookup(db.test, "01004")
+
+
 
 
 
