@@ -17,10 +17,10 @@ local.file.path <- function(db,key){
 ## or to also save a 'list' file, so I included an option
 
 getlist <- function(db, save=FALSE){
-	con <- gzcon(url(file.path(db[["url"]],"keys")))
+	con <- gzcon(url(file.path(db[["url"]],"keys.gz")))
 	open(con, "rb")
 	on.exit(close(con))
-	mylist <- unserialize(con)
+	mylist <- readLines(con)
 	if (save) save(mylist, file = file.path(db[["dir"]],"list"))
 	mylist 
 	}
