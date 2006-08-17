@@ -65,24 +65,22 @@ init <- function(dir){
 
 ####################
 ## 3) fetch ########
-####################
+#################### 
 
 fetch <- function(db,key){
-	con <- gzcon(url(file.path(db[["url"]],"db",key)))
-	open(con, "rb")
-	on.exit(close(con))
-	dat <- unserialize(con)
-	save(dat, file = local.file.path(db,key))
-}
+	download.file(file.path(db[["url"]],"db",key), local.file.path(db,key), mode="wb", cacheOK=FALSE)
+} 
 
 ####################
-## 4) read  ########
-####################
+## 4) read #########
+#################### 
 
 read <- function(db,key){
-	load(local.file.path(db,key))
-	dat
-	}
+	con <- gzfile(local.file.path(db,key))
+	open(con, "rb")
+	on.exit(close(con))
+	unserialize(con) 
+}
 
 ####################
 ## 5) insert #######
