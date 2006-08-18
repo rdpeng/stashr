@@ -1,13 +1,5 @@
 setClass("filehashRemote")
 
-createRemote <- function(dbName) {
-
-}
-
-initializeRemote <- function(dbName) {
-
-}
-
 setMethod("dbInsert", signature(db = "filehashRemote", key = "character", value = "ANY"),
           function(db, key, value) {
               stop("cannot insert into a 'filehashRemote' database")
