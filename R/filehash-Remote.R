@@ -24,3 +24,10 @@ setMethod("dbExists", signature(db = "filehashRemote", key = "character"),
           function(db, key) {
 
           })
+
+setGeneric("dbSync", function(db, key) standardGeneric("dbSync"))
+
+setMethod("dbSync", signature(db = "filehashRemote", key = "character"),
+          function(db, key) {
+
+          })
