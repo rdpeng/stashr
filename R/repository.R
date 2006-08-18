@@ -26,7 +26,3 @@ rds2repos <- function(from) {
     TRUE
 }
 
-setOldClass("data.frame")
-
-setClass("reposInfo", representation(meta = "data.frame"))
-                        
