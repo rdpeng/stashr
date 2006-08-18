@@ -1,4 +1,7 @@
-setClass("filehashRemote")
+setClass("filehashRemote",
+         representation(url = "character",
+                        dir = "character")
+         )
 
 setMethod("dbInsert", signature(db = "filehashRemote", key = "character", value = "ANY"),
           function(db, key, value) {
