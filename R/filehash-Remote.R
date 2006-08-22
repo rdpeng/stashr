@@ -95,7 +95,7 @@ getlist <- function(db, save=FALSE){
 #################### with more than one key.
 
 checkLocal <- function(db, key){
-	key %in% getlist(db, save = FALSE)	# returns a vector of T/F
+	key %in% list.files(file.path(db@dir,"data")) # returns a vector of T/F
 }
 
 ## Seven Functions #########################################################
