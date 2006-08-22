@@ -6,7 +6,7 @@
 ###############################  directory (to be used internally).	
 
 local.file.path <- function(db,key){
-	file.path(db[["dir"]],"data",key)
+	file.path(db@dir,"data",key)
 }
 
 ###############################
@@ -14,7 +14,7 @@ local.file.path <- function(db,key){
 ############################### directory (to be used internally) for the SIG files.	
 
 local.file.path.SIG <- function(db,key){
-	file.path(db[["dir"]],"data",paste(key,".SIG",sep=""))
+	file.path(db@dir,"data",paste(key,".SIG",sep=""))
 }
 
 #######################
@@ -22,11 +22,11 @@ local.file.path.SIG <- function(db,key){
 ####################### to save the repository's list of keys in local dir.
 
 getlist <- function(db, save=FALSE){
-	con <- gzcon(url(file.path(db[["url"]],"keys.gz")))
+	con <- gzcon(url(file.path(db@url,"keys.gz")))
 	open(con, "rb")
 	on.exit(close(con))
 	mylist <- readLines(con)
-	if (save) save(mylist, file = file.path(db[["dir"]],"list"))
+	if (save) save(mylist, file = file.path(db@dir,"list"))
 	mylist 
 	}
 
@@ -72,8 +72,8 @@ init <- function(dir){
 ####################
 
 getdata <- function(db,key){
-	download.file(file.path(db[["url"]],"db",key), local.file.path(db,key), mode="wb", cacheOK=FALSE)
-	download.file(file.path(db[["url"]],"db",paste(key,".SIG",sep="")), local.file.path.SIG(db,key), mode="wb", cacheOK=FALSE)
+	download.file(file.path(db@url,"db",key), local.file.path(db,key), mode="wb", cacheOK=FALSE)
+	download.file(file.path(db@url,"db",paste(key,".SIG",sep="")), local.file.path.SIG(db,key), mode="wb", cacheOK=FALSE)
 }
 
 ####################
@@ -116,7 +116,7 @@ update <- function(db, key = NULL){
 	if(!is.null(key) & !all(checkLocal(db,key))) 
 		stop("not all files referenced in the 'key' vector were previously downloaded, no files updated")
 	if(is.null(key)) 
-		{list.local.files <- list.files(file.path(db[["dir"]],"data"))
+		{list.local.files <- list.files(file.path(db@dir,"data"))
 		key <- list.local.files[-grep(".SIG", list.local.files)]
 		}
 	for (i in key){ 
