@@ -12,6 +12,9 @@
         if(!require(package, quietly = TRUE, character.only = TRUE))
             stop(gettextf("'%s' package required", package))
     }
+    if(!capabilities("http/ftp"))
+        warning("'http/ftp' capabilities not available")
+    
     ## Register 'filehashRemote' database format
     init <- list(create = createRemote, initialize = initializeRemote)
     registerFormatDB("Remote", init)
