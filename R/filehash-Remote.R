@@ -3,14 +3,14 @@
 
 setClass("filehashRemote",
          representation(url = "character",
-                        dir = "character")
+                        dir = "character"),
          contains = "filehash"
          )
 
 setClass("filehashLocal", contains = "filehashRemote")
 
 ######################################################################
-## Method definitions for 'filehashLocal'
+## Methods for 'filehashLocal'
 
 setMethod("dbInsert",
           signature(db = "filehashLocal", key = "character", value = "ANY"),
@@ -23,7 +23,7 @@ setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
               
           })
 
-setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
+setMethod("dbDelete", signature(db = "filehashLocal", key = "character"),
           function(db, key, ...){
 
           })
