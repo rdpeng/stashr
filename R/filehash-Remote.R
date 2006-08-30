@@ -1,17 +1,41 @@
+######################################################################
+## Class definitions
+
 setClass("filehashRemote",
          representation(url = "character",
                         dir = "character")
+         contains = "filehash"
          )
 
-setGeneric("dbInsert", function(db, key, value) standardGeneric("dbInsert"))
+setClass("filehashLocal", contains = "filehashRemote")
+
+######################################################################
+## Method definitions for 'filehashLocal'
+
+setMethod("dbInsert",
+          signature(db = "filehashLocal", key = "character", value = "ANY"),
+          function(db, key, value, ...) {
+              
+          })
+
+setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
+          function(db, key, ...) {
+              
+          })
+
+setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
+          function(db, key, ...){
+
+          })
+
+######################################################################
+## Method definitions for 'filehashRemote'
 
 setMethod("dbInsert",
           signature(db = "filehashRemote", key = "character", value = "ANY"),
           function(db, key, value) {
               stop("cannot insert into a 'filehashRemote' database")
           })
-
-setGeneric("dbFetch", function(db, key, offline) standardGeneric("dbFetch"))
 
 setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
           function(db, key, offline = FALSE){
@@ -23,14 +47,10 @@ setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
               read(db,key)
           })
 
-setGeneric("dbDelete", function(db, key) standardGeneric("dbDelete"))
-
 setMethod("dbDelete", signature(db = "filehashRemote", key = "character"),
           function(db, key) {
               stop("cannot delete from a 'filehashRemote' database")
           })
-
-setGeneric("dbList", function(db, save) standardGeneric("dbList"))
 
 setMethod("dbList", "filehashRemote",
           function(db, save=FALSE){
@@ -42,14 +62,10 @@ setMethod("dbList", "filehashRemote",
               mylist 
           })
 
-setGeneric("dbExists", function(db, key) standardGeneric("dbExists"))
-
 setMethod("dbExists", signature(db = "filehashRemote", key = "character"),
           function(db, key){
               key %in% getlist(db, save = FALSE)	# returns a vector of T/F
           })
-
-setGeneric("dbSync", function(db, key) standardGeneric("dbSync"))
 
 setMethod("dbSync", signature(db = "filehashRemote", key = "character"),
           function(db, key = NULL){
@@ -68,6 +84,10 @@ setMethod("dbSync", signature(db = "filehashRemote", key = "character"),
 
 
 
+
+
+
+########################################################################
 ## Prelim Functions  ###################################################
 ########################################################################
 

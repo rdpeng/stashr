@@ -7,6 +7,6 @@ createRemote <- function(dbName) {
 
 initializeRemote <- function(dbName) {
     r <- init(dbName)
-    new("filehashRemote", url = r$url, dir = r$dir)
+    new("filehashRemote", url = r$url, dir = r$dir, name = basename(dbName))
 }
 
