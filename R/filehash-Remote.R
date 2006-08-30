@@ -33,12 +33,12 @@ setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
 
 setMethod("dbInsert",
           signature(db = "filehashRemote", key = "character", value = "ANY"),
-          function(db, key, value) {
+          function(db, key, value, ...) {
               stop("cannot insert into a 'filehashRemote' database")
           })
 
 setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
-          function(db, key, offline = FALSE){
+          function(db, key, offline = FALSE, ...){
               if(!offline && checkLocal(db,key)) 
               {if(!md5sum(local.file.path(db,key)) 
                   == scan(local.file.path.SIG(db,key),quiet=TRUE,what="character",sep=" ")[1])
@@ -48,12 +48,12 @@ setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
           })
 
 setMethod("dbDelete", signature(db = "filehashRemote", key = "character"),
-          function(db, key) {
+          function(db, key, ...) {
               stop("cannot delete from a 'filehashRemote' database")
           })
 
 setMethod("dbList", "filehashRemote",
-          function(db, save=FALSE){
+          function(db, save=FALSE, ...){
               con <- gzcon(url(file.path(db@url, "keys.gz")))
               open(con, "rb")
               on.exit(close(con))
@@ -63,12 +63,15 @@ setMethod("dbList", "filehashRemote",
           })
 
 setMethod("dbExists", signature(db = "filehashRemote", key = "character"),
-          function(db, key){
+          function(db, key, ...){
               key %in% getlist(db, save = FALSE)	# returns a vector of T/F
           })
 
-setMethod("dbSync", signature(db = "filehashRemote", key = "character"),
-          function(db, key = NULL){
+
+setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
+
+setMethod("dbSync", signature(db = "filehashRemote"),
+          function(db, key = NULL, ...){
               if(!is.null(key) & !all(checkLocal(db,key))) 
                   stop("not all files referenced in the 'key' vector were previously downloaded, no files updated")
               if(is.null(key)) 
