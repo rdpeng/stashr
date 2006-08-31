@@ -4,7 +4,7 @@ Date:  2006-08-22
 LazyLoad:  yes
 Depends:  R (>= 2.3.0), filehash, methods, tools
 Title:  Simple key-value remote database using http
-Author:  Sandy Eckel, Roger D. Peng <rpeng@jhsph.edu>
+Author:  Sandy Eckel, Roger D. Peng
 Maintainer:  Roger D. Peng <rpeng@jhsph.edu>
 Description:  Simple key-value database using remote storage via http
 License:  GNU GPL (version 2 or later)
