@@ -1,6 +1,7 @@
 ## Classes
 exportClasses(
-              "filehashRemote"
+              "filehashRemote",
+	      "filehashLocal"
               )
 
 
