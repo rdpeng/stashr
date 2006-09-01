@@ -15,5 +15,7 @@ exportMethods(
 		  "dbSync"
               )
 
-## Import 
+## Imports
 importFrom(tools, md5sum)
+
+importClassesFrom(filehash, "filehash")
