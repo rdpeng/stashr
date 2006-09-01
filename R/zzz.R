@@ -6,7 +6,7 @@
 }
 
 .onLoad <- function(lib, pkg) {
-    pkgList <- c("methods", "filehash", "tools")
+    pkgList <- c("methods", "filehash")
 
     for(package in pkgList) {
         if(!require(package, quietly = TRUE, character.only = TRUE))

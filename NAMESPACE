@@ -15,3 +15,5 @@ exportMethods(
 		  "dbSync"
               )
 
+## Import 
+importFrom(tools, md5sum)
