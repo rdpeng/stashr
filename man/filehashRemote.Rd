@@ -6,7 +6,8 @@
 \alias{dbFetch,filehashRemote,character-method}
 \alias{dbInsert,filehashRemote,character-method}
 \alias{dbList,filehashRemote-method}
-\alias{dbSync,filehashRemote,character-method}
+\alias{dbSync,filehashRemote-method}
+\alias{dbSync}
 
 \title{Class "filehashRemote"}
 \description{
