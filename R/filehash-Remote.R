@@ -40,10 +40,11 @@ setMethod("dbInsert",
 setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
           function(db, key, offline = FALSE, ...){
               if(!offline && checkLocal(db,key)) 
-              {if(!md5sum(local.file.path(db,key)) 
-                  == scan(local.file.path.SIG(db,key),quiet=TRUE,what="character",sep=" ")[1])
+              	{if(!md5sum(local.file.path(db,key)) 
+                 		== scan(local.file.path.SIG(db,key),quiet=TRUE,what="character",sep=" ")[1])
                    getdata(db,key)
-           }
+           	  	}
+		  if(!checkLocal(db,key)) getdata(db,key)
               read(db,key)
           })
 
@@ -197,6 +198,7 @@ fetch <- function(db, key, offline = FALSE){
 				== scan(local.file.path.SIG(db,key),quiet=TRUE,what="character",sep=" ")[1])
 			getdata(db,key)
 		}
+	if(!checkLocal(db,key)) getdata(db,key)
 	read(db,key)
 } 
 
