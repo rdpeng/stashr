@@ -39,6 +39,9 @@ setMethod("dbInsert",
 
 setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
           function(db, key, offline = FALSE, ...){
+		  if(offline && !checkLocal(db,key)) stop("Haven't previously downloaded specified data,
+				and you have set 'offline = TRUE'") 
+		  if(!offline && !key%in%getlist(db)) stop("Specified data does not exist") 
               if(!offline && checkLocal(db,key)) 
               	{if(!md5sum(local.file.path(db,key)) 
                  		== scan(local.file.path.SIG(db,key),quiet=TRUE,what="character",sep=" ")[1])
@@ -74,7 +77,8 @@ setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
 setMethod("dbSync", signature(db = "filehashRemote"),
           function(db, key = NULL, ...){
               if(!is.null(key) & !all(checkLocal(db,key))) 
-                  stop("not all files referenced in the 'key' vector were previously downloaded, no files updated")
+                  stop("not all files referenced in the 'key' vector were 
+				previously downloaded, no files updated")
               if(is.null(key)) 
               {list.local.files <- list.files(file.path(db@dir, "data"))
                key <- list.local.files[-grep(".SIG", list.local.files)]
@@ -193,13 +197,16 @@ read <- function(db,key){
 library(tools)
 
 fetch <- function(db, key, offline = FALSE){
-	if(offline==FALSE & checkLocal(db,key)) 
-		{if(!md5sum(local.file.path(db,key)) 
-				== scan(local.file.path.SIG(db,key),quiet=TRUE,what="character",sep=" ")[1])
-			getdata(db,key)
-		}
-	if(!checkLocal(db,key)) getdata(db,key)
-	read(db,key)
+		  if(offline && !checkLocal(db,key)) stop("Haven't previously downloaded specified data,
+				and you have set 'offline = TRUE'") 
+		  if(!offline && !key%in%getlist(db)) stop("Specified data does not exist") 
+              if(!offline && checkLocal(db,key)) 
+              	{if(!md5sum(local.file.path(db,key)) 
+                 		== scan(local.file.path.SIG(db,key),quiet=TRUE,what="character",sep=" ")[1])
+                   getdata(db,key)
+           	  	}
+		  if(!checkLocal(db,key)) getdata(db,key)
+              read(db,key)
 } 
 
 #################### Updates all key/data pairs in the local directory by checking the
