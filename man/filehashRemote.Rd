@@ -1,6 +1,7 @@
 \name{filehashRemote}
 \docType{class}
 \alias{filehashRemote}
+\alias{filehashRemote-class}
 \alias{dbDelete,filehashRemote,character-method}
 \alias{dbExists,filehashRemote,character-method}
 \alias{dbFetch,filehashRemote,character-method}
