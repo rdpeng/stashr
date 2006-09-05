@@ -1,7 +1,7 @@
 .onAttach <- function(lib, pkg) {
     dcf <- read.dcf(file.path(lib, pkg, "DESCRIPTION"))
-    msg <- gettextf("%s (version %s)", dcf[, "Title"],
-                    as.character(dcf[, "Version"]))
+    msg <- gettextf("%s (version %s %s)", dcf[, "Title"],
+                    as.character(dcf[, "Version"]), dcf[, "Date"])
     writeLines(strwrap(msg))
 }
 
@@ -18,4 +18,7 @@
     ## Register 'filehashRemote' database format
     init <- list(create = createRemote, initialize = initializeRemote)
     registerFormatDB("Remote", init)
+
+    ## Switch default filehash database type to 'Remote'
+    filehashOption(defaultType = "Remote")
 }    
