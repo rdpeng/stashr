@@ -3,7 +3,9 @@
 
 createRemote <- function(dbName) {
     nms <- names(dbName)
-    
+
+    if(is.null(nms))
+        stop("'dbName' should have non-NULL names")
     if(!("url" %in% nms))
         stop("'dbName' should have a 'url' element")
     URL <- dbName["url"]
