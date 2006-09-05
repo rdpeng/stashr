@@ -18,5 +18,4 @@ exportMethods(
 ## Imports
 ## importFrom(tools, md5sum)
 import(tools)
-
-importClassesFrom(filehash, "filehash")
+import(filehash)
