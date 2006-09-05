@@ -48,3 +48,33 @@ checkURLtype <- function(URL) {
     else
         stop("'url' should be of type 'http://' or 'file://'")
 }
+
+
+
+
+####################
+## 1) create #######
+####################
+
+create <- function(myurl,dir){	
+	## remove trailing "/" on dir and myurl ##
+	if (length(grep("/$",list(dir),perl=T))==1) dir <- sub("/$","", dir)
+	if (length(grep("/$",list(myurl),perl=T))==1) myurl <- sub("/$","", myurl)
+	## create the local main directory and data sub-directory to store the data files ##
+	dir.create(dir)
+	dir.create(file.path(dir,"data"))
+	## save myurl in the R workspace format in the main directory ## 
+	save(myurl, file = file.path(dir,"url"))
+	}
+
+####################
+## 2) init #########
+####################
+
+init <- function(dir){
+	## remove trailing "/" on dir ##
+	if (length(grep("/$",list(dir),perl=T))==1) dir <- sub("/$","", dir)
+	load(file.path(dir,"url"))
+	list(url=myurl,dir=dir)
+	}
+

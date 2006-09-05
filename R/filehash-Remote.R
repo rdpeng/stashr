@@ -140,32 +140,6 @@ checkLocal <- function(db, key){
 ############################################################################
 
 ####################
-## 1) create #######
-####################
-
-create <- function(myurl,dir){	
-	## remove trailing "/" on dir and myurl ##
-	if (length(grep("/$",list(dir),perl=T))==1) dir <- sub("/$","", dir)
-	if (length(grep("/$",list(myurl),perl=T))==1) myurl <- sub("/$","", myurl)
-	## create the local main directory and data sub-directory to store the data files ##
-	dir.create(dir)
-	dir.create(file.path(dir,"data"))
-	## save myurl in the R workspace format in the main directory ## 
-	save(myurl, file = file.path(dir,"url"))
-	}
-
-####################
-## 2) init #########
-####################
-
-init <- function(dir){
-	## remove trailing "/" on dir ##
-	if (length(grep("/$",list(dir),perl=T))==1) dir <- sub("/$","", dir)
-	load(file.path(dir,"url"))
-	list(url=myurl,dir=dir)
-	}
-
-####################
 ## 3) getdata ###### old 'fetch()', but now downloads the key & the SIG file
 ####################
 
@@ -179,7 +153,7 @@ getdata <- function(db,key){
 #################### Returns the data object associated with the key.
 
 read <- function(db,key){
-	if(checkLocal(db,key)==F) stop("files associated with this key not yet downloaded")
+	if(!checkLocal(db,key)) stop("files associated with this key not yet downloaded")
 	con <- gzfile(local.file.path(db,key))
 	open(con, "rb")
 	on.exit(close(con))
@@ -233,7 +207,7 @@ update <- function(db, key = NULL){
 #################### associated with a specified key.
 
 insert <- function(db,key,value,overwrite=FALSE){
-	if(file.exists(local.file.path(db,key)) & overwrite==FALSE)
+	if(file.exists(local.file.path(db,key)) & !overwrite)
 		stop("cannot overwrite previously saved file")
 	else	{save(value, file = local.file.path(db,key))}
 	}
