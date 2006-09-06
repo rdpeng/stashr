@@ -52,6 +52,22 @@ checkURLtype <- function(URL) {
 }
 
 
+setMethod("dbCreate",
+          signature(db = "filehashRemote"),
+          function(db, ...) {
+		## remove trailing "/" on dir and url ##
+		if (length(grep("/$",list(db@dir),perl = TRUE)) > 0)
+       	     db@dir <- sub("/$","", db@dir)
+		if (length(grep("/$",list(db@url),perl = TRUE)) > 0)
+       	     db@url <- sub("/$","", db@url)
+		## create the local main directory and data sub-directory to
+		## store the data files ##
+		dir.create(db@dir)
+		dir.create(file.path(db@dir,"data"))
+		## save url in the R workspace format in the main directory ## 
+		save(db@url, file = file.path(db@dir,"url"))
+          })
+
 
 
 ####################
