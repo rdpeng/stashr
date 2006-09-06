@@ -14,18 +14,24 @@ setClass("filehashLocal", contains = "filehashRemote")
 
 setMethod("dbInsert",
           signature(db = "filehashLocal", key = "character", value = "ANY"),
-          function(db, key, value, ...) {
-              
+          function(db, key, value, overwrite, ...) {
+		if(file.exists(local.file.path(db,key)) & !overwrite)
+			stop("cannot overwrite previously saved file")
+		else	{save(value, file = local.file.path(db,key))}
           })
 
 setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
           function(db, key, ...) {
-              
+		  if(!checkLocal(db,key)) stop("Specified data does not exist") 
+              read(db,key)
           })
 
 setMethod("dbDelete", signature(db = "filehashLocal", key = "character"),
           function(db, key, ...){
-
+		if(file.exists(local.file.path(db,key))) 
+			file.remove(local.file.path(db,key))
+		if(file.exists(local.file.path.SIG(db,key))) 
+			file.remove(local.file.path.SIG(db,key))
           })
 
 ######################################################################
