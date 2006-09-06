@@ -16,7 +16,7 @@ show(db@dir)
 
 
 ## other prelim steps necessary ##
-dbCreate(c(url = db@url, dir = db@dir))
+dbCreate(db)
 
 ## test the methods ##
 dbList(db)

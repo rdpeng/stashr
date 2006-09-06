@@ -64,8 +64,9 @@ setMethod("dbCreate",
 		## store the data files ##
 		dir.create(db@dir)
 		dir.create(file.path(db@dir,"data"))
-		## save url in the R workspace format in the main directory ## 
-		save(db@url, file = file.path(db@dir,"url"))
+		## save url in the R workspace format in the main directory ##
+		myurl <- db@url 
+		save(myurl, file = file.path(db@dir,"url"))
           })
 
 
