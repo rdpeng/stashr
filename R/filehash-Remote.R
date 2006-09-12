@@ -1,13 +1,16 @@
 ######################################################################
 ## Class definitions
 
+## Use 'http://' type URLs
 setClass("filehashRemote",
          representation(url = "character",
                         dir = "character"),
          contains = "filehash"
          )
 
+## Use 'file://' type URLs
 setClass("filehashLocal", contains = "filehashRemote")
+
 
 ######################################################################
 ## Methods for 'filehashLocal'
@@ -15,9 +18,15 @@ setClass("filehashLocal", contains = "filehashRemote")
 setMethod("dbInsert",
           signature(db = "filehashLocal", key = "character", value = "ANY"),
           function(db, key, value, overwrite, ...) {
-		if(file.exists(local.file.path(db,key)) & !overwrite)
-			stop("cannot overwrite previously saved file")
-		else	{save(value, file = local.file.path(db,key))}
+              if(file.exists(local.file.path(db,key)) & !overwrite)
+                  stop("cannot overwrite previously saved file")
+              else {
+                  ## save(value, file = local.file.path(db,key))
+                  con <- gzfile(local.file.path(db, key))
+                  open(con, "wb")
+                  on.exit(close(con))
+                  serialize(value, con)
+              }
           })
 
 setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
