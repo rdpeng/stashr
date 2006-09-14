@@ -18,4 +18,4 @@ exportMethods(
 
 ## Imports
 import(tools)
-importClassFrom(filehash, "filehash")
+import(filehash)
