@@ -13,6 +13,8 @@
 \alias{dbList,filehashRemote-method}
 \alias{dbSync,filehashRemote-method}
 \alias{dbSync}
+\alias{dbCreate,filehashRemote-method}
+\alias{dbCreate}
 
 \title{Classes "filehashRemote" and "filehashLocal"}
 \description{
@@ -37,6 +39,11 @@
 
 \section{Methods}{
   \describe{
+    \item{dbCreate}{\code{signature(db = "filehashRemote")}: 
+	Calling \code{dbCreate} on a \code{filehashRemote} object creates the 
+	local main directory and data sub-directory to in which to store the 
+	data files and saves the url associated with the \code{filehashRemote}
+	object in the R workspace format in the local main directory.}
     \item{dbDelete}{\code{signature(db = "filehashRemote", key = "character")}: 
 	Calling \code{dbDelete} on a \code{filehashRemote} object returns the 
 	error message: "cannot delete from a 'filehashRemote' database."}
