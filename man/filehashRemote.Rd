@@ -49,7 +49,7 @@
 	error message: "cannot delete from a 'filehashRemote' database."}
     \item{dbDelete}{\code{signature(db = "filehashLocal", key = "character")}: 
 	Calling \code{dbDelete} on a \code{filehashLocal} deletes the specified
-	files from your local directory.}
+	file and its corresponding .SIG file from your local directory.}
     \item{dbExists}{\code{signature(db = "filehashRemote", key = "character")}: 
 	The \code{key} argument is a character vector. For each element in 
 	\code{key}, \code{dbExists} returns TRUE if the corresponding data file 
