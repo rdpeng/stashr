@@ -26,6 +26,9 @@ setMethod("dbInsert",
                   open(con, "wb")
                   on.exit(close(con))
                   serialize(value, con)
+			s <- unname(md5sum(local.file.pathLocal(db,key)))
+			s2 <- paste(s,key,sep="  ")
+			writeLines(s2, con = local.file.path.SIGLocal(dbLocal,key))
 		  }
           })
 
