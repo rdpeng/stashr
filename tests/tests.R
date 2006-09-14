@@ -3,6 +3,9 @@
 
 library(filehashRemote)
 
+##########################################################################
+## Test objects of class 'filehashRemote'
+
 myurl <- "http://www.biostat.jhsph.edu/MCAPS/data/"
 wd <- getwd()
 dir <- file.path(wd,"testDir")
@@ -31,3 +34,30 @@ dbSync(db, key = NULL)
 dbSync(db, key = c("01003"))
 try( dbSync(db, key = c("01004","01003")) )
 dbExists(db,c("01003", "01004","55079"))
+
+
+##########################################################################
+## Test objects of class 'filehashLocal'
+
+## (create a larger local database using 'filehashRemote') ##
+dbFetch(db, "55079")
+dbFetch(db, "55087")
+dbFetch(db, "55089")
+dbFetch(db, "55105")
+
+## create a 'filehashRemote' object ##
+dirLocal <- db@dir
+dbLocal <- new("filehashLocal", url= dirLocal, name= "MCAPS")
+show(dbLocal)
+show(class(dbLocal))
+show(dbLocal@url)
+show(dbLocal@dir)
+
+## test the methods  ##
+dbFetch(dbLocal, "01003") 
+try( dbFetch(dbLocal, "01004") )
+dbDelete(dbLocal,"01003")
+try( dbDelete(dbLocal,"01005") )
+dbInsert(dbLocal,key = "01004", value = 1:10) 
+dbFetch(dbLocal, "01004")
+try( dbInsert(dbLocal,key = "01004", value = 1:10, overwrite=FALSE) )
