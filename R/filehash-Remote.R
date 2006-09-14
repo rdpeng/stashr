@@ -17,30 +17,33 @@ setClass("filehashLocal", contains = "filehashRemote")
 
 setMethod("dbInsert",
           signature(db = "filehashLocal", key = "character", value = "ANY"),
-          function(db, key, value, overwrite, ...) {
-              if(file.exists(local.file.path(db,key)) & !overwrite)
+          function(db, key, value, overwrite=FALSE, ...) {
+              if(file.exists(local.file.pathLocal(db,key)) & !overwrite)
                   stop("cannot overwrite previously saved file")
-              else {
+              else{
                   ## save(value, file = local.file.path(db,key))
-                  con <- gzfile(local.file.path(db, key))
+                  con <- gzfile(local.file.pathLocal(db,key))
                   open(con, "wb")
                   on.exit(close(con))
                   serialize(value, con)
-              }
+		  }
           })
 
 setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
           function(db, key, ...) {
-		  if(!checkLocal(db,key)) stop("Specified data does not exist") 
-              read(db,key)
+		  if(!checkLocalLocal(db,key)) 
+			stop("Specified data does not exist") 
+              readLocal(db,key)
           })
 
 setMethod("dbDelete", signature(db = "filehashLocal", key = "character"),
           function(db, key, ...){
-		if(file.exists(local.file.path(db,key))) 
-			file.remove(local.file.path(db,key))
-		if(file.exists(local.file.path.SIG(db,key))) 
-			file.remove(local.file.path.SIG(db,key))
+		if(file.exists(local.file.pathLocal(db,key))) 
+			file.remove(local.file.pathLocal(db,key))
+		else stop("Specified file does not exist")
+		if(file.exists(local.file.path.SIGLocal(db,key))) 
+			file.remove(local.file.path.SIGLocal(db,key))
+		else stop("Specified .SIG file does not exist")
           })
 
 ######################################################################
@@ -122,6 +125,11 @@ local.file.path <- function(db,key){
 	file.path(db@dir,"data",key)
 }
 
+local.file.pathLocal <- function(db,key){
+	file.path(db@url,"data",key)
+}
+
+
 ###############################
 ## local.file.path.SIG ######## Creates a file path in the local data  
 ############################### directory (to be used internally) for the SIG files.	
@@ -129,6 +137,11 @@ local.file.path <- function(db,key){
 local.file.path.SIG <- function(db,key){
 	file.path(db@dir,"data",paste(key,".SIG",sep=""))
 }
+
+local.file.path.SIGLocal <- function(db,key){
+	file.path(db@url,"data",paste(key,".SIG",sep=""))
+}
+
 
 #######################
 ## getlist ############ Reads the 'keys' file from the server. Has an option 
@@ -151,6 +164,11 @@ checkLocal <- function(db, key){
 	key %in% list.files(file.path(db@dir,"data")) # returns a vector of T/F
 }
 
+checkLocalLocal <- function(db, key){
+	key %in% list.files(file.path(db@url,"data")) # returns a vector of T/F
+}
+
+
 ## Seven Functions #########################################################
 ############################################################################
 
@@ -170,6 +188,14 @@ getdata <- function(db,key){
 read <- function(db,key){
 	if(!checkLocal(db,key)) stop("files associated with this key not yet downloaded")
 	con <- gzfile(local.file.path(db,key))
+	open(con, "rb")
+	on.exit(close(con))
+	unserialize(con) 
+}
+
+readLocal <- function(db,key){
+	if(!checkLocalLocal(db,key)) stop("files associated with this key do not exist")
+	con <- gzfile(local.file.pathLocal(db,key))
 	open(con, "rb")
 	on.exit(close(con))
 	unserialize(con) 
