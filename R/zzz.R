@@ -16,8 +16,8 @@
         warning("'http/ftp' capabilities not available")
     
     ## Register 'filehashRemote' database format
-    ## init <- list(create = createRemote, initialize = initializeRemote)
-    ## registerFormatDB("Remote", init)
+    init <- list(create = createRemote, initialize = initializeRemote)
+    registerFormatDB("Remote", init)
 
     ## Switch default filehash database type to 'Remote'
     ## filehashOption(defaultType = "Remote")
