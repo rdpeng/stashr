@@ -8,8 +8,12 @@ setClass("filehashRemote",
          contains = "filehash"
          )
 
-## Use 'file://' type URLs
-setClass("filehashLocal", contains = "filehashRemote")
+## For local directories
+setClass("filehashLocal",
+         representation(dir = "character"),
+         contains = "filehash"
+         )
+         
 
 
 ######################################################################
