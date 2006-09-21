@@ -19,3 +19,7 @@ exportMethods(
 ## Imports
 import(tools)
 import(filehash)
+
+exportMethods(
+             "setDir<-"
+             )
