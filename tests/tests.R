@@ -47,10 +47,9 @@ dbFetch(db, "55105")
 
 ## create a 'filehashRemote' object ##
 dirLocal <- db@dir
-dbLocal <- new("filehashLocal", url= dirLocal, name= "MCAPS")
+dbLocal <- new("filehashLocal", dir= dirLocal, name= "MCAPS")
 show(dbLocal)
 show(class(dbLocal))
-show(dbLocal@url)
 show(dbLocal@dir)
 
 ## test the methods  ##
