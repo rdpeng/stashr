@@ -32,7 +32,15 @@ setMethod("dbInsert",
                   serialize(value, con)
 			s <- unname(md5sum(local.file.path(db,key)))
 			s2 <- paste(s,key,sep="  ")
-			writeLines(s2, con = local.file.path.SIG(dbLocal,key))
+			writeLines(s2, con = local.file.path.SIG(db,key))
+			##update the 'keys' file
+			if(!dbExists(db,key)){
+              		conA <- file(file.path(db@dir, "keys"))
+              		open(conA, "a")
+              		on.exit(close(conA))
+				cat(key, file = file.path(db@dir,"keys"),sep = "\n",
+					append = TRUE)
+			}
 		  }
           })
 
@@ -51,11 +59,21 @@ setMethod("dbDelete", signature(db = "filehashLocal", key = "character"),
 		if(file.exists(local.file.path.SIG(db,key))) 
 			file.remove(local.file.path.SIG(db,key))
 		else stop("Specified .SIG file does not exist")
+		## Delete the key from the 'keys' file ##
+		if(dbExists(db,key)) {	
+			keylist <- dbList(db)
+			keyindex <- match(key,keylist)
+			newkeylist <- keylist[-keyindex]
+			con <- file(file.path(db@dir, "keys"))
+              	open(con, "wb")
+              	on.exit(close(con))
+			cat(newkeylist, file = file.path(db@dir,"keys"),sep = "\n")
+		}
           })
 
 setMethod("dbList", "filehashLocal",
-          function(db, save=FALSE, ...){
-              con <- file.path(db@dir, "keys")
+          function(db, ...){
+              con <- file(file.path(db@dir, "keys"))
               open(con, "rb")
               on.exit(close(con))
               readLines(con)
@@ -63,7 +81,7 @@ setMethod("dbList", "filehashLocal",
 
 setMethod("dbExists", signature(db = "filehashLocal", key = "character"),
           function(db, key, ...){
-              key %in% getlistLocal(db)	# returns a vector of T/F
+              key %in% dbList(db)	# returns a vector of T/F
           })
 
 
@@ -101,7 +119,7 @@ setMethod("dbList", "filehashRemote",
               open(con, "rb")
               on.exit(close(con))
 		  mylist <- readLines(con)
-              if (save) save(mylist, file = file.path(db@dir,"keys"))
+              if (save) cat(mylist, file = file.path(db@dir,"keys"),sep = "\n")
 		  mylist
           })
 
@@ -164,14 +182,6 @@ getlist <- function(db){
 	on.exit(close(con))
 	readLines(con)
  	}
-
-getlistLocal <- function(db){
-	con <- file.path(db@dir,"keys")
-	open(con, "rb")
-	on.exit(close(con))
-	readLines(con)
-	}
-
 
 #################### Returns TRUE if data file for 'key' is in local dir, otherwise
 ## checkLocal ###### returns FALSE. We have 'key' allowed to be a character vector
