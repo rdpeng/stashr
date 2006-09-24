@@ -69,6 +69,18 @@ setMethod("dbCreate",
 		save(myurl, file = file.path(db@dir,"url"))
           })
 
+setMethod("dbCreate",
+          signature(db = "filehashLocal"),
+          function(db, ...) {
+		## remove trailing "/" on dir and url ##
+		if (length(grep("/$",list(db@dir),perl = TRUE)) > 0)
+       	     db@dir <- sub("/$","", db@dir)
+		## create the local main directory and data sub-directory to
+		## store the data files ##
+		dir.create(db@dir)
+		dir.create(file.path(db@dir,"data"))
+          })
+
 
 
 ####################
