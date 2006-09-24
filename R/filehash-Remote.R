@@ -34,12 +34,20 @@ setMethod("dbInsert",
 			s2 <- paste(s,key,sep="  ")
 			writeLines(s2, con = local.file.path.SIG(db,key))
 			##update the 'keys' file
-			if(!dbExists(db,key)){
+			if(!file.exists(file.path(db@dir, "keys"))) {
+			      conA <- file(file.path(db@dir, "keys"))
+              		open(conA, "a")
+              		on.exit(close(conA))
+				cat(key, file = file.path(db@dir,"keys"),sep = "\n",
+					append = TRUE)
+			}
+			else{	if(!dbExists(db,key)){
               		conA <- file(file.path(db@dir, "keys"))
               		open(conA, "a")
               		on.exit(close(conA))
 				cat(key, file = file.path(db@dir,"keys"),sep = "\n",
 					append = TRUE)
+				}
 			}
 		  }
           })
