@@ -22,33 +22,34 @@ setClass("filehashLocal",
 setMethod("dbInsert",
           signature(db = "filehashLocal", key = "character", value = "ANY"),
           function(db, key, value, overwrite=FALSE, ...) {
-              if(file.exists(local.file.path(db,key)) & !overwrite)
+		if(file.exists(local.file.path(db,key)) & !overwrite){
                   stop("cannot overwrite previously saved file")
-
-                  ## save(value, file = local.file.path(db,key))
-                  con <- gzfile(local.file.path(db,key))
-                  open(con, "wb")
-                  on.exit(close(con))
-                  serialize(value, con)
-			s <- unname(md5sum(local.file.path(db,key)))
-			s2 <- paste(s,key,sep="  ")
-			writeLines(s2, con = local.file.path.SIG(db,key))
-			##update the 'keys' file
-			if(!file.exists(file.path(db@dir, "keys"))) {
-			      conA <- file(file.path(db@dir, "keys"))
-              		open(conA, "a")
-              		on.exit(close(conA))
-				cat(key, file = file.path(db@dir,"keys"),sep = "\n",
-					append = TRUE)
+		}		
+            ## save(value, file = local.file.path(db,key))
+            con <- gzfile(local.file.path(db,key))
+            open(con, "wb")
+            on.exit(close(con), add=TRUE)
+            serialize(value, con)
+		#close(con)
+		s <- unname(md5sum(local.file.path(db,key)))
+		s2 <- paste(s,key,sep="  ")
+		writeLines(s2, con = local.file.path.SIG(db,key))
+		##update the 'keys' file
+		if(!file.exists(file.path(db@dir, "keys"))) {
+		      conA <- file(file.path(db@dir, "keys"))
+            	open(conA, "a")
+            	on.exit(close(conA), add=TRUE)
+			cat(key, file = file.path(db@dir,"keys"),sep = "\n",
+				append = TRUE)
+		}
+		else{	if(!dbExists(db,key)){
+            	conA <- file(file.path(db@dir, "keys"))
+            	open(conA, "a")
+            	on.exit(close(conA), add=TRUE)
+			cat(key, file = file.path(db@dir,"keys"),sep = "\n",
+				append = TRUE)
 			}
-			else{	if(!dbExists(db,key)){
-              		conA <- file(file.path(db@dir, "keys"))
-              		open(conA, "a")
-              		on.exit(close(conA))
-				cat(key, file = file.path(db@dir,"keys"),sep = "\n",
-					append = TRUE)
-				}
-			}
+		}
           })
 
 setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
