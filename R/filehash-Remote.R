@@ -24,7 +24,7 @@ setMethod("dbInsert",
           function(db, key, value, overwrite=FALSE, ...) {
               if(file.exists(local.file.path(db,key)) & !overwrite)
                   stop("cannot overwrite previously saved file")
-              else{
+
                   ## save(value, file = local.file.path(db,key))
                   con <- gzfile(local.file.path(db,key))
                   open(con, "wb")
@@ -49,7 +49,6 @@ setMethod("dbInsert",
 					append = TRUE)
 				}
 			}
-		  }
           })
 
 setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
