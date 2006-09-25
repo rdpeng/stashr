@@ -5,7 +5,6 @@ library(filehashRemote)
 
 ##########################################################################
 ## Test objects of class 'filehashRemote'
-
 myurl <- "http://www.biostat.jhsph.edu/MCAPS/data/"
 wd <- getwd()
 dir <- file.path(wd,"testDir")
@@ -56,12 +55,13 @@ dbList(dbLocal)
 dbInsert(dbLocal,key = "01005", value = rep(5,10), overwrite = FALSE)
 dbInsert(dbLocal,key = "01006", value = matrix(1,5,4), overwrite = FALSE)
 dbList(dbLocal)
-dbFetch(dbLocal, "01004") 
+dbFetch(dbLocal, "01004")  
 try( dbFetch(dbLocal, "01003") )
-dbFetch(dbLocal, "01005")  # should work, doesn't right now!
+dbFetch(dbLocal, "01005")
 dbDelete(dbLocal,"01004")
+dbList(dbLocal)	
 try( dbDelete(dbLocal,"01004") )
-dbDelete(dbLocal,"01005")	#doesn't delete both files? (b/c file is empty)
+dbDelete(dbLocal,"01005")
 dbList(dbLocal)
 dbExists(dbLocal,key="01004")
 dbExists(dbLocal,key="01006")
