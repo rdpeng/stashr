@@ -35,28 +35,35 @@ dbSync(db, key = c("01003"))
 try( dbSync(db, key = c("01004","01003")) )
 dbExists(db,c("01003", "01004","55079"))
 
+## remove db@dir directory ##
+unlink(db@dir, recursive = TRUE)
 
 ##########################################################################
 ## Test objects of class 'filehashLocal'
 
-## (create a larger local database using 'filehashRemote') ##
-dbFetch(db, "55079")
-dbFetch(db, "55087")
-dbFetch(db, "55089")
-dbFetch(db, "55105")
-
 ## create a 'filehashRemote' object ##
-dirLocal <- db@dir
-dbLocal <- new("filehashLocal", dir= dirLocal, name= "MCAPS")
+dbLocal <- new("filehashLocal", dir= dir, name= "MCAPS")
 show(dbLocal)
 show(class(dbLocal))
 show(dbLocal@dir)
 
+dbCreate(dbLocal)
+
 ## test the methods  ##
-dbFetch(dbLocal, "01003") 
-try( dbFetch(dbLocal, "01004") )
-dbDelete(dbLocal,"01003")
-try( dbDelete(dbLocal,"01005") )
-dbInsert(dbLocal,key = "01004", value = 1:10) 
-dbFetch(dbLocal, "01004")
-try( dbInsert(dbLocal,key = "01004", value = 1:10, overwrite=FALSE) )
+dbInsert(dbLocal,key = "01004", value = 1:10, overwrite = FALSE)
+try( dbInsert(dbLocal,key = "01004", value = 1:10, overwrite = FALSE) )
+dbList(dbLocal)
+dbInsert(dbLocal,key = "01005", value = rep(5,10), overwrite = FALSE)
+dbInsert(dbLocal,key = "01006", value = matrix(1,5,4), overwrite = FALSE)
+dbList(dbLocal)
+dbFetch(dbLocal, "01004") 
+try( dbFetch(dbLocal, "01003") )
+dbFetch(dbLocal, "01005")  # should work, doesn't right now!
+dbDelete(dbLocal,"01004")
+try( dbDelete(dbLocal,"01004") )
+dbDelete(dbLocal,"01005")	#doesn't delete both files? (b/c file is empty)
+dbList(dbLocal)
+dbExists(dbLocal,key="01004")
+dbExists(dbLocal,key="01006")
+
+
