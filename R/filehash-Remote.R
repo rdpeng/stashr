@@ -208,8 +208,10 @@ checkLocal <- function(db, key){
 ####################
 
 getdata <- function(db,key){
-	download.file(file.path(db@url,"db",key), local.file.path(db,key), mode="wb", cacheOK=FALSE)
-	download.file(file.path(db@url,"db",paste(key,".SIG",sep="")), local.file.path.SIG(db,key), mode="wb", cacheOK=FALSE)
+	download.file(file.path(db@url, "data", key),
+                      local.file.path(db, key), mode = "wb", cacheOK = FALSE)
+	download.file(file.path(db@url, "data", paste(key, ".SIG", sep = "")),
+                      local.file.path.SIG(db, key), mode = "wb", cacheOK = FALSE)
 }
 
 ####################
