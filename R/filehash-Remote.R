@@ -211,18 +211,20 @@ getdata <- function(db,key){
     localFiles <- c(data = local.file.path(db, key),
                     sig = local.file.path.SIG(db, key))
 
-    status <- tryCatch({
-        download.file(file.path(db@url, "data", key),
-                      localFiles["data"], mode = "wb", cacheOK = FALSE)
-        download.file(file.path(db@url, "data", paste(key, ".SIG", sep = "")),
-                      localFiles["sig"], mode = "wb", cacheOK = FALSE)
-    }, condition = function(cond) {
+    handler <- function(cond) {
         ## If a condition is thrown (e.g. error or interrupt), delete
         ## whatever was downloaded
         ex <- file.exists(localFiles)
         file.remove(localFiles[ex])
         cond
-    })
+    }
+    status <- tryCatch({
+        download.file(file.path(db@url, "data", key),
+                      localFiles["data"], mode = "wb", cacheOK = FALSE)
+        download.file(file.path(db@url, "data", paste(key, ".SIG", sep = "")),
+                      localFiles["sig"], mode = "wb", cacheOK = FALSE)
+    }, error = handler, interrupt = handler)
+
     if(inherits(status, "condition"))
         stop(gettextf("problem downloading data for key '%s': %s",
                       key, conditionMessage(cond)))
