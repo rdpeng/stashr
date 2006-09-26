@@ -104,7 +104,7 @@ setMethod("dbInsert",
 
 setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
           function(db, key, offline = FALSE, ...){
-		  if(offline && !checkLocal(db,key)) stop("Haven't previously downloaded specified data,
+              if(offline && !checkLocal(db,key)) stop("Haven't previously downloaded specified data,
 				and you have set 'offline = TRUE'") 
 		  if(!offline && !key%in%getlist(db)) stop("Specified data does not exist") 
               if(!offline && checkLocal(db,key)) 
@@ -196,7 +196,7 @@ getlist <- function(db){
 #################### with more than one key.
 
 checkLocal <- function(db, key){
-	key %in% list.files(file.path(db@dir,"data")) # returns a vector of T/F
+    key %in% list.files(file.path(db@dir, "data")) # returns a vector of T/F
 }
 
 
@@ -208,10 +208,24 @@ checkLocal <- function(db, key){
 ####################
 
 getdata <- function(db,key){
-	download.file(file.path(db@url, "data", key),
-                      local.file.path(db, key), mode = "wb", cacheOK = FALSE)
-	download.file(file.path(db@url, "data", paste(key, ".SIG", sep = "")),
-                      local.file.path.SIG(db, key), mode = "wb", cacheOK = FALSE)
+    localFiles <- c(data = local.file.path(db, key),
+                    sig = local.file.path.SIG(db, key))
+
+    status <- tryCatch({
+        download.file(file.path(db@url, "data", key),
+                      localFiles["data"], mode = "wb", cacheOK = FALSE)
+        download.file(file.path(db@url, "data", paste(key, ".SIG", sep = "")),
+                      localFiles["sig"], mode = "wb", cacheOK = FALSE)
+    }, condition = function(cond) {
+        ## If a condition is thrown (e.g. error or interrupt), delete
+        ## whatever was downloaded
+        ex <- file.exists(localFiles)
+        file.remove(localFiles[ex])
+        cond
+    })
+    if(inherits(status, "condition"))
+        stop(gettextf("problem downloading data for key '%s': %s",
+                      key, conditionMessage(cond)))
 }
 
 ####################
