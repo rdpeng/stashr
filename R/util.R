@@ -1,4 +1,4 @@
-setGeneric("setDir<-", function(db, value, ...) standardGeneric("setDir<-"))
+setGeneric("setDir<-", function(db, value) standardGeneric("setDir<-"))
 
 setReplaceMethod("setDir", signature(db = "filehashRemote", value = "character"),
           function(db, value) {
