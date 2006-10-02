@@ -13,6 +13,7 @@
 \alias{dbFetch,filehashRemote,character-method}
 \alias{dbInsert,filehashRemote,character-method}
 \alias{dbList,filehashRemote-method}
+\alias{dbList}
 \alias{dbSync,filehashRemote-method}
 \alias{dbSync}
 \alias{dbCreate,filehashRemote-method}
