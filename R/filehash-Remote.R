@@ -227,7 +227,7 @@ getdata <- function(db,key){
 
     if(inherits(status, "condition"))
         stop(gettextf("problem downloading data for key '%s': %s",
-                      key, conditionMessage(cond)))
+                      key, conditionMessage(status)))
 }
 
 ####################
