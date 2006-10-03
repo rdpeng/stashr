@@ -79,7 +79,8 @@ setMethod("dbCreate",
               ## create the local main directory and data
               ## sub-directory to store the data files
               dir.create(db@dir, showWarnings = FALSE)
-              dir.create(file.path(db@dir, "data"), showWarnings = FALSE)
+              dir.create(file.path(db@dir, "data"), showWarnings = FALSE,
+                         recursive = TRUE)
           })
 
 

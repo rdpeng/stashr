@@ -21,24 +21,28 @@ setClass("filehashLocal",
 
 setMethod("dbInsert",
           signature(db = "filehashLocal", key = "character", value = "ANY"),
-          function(db, key, value, overwrite=FALSE, ...) {
+          function(db, key, value, overwrite = TRUE, ...) {
               if(file.exists(local.file.path(db,key)) & !overwrite){
                   stop("cannot overwrite previously saved file")
               }		
               ## save(value, file = local.file.path(db,key))
               con <- gzfile(local.file.path(db,key))
-              open(con, "wb")
-              on.exit(close(con), add=TRUE)
-              serialize(value, con)
-                                        #close(con)
+              tryCatch({
+                  open(con, "wb")
+                  serialize(value, con)
+              }, finally = {
+                  if(isOpen(con))
+                      close(con)
+              })
               s <- unname(md5sum(local.file.path(db,key)))
               s2 <- paste(s, key, sep="  ")
               writeLines(s2, con = local.file.path.SIG(db,key))
+
               ## update the 'keys' file
-              if(!file.exists(file.path(db@dir, "keys")) || !dbExists(db, key)) {
+              if(!dbExists(db, key)) {
                   conA <- file(file.path(db@dir, "keys"))
                   open(conA, "a")
-                  on.exit(close(conA), add=TRUE)
+                  on.exit(close(conA))
                   cat(key, file = file.path(db@dir,"keys"),sep = "\n",
                       append = TRUE)
               }
@@ -56,7 +60,7 @@ setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
           function(db, key, ...) {
               if(!checkLocal(db,key)) 
                   stop("specified data does not exist") 
-              read(db,key)
+              read(db, key)
           })
 
 setMethod("dbDelete", signature(db = "filehashLocal", key = "character"),
@@ -83,9 +87,17 @@ setMethod("dbDelete", signature(db = "filehashLocal", key = "character"),
 setMethod("dbList", "filehashLocal",
           function(db, ...){
               con <- file(file.path(db@dir, "keys"))
-              open(con, "r")  ## 'keys' is a text file
-              on.exit(close(con))
-              readLines(con)
+
+              handler <- function(cond) {
+                  character(0)
+              }
+              tryCatch({
+                  open(con, "r")  ## 'keys' is a text file
+                  readLines(con)
+              }, error = handler, warning = handler, finally = {
+                  if(isOpen(con))
+                      close(con)
+              })
           })
 
 setMethod("dbExists", signature(db = "filehashLocal", key = "character"),
@@ -114,7 +126,7 @@ readRemoteSIG <- function(db, key) {
 setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
           function(db, key, offline = FALSE, ...){
               if(offline && !checkLocal(db,key))
-                  stop("have not previously downloaded specified data "
+                  stop("have not previously downloaded specified data ", 
                        "and you have set 'offline = TRUE'") 
               if(!offline && !(key %in% dbList(db)))
                   stop("specified key not in database")
@@ -139,9 +151,15 @@ setMethod("dbDelete", signature(db = "filehashRemote", key = "character"),
 setMethod("dbList", "filehashRemote",
           function(db, save = FALSE, ...){
               con <- url(file.path(db@url, "keys"))
-              open(con, "r")  ## 'keys' file is text
-              on.exit(close(con))
-              mylist <- readLines(con)
+              mylist <- tryCatch({
+                  open(con, "r")  ## 'keys' file is text
+                  readLines(con)
+              }, error = function(err) {
+                  character(0)
+              }, finally = {
+                  if(isOpen(con))
+                      close(con)
+              })
               if (save) cat(mylist, file = file.path(db@dir,"keys"),sep = "\n")
               mylist
           })
@@ -157,7 +175,7 @@ setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
 setMethod("dbSync", signature(db = "filehashRemote"),
           function(db, key = NULL, ...){
               if(!is.null(key) & !all(checkLocal(db,key))) 
-                  stop("not all files referenced in the 'key' vector were "
+                  stop("not all files referenced in the 'key' vector were ",
                        "previously downloaded, no files updated")
               if(is.null(key)) 
               {list.local.files <- list.files(file.path(db@dir, "data"))
@@ -211,7 +229,8 @@ local.file.path.SIG <- function(db,key){
 #################### with more than one key.
 
 checkLocal <- function(db, key){
-    key %in% list.files(file.path(db@dir, "data")) # returns a vector of T/F
+    ## key %in% list.files(file.path(db@dir, "data"), all.files = TRUE)
+    file.exists(file.path(db@dir, "data", key))      ## returns a vector of T/F
 }
 
 
