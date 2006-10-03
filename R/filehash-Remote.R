@@ -32,30 +32,30 @@ setMethod("dbInsert",
               serialize(value, con)
                                         #close(con)
               s <- unname(md5sum(local.file.path(db,key)))
-              s2 <- paste(s,key,sep="  ")
+              s2 <- paste(s, key, sep="  ")
               writeLines(s2, con = local.file.path.SIG(db,key))
-              ##update the 'keys' file
-              if(!file.exists(file.path(db@dir, "keys"))) {
+              ## update the 'keys' file
+              if(!file.exists(file.path(db@dir, "keys")) || !dbExists(db, key)) {
                   conA <- file(file.path(db@dir, "keys"))
                   open(conA, "a")
                   on.exit(close(conA), add=TRUE)
                   cat(key, file = file.path(db@dir,"keys"),sep = "\n",
                       append = TRUE)
               }
-              else{	if(!dbExists(db,key)){
-                  conA <- file(file.path(db@dir, "keys"))
-                  open(conA, "a")
-                  on.exit(close(conA), add=TRUE)
-                  cat(key, file = file.path(db@dir,"keys"),sep = "\n",
-                      append = TRUE)
-              }
-                    }
+              ## else{	if(!dbExists(db,key)){
+              ##     conA <- file(file.path(db@dir, "keys"))
+              ##     open(conA, "a")
+              ##     on.exit(close(conA), add=TRUE)
+              ##     cat(key, file = file.path(db@dir,"keys"),sep = "\n",
+              ##         append = TRUE)
+              ## }
+              ## }
           })
 
 setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
           function(db, key, ...) {
               if(!checkLocal(db,key)) 
-                  stop("Specified data does not exist") 
+                  stop("specified data does not exist") 
               read(db,key)
           })
 
@@ -63,17 +63,18 @@ setMethod("dbDelete", signature(db = "filehashLocal", key = "character"),
           function(db, key, ...){
               if(file.exists(local.file.path(db,key))) 
                   file.remove(local.file.path(db,key))
-              else stop("Specified file does not exist")
+              else stop("specified file does not exist")
               if(file.exists(local.file.path.SIG(db,key))) 
                   file.remove(local.file.path.SIG(db,key))
-              else stop("Specified .SIG file does not exist")
+              else stop("specified .SIG file does not exist")
+
               ## Delete the key from the 'keys' file ##
               if(dbExists(db,key)) {	
                   keylist <- dbList(db)
                   keyindex <- match(key,keylist)
                   newkeylist <- keylist[-keyindex]
                   con <- file(file.path(db@dir, "keys"))
-                  open(con, "wb")
+                  open(con, "w")  ## 'keys' is a text file
                   on.exit(close(con))
                   cat(newkeylist, file = file.path(db@dir,"keys"),sep = "\n")
               }
@@ -82,7 +83,7 @@ setMethod("dbDelete", signature(db = "filehashLocal", key = "character"),
 setMethod("dbList", "filehashLocal",
           function(db, ...){
               con <- file(file.path(db@dir, "keys"))
-              open(con, "rb")
+              open(con, "r")  ## 'keys' is a text file
               on.exit(close(con))
               readLines(con)
           })
@@ -104,9 +105,11 @@ setMethod("dbInsert",
 
 setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
           function(db, key, offline = FALSE, ...){
-              if(offline && !checkLocal(db,key)) stop("Haven't previously downloaded specified data,
-				and you have set 'offline = TRUE'") 
-              if(!offline && !key%in%getlist(db)) stop("Specified data does not exist") 
+              if(offline && !checkLocal(db,key))
+                  stop("have not previously downloaded specified data "
+                       "and you have set 'offline = TRUE'") 
+              if(!offline && !key %in% getlist(db))
+                  stop("specified data does not exist") 
               if(!offline && checkLocal(db,key)) 
               {if(!md5sum(local.file.path(db,key)) 
                   == scan(local.file.path.SIG(db,key),quiet=TRUE,what="character",sep=" ")[1])
@@ -142,8 +145,8 @@ setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
 setMethod("dbSync", signature(db = "filehashRemote"),
           function(db, key = NULL, ...){
               if(!is.null(key) & !all(checkLocal(db,key))) 
-                  stop("not all files referenced in the 'key' vector were 
-				previously downloaded, no files updated")
+                  stop("not all files referenced in the 'key' vector were "
+                       "previously downloaded, no files updated")
               if(is.null(key)) 
               {list.local.files <- list.files(file.path(db@dir, "data"))
                key <- list.local.files[-grep(".SIG", list.local.files)]
@@ -234,8 +237,9 @@ getdata <- function(db,key){
 ## 4) read ######### Reads file associated with specified key from the local directory.
 #################### Returns the data object associated with the key.
 
-read <- function(db,key){
-    if(!checkLocal(db,key)) stop("files associated with this key not yet downloaded")
+read <- function(db, key){
+    if(!checkLocal(db,key))
+        stop(gettextf("files associated with key '%s' not yet downloaded", key))
     con <- gzfile(local.file.path(db,key))
     open(con, "rb")
     on.exit(close(con))
@@ -250,48 +254,48 @@ read <- function(db,key){
 #################### file & SIG file. If 'offline=TRUE', 'fetch' skips the downloading step.
 #################### The function returns the data object associated with the key.
 
-library(tools)
+## library(tools)
 
-fetch <- function(db, key, offline = FALSE){
-    if(offline && !checkLocal(db,key)) stop("Haven't previously downloaded specified data,
-				and you have set 'offline = TRUE'") 
-    if(!offline && !key%in%getlist(db)) stop("Specified data does not exist") 
-    if(!offline && checkLocal(db,key)) 
-    {if(!md5sum(local.file.path(db,key)) 
-        == scan(local.file.path.SIG(db,key),quiet=TRUE,what="character",sep=" ")[1])
-         getdata(db,key)
- }
-    if(!checkLocal(db,key)) getdata(db,key)
-    read(db,key)
-} 
+## fetch <- function(db, key, offline = FALSE){
+##     if(offline && !checkLocal(db,key)) stop("haven't previously downloaded specified data,
+## 				and you have set 'offline = TRUE'") 
+##     if(!offline && !key%in%getlist(db)) stop("Specified data does not exist") 
+##     if(!offline && checkLocal(db,key)) 
+##     {if(!md5sum(local.file.path(db,key)) 
+##         == scan(local.file.path.SIG(db,key),quiet=TRUE,what="character",sep=" ")[1])
+##          getdata(db,key)
+##  }
+##     if(!checkLocal(db,key)) getdata(db,key)
+##     read(db,key)
+## } 
 
 #################### Updates all key/data pairs in the local directory by checking the
 ## 6) update ####### SIGs if 'key' is 'NULL'.  If 'key' is a character vector, then it
 #################### only updates the specified key/data pairs (in which case, it first
 #################### checks to ensure that all specified keys' files have been previously saved).
 
-update <- function(db, key = NULL){
-    if(!is.null(key) & !all(checkLocal(db,key))) 
-        stop("not all files referenced in the 'key' vector were previously downloaded, no files updated")
-    if(is.null(key)) 
-    {list.local.files <- list.files(file.path(db@dir,"data"))
-     key <- list.local.files[-grep(".SIG", list.local.files)]
- }
-    for (i in key){ 
-        if(!md5sum(local.file.path(db,i)) 
-           == scan(local.file.path.SIG(db,i),quiet=TRUE,what="character",sep=" ")[1])
-            getdata(db,i)
-    }	
-}
+## update <- function(db, key = NULL){
+##     if(!is.null(key) & !all(checkLocal(db,key))) 
+##         stop("not all files referenced in the 'key' vector were previously downloaded, no files updated")
+##     if(is.null(key)) 
+##     {list.local.files <- list.files(file.path(db@dir,"data"))
+##      key <- list.local.files[-grep(".SIG", list.local.files)]
+##  }
+##     for (i in key){ 
+##         if(!md5sum(local.file.path(db,i)) 
+##            == scan(local.file.path.SIG(db,i),quiet=TRUE,what="character",sep=" ")[1])
+##             getdata(db,i)
+##     }	
+## }
 
 #################### Saves an R object ('value') as a file in the local directory.
 ## 7) insert ####### Can specify whether overwriting is OK. The new file is 
 #################### associated with a specified key.
 
-insert <- function(db,key,value,overwrite=FALSE){
-    if(file.exists(local.file.path(db,key)) & !overwrite)
-        stop("cannot overwrite previously saved file")
-    else	{save(value, file = local.file.path(db,key))}
-}
+## insert <- function(db,key,value,overwrite=FALSE){
+##     if(file.exists(local.file.path(db,key)) & !overwrite)
+##         stop("cannot overwrite previously saved file")
+##     else	{save(value, file = local.file.path(db,key))}
+## }
 
 
