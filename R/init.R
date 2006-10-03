@@ -55,30 +55,31 @@ checkURLtype <- function(URL) {
 setMethod("dbCreate",
           signature(db = "filehashRemote"),
           function(db, ...) {
-		## remove trailing "/" on dir and url ##
-		if (length(grep("/$",list(db@dir),perl = TRUE)) > 0)
-       	     db@dir <- sub("/$","", db@dir)
-		if (length(grep("/$",list(db@url),perl = TRUE)) > 0)
-       	     db@url <- sub("/$","", db@url)
-		## create the local main directory and data sub-directory to
-		## store the data files ##
-		dir.create(db@dir)
-		dir.create(file.path(db@dir,"data"))
-		## save url in the R workspace format in the main directory ##
-		myurl <- db@url 
-		save(myurl, file = file.path(db@dir,"url"))
+              ## remove trailing "/" on dir and url ##
+              if (length(grep("/$",list(db@dir),perl = TRUE)) > 0)
+                  db@dir <- sub("/$","", db@dir)
+              if (length(grep("/$",list(db@url),perl = TRUE)) > 0)
+                  db@url <- sub("/$","", db@url)
+              ## create the local main directory and data sub-directory to
+              ## store the data files ##
+              dir.create(db@dir)
+              dir.create(file.path(db@dir,"data"))
+              ## save url in the R workspace format in the main directory ##
+              myurl <- db@url 
+              save(myurl, file = file.path(db@dir,"url"))
           })
 
 setMethod("dbCreate",
           signature(db = "filehashLocal"),
           function(db, ...) {
-		## remove trailing "/" on dir and url ##
-		if (length(grep("/$",list(db@dir),perl = TRUE)) > 0)
-       	     db@dir <- sub("/$","", db@dir)
-		## create the local main directory and data sub-directory to
-		## store the data files ##
-		dir.create(db@dir)
-		dir.create(file.path(db@dir,"data"))
+              ## remove trailing "/" on dir and url ##
+              if (length(grep("/$",list(db@dir),perl = TRUE)) > 0)
+                  db@dir <- sub("/$","", db@dir)
+
+              ## create the local main directory and data
+              ## sub-directory to store the data files
+              dir.create(db@dir, showWarnings = FALSE)
+              dir.create(file.path(db@dir, "data"), showWarnings = FALSE)
           })
 
 
@@ -88,29 +89,29 @@ setMethod("dbCreate",
 ####################
 
 create <- function(myurl,dir) {	
-	## remove trailing "/" on dir and myurl ##
-	if (length(grep("/$",list(dir),perl = TRUE)) > 0)
-            dir <- sub("/$","", dir)
-	if (length(grep("/$",list(myurl),perl = TRUE)) > 0)
-            myurl <- sub("/$","", myurl)
+    ## remove trailing "/" on dir and myurl ##
+    if (length(grep("/$",list(dir),perl = TRUE)) > 0)
+        dir <- sub("/$","", dir)
+    if (length(grep("/$",list(myurl),perl = TRUE)) > 0)
+        myurl <- sub("/$","", myurl)
 
-	## create the local main directory and data sub-directory to
-	## store the data files ##
-	dir.create(dir)
-	dir.create(file.path(dir,"data"))
+    ## create the local main directory and data sub-directory to
+    ## store the data files ##
+    dir.create(dir)
+    dir.create(file.path(dir,"data"))
 
-	## save myurl in the R workspace format in the main directory ## 
-	save(myurl, file = file.path(dir,"url"))
-    }
+    ## save myurl in the R workspace format in the main directory ## 
+    save(myurl, file = file.path(dir,"url"))
+}
 
 ####################
 ## 2) init #########
 ####################
 
 init <- function(dir){
-	## remove trailing "/" on dir ##
-	if (length(grep("/$",list(dir),perl=T))==1) dir <- sub("/$","", dir)
-	load(file.path(dir,"url"))
-	list(url=myurl,dir=dir)
-	}
+    ## remove trailing "/" on dir ##
+    if (length(grep("/$",list(dir),perl=T))==1) dir <- sub("/$","", dir)
+    load(file.path(dir,"url"))
+    list(url=myurl,dir=dir)
+}
 
