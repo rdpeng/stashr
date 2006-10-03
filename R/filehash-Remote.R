@@ -103,20 +103,32 @@ setMethod("dbInsert",
               stop("cannot insert into a 'filehashRemote' database")
           })
 
+readRemoteSIG <- function(db, key) {
+    con <- url(file.path(db@url, "data", paste(key, "SIG", sep = ".")))
+    open(con, "r")  ## SIG files are text
+    on.exit(close(con))
+
+    scan(con, quiet=TRUE,what="character",sep=" ")[1]
+}
+
 setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
           function(db, key, offline = FALSE, ...){
               if(offline && !checkLocal(db,key))
                   stop("have not previously downloaded specified data "
                        "and you have set 'offline = TRUE'") 
-              if(!offline && !key %in% getlist(db))
-                  stop("specified data does not exist") 
-              if(!offline && checkLocal(db,key)) 
-              {if(!md5sum(local.file.path(db,key)) 
-                  == scan(local.file.path.SIG(db,key),quiet=TRUE,what="character",sep=" ")[1])
-                   getdata(db,key)
-           }
-              if(!checkLocal(db,key)) getdata(db,key)
-              read(db,key)
+              if(!offline && !(key %in% dbList(db)))
+                  stop("specified key not in database")
+              if(!offline && checkLocal(db, key)) {
+                  ## Check the remote/local MD5 hash value
+                  localSIG <- unname( md5sum(local.file.path(db, key)) )
+                  remoteSIG <- unname( readRemoteSIG(db, key) )
+
+                  if(localSIG != remoteSIG)
+                      getdata(db,key)
+              }
+              if(!checkLocal(db, key))
+                  getdata(db,key)
+              read(db, key)
           })
 
 setMethod("dbDelete", signature(db = "filehashRemote", key = "character"),
@@ -125,9 +137,9 @@ setMethod("dbDelete", signature(db = "filehashRemote", key = "character"),
           })
 
 setMethod("dbList", "filehashRemote",
-          function(db, save=FALSE, ...){
+          function(db, save = FALSE, ...){
               con <- url(file.path(db@url, "keys"))
-              open(con, "rb")
+              open(con, "r")  ## 'keys' file is text
               on.exit(close(con))
               mylist <- readLines(con)
               if (save) cat(mylist, file = file.path(db@dir,"keys"),sep = "\n")
@@ -136,7 +148,7 @@ setMethod("dbList", "filehashRemote",
 
 setMethod("dbExists", signature(db = "filehashRemote", key = "character"),
           function(db, key, ...){
-              key %in% getlist(db)	# returns a vector of T/F
+              key %in% dbList(db)  ## returns a vector of TRUE/FALSE
           })
 
 
@@ -172,7 +184,7 @@ setMethod("dbSync", signature(db = "filehashRemote"),
 ###############################  directory (to be used internally).	
 
 local.file.path <- function(db,key){
-    file.path(db@dir,"data",key)
+    file.path(db@dir, "data", key)
 }
 
 ###############################
@@ -180,19 +192,19 @@ local.file.path <- function(db,key){
 ############################### directory (to be used internally) for the SIG files.	
 
 local.file.path.SIG <- function(db,key){
-    file.path(db@dir,"data",paste(key,".SIG",sep=""))
+    file.path(db@dir, "data", paste(key,".SIG",sep=""))
 }
 
 #######################
 ## getlist ############ Reads the 'keys' file from the server. Has an option 
 ####################### to save the repository's list of keys in local dir.
 
-getlist <- function(db){
-    con <- url(file.path(db@url,"keys"))
-    open(con, "rb")
-    on.exit(close(con))
-    readLines(con)
-}
+## getlist <- function(db){
+##     con <- url(file.path(db@url,"keys"))
+##     open(con, "rb")
+##     on.exit(close(con))
+##     readLines(con)
+## }
 
 #################### Returns TRUE if data file for 'key' is in local dir, otherwise
 ## checkLocal ###### returns FALSE. We have 'key' allowed to be a character vector
