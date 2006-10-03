@@ -108,7 +108,7 @@ readRemoteSIG <- function(db, key) {
     open(con, "r")  ## SIG files are text
     on.exit(close(con))
 
-    scan(con, quiet=TRUE,what="character",sep=" ")[1]
+    scan(con, quiet = TRUE, what = "character", sep = " ")[1]
 }
 
 setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
