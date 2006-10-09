@@ -2,14 +2,14 @@
 ## Class definitions
 
 ## Use 'http://' type URLs
-setClass("filehashRemote",
+setClass("remoteDB",
          representation(url = "character",
                         dir = "character"),
          contains = "filehash"
          )
 
 ## For local directories
-setClass("filehashLocal",
+setClass("localDB",
          representation(dir = "character"),
          contains = "filehash"
          )
@@ -17,10 +17,10 @@ setClass("filehashLocal",
 
 
 ######################################################################
-## Methods for 'filehashLocal'
+## Methods for 'localDB'
 
 setMethod("dbInsert",
-          signature(db = "filehashLocal", key = "character", value = "ANY"),
+          signature(db = "localDB", key = "character", value = "ANY"),
           function(db, key, value, overwrite = TRUE, ...) {
               if(file.exists(local.file.path(db,key)) && !overwrite){
                   stop("cannot overwrite previously saved file")
@@ -49,14 +49,14 @@ setMethod("dbInsert",
               }
           })
 
-setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
+setMethod("dbFetch", signature(db = "localDB", key = "character"),
           function(db, key, ...) {
               if(!checkLocal(db,key)) 
                   stop("specified data does not exist") 
               read(db, key)
           })
 
-setMethod("dbDelete", signature(db = "filehashLocal", key = "character"),
+setMethod("dbDelete", signature(db = "localDB", key = "character"),
           function(db, key, ...){
               if(file.exists(local.file.path(db,key))) 
                   file.remove(local.file.path(db,key))
@@ -77,7 +77,7 @@ setMethod("dbDelete", signature(db = "filehashLocal", key = "character"),
               }
           })
 
-setMethod("dbList", "filehashLocal",
+setMethod("dbList", "localDB",
           function(db, ...){
               con <- file(file.path(db@dir, "keys"))
 
@@ -93,19 +93,19 @@ setMethod("dbList", "filehashLocal",
               })
           })
 
-setMethod("dbExists", signature(db = "filehashLocal", key = "character"),
+setMethod("dbExists", signature(db = "localDB", key = "character"),
           function(db, key, ...){
               key %in% dbList(db)	# returns a vector of T/F
           })
 
 
 ######################################################################
-## Method definitions for 'filehashRemote'
+## Method definitions for 'remoteDB'
 
 setMethod("dbInsert",
-          signature(db = "filehashRemote", key = "character", value = "ANY"),
+          signature(db = "remoteDB", key = "character", value = "ANY"),
           function(db, key, value, ...) {
-              stop("cannot insert into a 'filehashRemote' database")
+              stop("cannot insert into a 'remoteDB' database")
           })
 
 readRemoteSIG <- function(db, key) {
@@ -132,7 +132,7 @@ checkSIG <- function(db, key) {
 }
                        
 
-setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
+setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
           function(db, key, offline = FALSE, ...){
               if(offline && !checkLocal(db,key))
                   stop("have not previously downloaded specified data ", 
@@ -149,12 +149,12 @@ setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
               read(db, key)
           })
 
-setMethod("dbDelete", signature(db = "filehashRemote", key = "character"),
+setMethod("dbDelete", signature(db = "remoteDB", key = "character"),
           function(db, key, ...) {
-              stop("cannot delete from a 'filehashRemote' database")
+              stop("cannot delete from a 'remoteDB' database")
           })
 
-setMethod("dbList", "filehashRemote",
+setMethod("dbList", "remoteDB",
           function(db, save = FALSE, ...){
               con <- url(file.path(db@url, "keys"))
               mylist <- tryCatch({
@@ -171,7 +171,7 @@ setMethod("dbList", "filehashRemote",
               mylist
           })
 
-setMethod("dbExists", signature(db = "filehashRemote", key = "character"),
+setMethod("dbExists", signature(db = "remoteDB", key = "character"),
           function(db, key, ...){
               key %in% dbList(db)  ## returns a vector of TRUE/FALSE
           })
@@ -179,7 +179,7 @@ setMethod("dbExists", signature(db = "filehashRemote", key = "character"),
 
 setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
 
-setMethod("dbSync", signature(db = "filehashRemote"),
+setMethod("dbSync", signature(db = "remoteDB"),
           function(db, key = NULL, ...){
               if(!is.null(key) && !all(checkLocal(db,key))) 
                   stop("not all files referenced in the 'key' vector were ",
