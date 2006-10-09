@@ -46,14 +46,6 @@ setMethod("dbInsert",
                   cat(key, file = file.path(db@dir,"keys"),sep = "\n",
                       append = TRUE)
               }
-              ## else{	if(!dbExists(db,key)){
-              ##     conA <- file(file.path(db@dir, "keys"))
-              ##     open(conA, "a")
-              ##     on.exit(close(conA), add=TRUE)
-              ##     cat(key, file = file.path(db@dir,"keys"),sep = "\n",
-              ##         append = TRUE)
-              ## }
-              ## }
           })
 
 setMethod("dbFetch", signature(db = "filehashLocal", key = "character"),
@@ -123,6 +115,22 @@ readRemoteSIG <- function(db, key) {
     scan(con, quiet = TRUE, what = "character", sep = " ")[1]
 }
 
+readLocalSIG <- function(db, key) {
+    path <- local.file.path.SIG(db, key)
+    scan(path, quiet = TRUE, what = "character", sep = " ")[1]
+}
+
+
+## Return TRUE if local and remote SIGs are the same; FALSE otherwise
+
+checkSIG <- function(db, key) {
+    localSIG <- readLocalSIG(db, key)
+    remoteSIG <- readRemoteSIG(db, key)
+
+    isTRUE(localSIG == remoteSIG)
+}
+                       
+
 setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
           function(db, key, offline = FALSE, ...){
               if(offline && !checkLocal(db,key))
@@ -132,10 +140,7 @@ setMethod("dbFetch", signature(db = "filehashRemote", key = "character"),
                   stop("specified key not in database")
               if(!offline && checkLocal(db, key)) {
                   ## Check the remote/local MD5 hash value
-                  localSIG <- unname( md5sum(local.file.path(db, key)) )
-                  remoteSIG <- unname( readRemoteSIG(db, key) )
-
-                  if(localSIG != remoteSIG)
+                  if(!checkSIG(db, key))
                       getdata(db,key)
               }
               if(!checkLocal(db, key))
@@ -160,7 +165,8 @@ setMethod("dbList", "filehashRemote",
                   if(isOpen(con))
                       close(con)
               })
-              if (save) cat(mylist, file = file.path(db@dir,"keys"),sep = "\n")
+              if (save)
+                  cat(mylist, file = file.path(db@dir,"keys"),sep = "\n")
               mylist
           })
 
@@ -174,23 +180,36 @@ setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
 
 setMethod("dbSync", signature(db = "filehashRemote"),
           function(db, key = NULL, ...){
-              if(!is.null(key) & !all(checkLocal(db,key))) 
+              if(!is.null(key) && !all(checkLocal(db,key))) 
                   stop("not all files referenced in the 'key' vector were ",
                        "previously downloaded, no files updated")
-              if(is.null(key)) 
-              {list.local.files <- list.files(file.path(db@dir, "data"))
-               key <- list.local.files[-grep(".SIG", list.local.files)]
-           }
+              if(is.null(key)) {
+                  list.local.files <- list.files(file.path(db@dir, "data"),
+                                                 all.files = TRUEq)
+                  use <- !file.info(list.local.files)$isdir  ## exclude directories
+                  list.local.files <- list.local.files[use]
+
+                  dontuse <- grep(".SIG", list.local.files, fixed = TRUE)
+                  key <- list.local.files[-dontuse]
+              }
               for (i in key){ 
-                  if(!md5sum(local.file.path(db,i)) 
-                     == scan(local.file.path.SIG(db,i),quiet=TRUE,what="character",sep=" ")[1])
+                  if(!checkSIG(db, i))
                       getdata(db,i)
               }	
           })
 
 
 
+######################################################################
+## For case-insensitive file systems, objects with the same name but
+## differ by capitalization might get clobbered.  `mangleName()'
+## inserts a "@" before each capital letter and `unMangleName()'
+## reverses the operation.
 
+mangleName <- filehash:::mangleName
+unMangleName <- filehash:::unMangleName
+
+######################################################################
 
 
 ########################################################################
