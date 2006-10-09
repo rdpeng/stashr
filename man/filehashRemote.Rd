@@ -1,38 +1,38 @@
-\name{filehashRemote}
+\name{stashR}
 \docType{class}
-\alias{filehashRemote}
-\alias{filehashRemote-class}
-\alias{filehashLocal-class}
-\alias{dbInsert,filehashLocal,character-method}
-\alias{dbFetch,filehashLocal,character-method}
-\alias{dbDelete,filehashLocal,character-method}
-%\alias{dbList,filehashLocal,character-method}
-\alias{dbList,filehashLocal-method}
-\alias{dbExists,filehashLocal,character-method}
-\alias{dbDelete,filehashRemote,character-method}
-\alias{dbExists,filehashRemote,character-method}
-\alias{dbFetch,filehashRemote,character-method}
-\alias{dbInsert,filehashRemote,character-method}
-\alias{dbList,filehashRemote-method}
+\alias{remoteDB}
+\alias{remoteDB-class}
+\alias{localDB-class}
+\alias{dbInsert,localDB,character-method}
+\alias{dbFetch,localDB,character-method}
+\alias{dbDelete,localDB,character-method}
+%\alias{dbList,localDB,character-method}
+\alias{dbList,localDB-method}
+\alias{dbExists,localDB,character-method}
+\alias{dbDelete,remoteDB,character-method}
+\alias{dbExists,remoteDB,character-method}
+\alias{dbFetch,remoteDB,character-method}
+\alias{dbInsert,remoteDB,character-method}
+\alias{dbList,remoteDB-method}
 \alias{dbList}
-\alias{dbSync,filehashRemote-method}
+\alias{dbSync,remoteDB-method}
 \alias{dbSync}
-\alias{dbCreate,filehashRemote-method}
-\alias{dbCreate,filehashLocal-method}
+\alias{dbCreate,remoteDB-method}
+\alias{dbCreate,localDB-method}
 \alias{dbCreate}
 
 \alias{setDir<-}
-\alias{setDir<-,filehashRemote,character-method}
+\alias{setDir<-,remoteDB,character-method}
 
-\title{Classes "filehashRemote" and "filehashLocal"}
+\title{Classes "remoteDB" and "localDB"}
 \description{
 	These functions create an interface for a simple file-based 
 	key-value database using remote storage via http
 }
 
-\section{Objects from the "filehashRemote" and "filehashLocal" classes}{
+\section{Objects from the "remoteDB" and "localDB" classes}{
 	Objects can be created by calls of the form 
-	\code{new("filehashRemote", ...)} and \code{new("filehashLocal", ...)}
+	\code{new("remoteDB", ...)} and \code{new("localDB", ...)}
 	respectively.
 }
 
@@ -48,31 +48,31 @@
 
 \section{Methods}{
   \describe{
-    \item{dbCreate}{\code{signature(db = "filehashRemote")}: 
-	Calling \code{dbCreate} on a \code{filehashRemote} object creates the 
+    \item{dbCreate}{\code{signature(db = "remoteDB")}: 
+	Calling \code{dbCreate} on a \code{remoteDB} object creates the 
 	local main directory and data sub-directory to in which to store the 
-	data files and saves the url associated with the \code{filehashRemote}
+	data files and saves the url associated with the \code{remoteDB}
 	object in the R workspace format in the local main directory.}
-    \item{dbCreate}{\code{signature(db = "filehashLocal")}: 
-	Calling \code{dbCreate} on a \code{filehashLocal} object creates the 
+    \item{dbCreate}{\code{signature(db = "localDB")}: 
+	Calling \code{dbCreate} on a \code{localDB} object creates the 
 	local main directory and data sub-directory to in which to store the 
 	data files.}
-    \item{dbDelete}{\code{signature(db = "filehashRemote", key = "character")}: 
-	Calling \code{dbDelete} on a \code{filehashRemote} object returns the 
-	error message: "cannot delete from a 'filehashRemote' database."}
-    \item{dbDelete}{\code{signature(db = "filehashLocal", key = "character")}: 
-	Calling \code{dbDelete} on a \code{filehashLocal} deletes the specified
+    \item{dbDelete}{\code{signature(db = "remoteDB", key = "character")}: 
+	Calling \code{dbDelete} on a \code{remoteDB} object returns the 
+	error message: "cannot delete from a 'remoteDB' database."}
+    \item{dbDelete}{\code{signature(db = "localDB", key = "character")}: 
+	Calling \code{dbDelete} on a \code{localDB} deletes the specified
 	file and its corresponding .SIG file from your local directory. It also
 	removes the specified key from the \code{keys} file.}
-    \item{dbExists}{\code{signature(db = "filehashRemote", key = "character")}: 
+    \item{dbExists}{\code{signature(db = "remoteDB", key = "character")}: 
 	The \code{key} argument is a character vector. For each element in 
 	\code{key}, \code{dbExists} returns TRUE if the corresponding data file 
 	is in the local directory and otherwise returns FALSE.} 
-    \item{dbExists}{\code{signature(db = "filehashLocal", key = "character")}: 
+    \item{dbExists}{\code{signature(db = "localDB", key = "character")}: 
 	The \code{key} argument is a character vector. For each element in 
 	\code{key}, \code{dbExists} returns TRUE if the corresponding data file 
 	is in the local directory and otherwise returns FALSE.} 
-    \item{dbFetch}{\code{signature(db = "filehashRemote", key = "character")}: 
+    \item{dbFetch}{\code{signature(db = "remoteDB", key = "character")}: 
 	Checks if the provided character value \code{key} exists in the local 
 	directory. If it doesn't, \code{dbFetch} downloads the corresponding data 
 	and SIG files. If the \code{key} exists in the local directory, then 
@@ -82,30 +82,30 @@
 	data and SIG files. If \code{offline = TRUE}, \code{dbFetch} skips the 
 	download step. The function returns the data object associated with the 
 	\code{key}. }
-    \item{dbFetch}{\code{signature(db = "filehashLocal", key = "character")}: 
+    \item{dbFetch}{\code{signature(db = "localDB", key = "character")}: 
 	Checks if the provided character value \code{key} exists in the local 
 	directory. If the \code{key} exists in the local directory, then 
 	\code{dbFetch} reads the file from the local directory. The function 
 	returns the data object associated with the \code{key}. }
-    \item{dbInsert}{\code{signature(db = "filehashRemote", key = "character",
+    \item{dbInsert}{\code{signature(db = "remoteDB", key = "character",
 	value = "ANY")}: 
-	Calling \code{dbInsert} on a \code{filehashRemote} object returns the 
-	error message: "cannot insert into a 'filehashRemote' database." }
-    \item{dbInsert}{\code{signature(db = "filehashLocal", key = "character", 
+	Calling \code{dbInsert} on a \code{remoteDB} object returns the 
+	error message: "cannot insert into a 'remoteDB' database." }
+    \item{dbInsert}{\code{signature(db = "localDB", key = "character", 
 	value = "ANY")}: 
-	Calling \code{dbInsert} on a \code{filehashLocal} object writes the 
+	Calling \code{dbInsert} on a \code{localDB} object writes the 
 	value to a file corresponding to the specified key in the local 
 	directory. Also, \code{dbInsert} appends the specified key to the end
 	of the \code{keys} file if the key is not already included in the 
 	\code{keys} file. }
-    \item{dbList}{\code{signature(db = "filehashRemote")}: 
+    \item{dbList}{\code{signature(db = "remoteDB")}: 
 	The method \code{dbList} reads the \code{keys} file from the remote
 	database and has the option \code{save} to save the repository's list 
 	of keys in the local directory.}
-    \item{dbList}{\code{signature(db = "filehashLocal")}: 
-	The method \code{dbList} called on a \code{filehashLocal} object reads 
+    \item{dbList}{\code{signature(db = "localDB")}: 
+	The method \code{dbList} called on a \code{localDB} object reads 
 	the \code{keys} file from the local directory and returns the vector of keys.}
-    \item{dbSync}{\code{signature(db = "filehashRemote", key = "character")}: 
+    \item{dbSync}{\code{signature(db = "remoteDB", key = "character")}: 
 	 Updates all key/data pairs in the local directory by checking the
 	SIGs if \code{key = NULL}.  If \code{key} is a character vector, then it
 	only updates the specified key/data pairs (in which case, it first
