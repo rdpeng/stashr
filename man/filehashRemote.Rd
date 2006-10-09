@@ -6,7 +6,8 @@
 \alias{dbInsert,filehashLocal,character-method}
 \alias{dbFetch,filehashLocal,character-method}
 \alias{dbDelete,filehashLocal,character-method}
-\alias{dbList,filehashLocal,character-method}
+%\alias{dbList,filehashLocal,character-method}
+\alias{dbList,filehashLocal-method}
 \alias{dbExists,filehashLocal,character-method}
 \alias{dbDelete,filehashRemote,character-method}
 \alias{dbExists,filehashRemote,character-method}
@@ -19,6 +20,9 @@
 \alias{dbCreate,filehashRemote-method}
 \alias{dbCreate,filehashLocal-method}
 \alias{dbCreate}
+
+\alias{setDir<-}
+\alias{setDir<-,filehashRemote,character-method}
 
 \title{Classes "filehashRemote" and "filehashLocal"}
 \description{
