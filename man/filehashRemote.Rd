@@ -111,9 +111,6 @@
 
 \author{Sandy Eckel, Roger D. Peng}
 
-\seealso{
-	\code{\link{filehash-class}}
-}
 \examples{
 ## ???
 }
