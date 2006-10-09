@@ -1,4 +1,4 @@
-setValidity("filehashRemote",
+setValidity("remoteDB",
             function(object) {
                 if(length(object@name) == 0)
                     return("object needs a 'name'")

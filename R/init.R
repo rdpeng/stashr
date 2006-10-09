@@ -33,11 +33,11 @@ initializeRemote <- function(dbName) {
 
     switch(checkURLtype(r$url),
            http = {
-               new("filehashRemote", url = r$url, dir = r$dir,
+               new("remoteDB", url = r$url, dir = r$dir,
                    name = basename(dbName))
            },
            file = {
-               new("filehashLocal", url = r$url, dir = r$dir,
+               new("localDB", url = r$url, dir = r$dir,
                    name = basename(dbName))
            })
 }
@@ -53,7 +53,7 @@ checkURLtype <- function(URL) {
 
 
 setMethod("dbCreate",
-          signature(db = "filehashRemote"),
+          signature(db = "remoteDB"),
           function(db, ...) {
               ## remove trailing "/" on dir and url ##
               if (length(grep("/$",list(db@dir),perl = TRUE)) > 0)
@@ -70,7 +70,7 @@ setMethod("dbCreate",
           })
 
 setMethod("dbCreate",
-          signature(db = "filehashLocal"),
+          signature(db = "localDB"),
           function(db, ...) {
               ## remove trailing "/" on dir and url ##
               if (length(grep("/$",list(db@dir),perl = TRUE)) > 0)
