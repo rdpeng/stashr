@@ -186,7 +186,7 @@ setMethod("dbSync", signature(db = "filehashRemote"),
                        "previously downloaded, no files updated")
               if(is.null(key)) {
                   list.local.files <- list.files(file.path(db@dir, "data"),
-                                                 all.files = TRUEq)
+                                                 all.files = TRUE)
                   use <- !file.info(list.local.files)$isdir  ## exclude directories
                   list.local.files <- list.local.files[use]
 
