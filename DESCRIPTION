@@ -1,11 +1,11 @@
-Package:  filehashRemote
+Package:  stashR
 Version:  0.1
-Date:  2006-10-03
+Date:  2006-10-09
 LazyLoad:  yes
 Depends:  R (>= 2.3.1), methods, filehash (>= 0.8)
 Imports:  tools
-Title:  Simple key-value remote database using http
+Title:  A Set of Tools for Administering SHarEd Repositories
 Author:  Sandy Eckel, Roger D. Peng
 Maintainer:  Roger D. Peng <rpeng@jhsph.edu>
-Description:  Simple key-value database using remote storage via http
+Description:  A Set of Tools for Administering SHarEd Repositories
 License:  GNU GPL (version 2 or later)
