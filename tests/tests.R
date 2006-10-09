@@ -1,16 +1,16 @@
 ## Tests for Regression testing ##########################################
 ##########################################################################
 
-library(filehashRemote)
+library(stashR)
 
 ##########################################################################
-## Test objects of class 'filehashRemote'
+## Test objects of class 'remoteDB'
 myurl <- "http://www.biostat.jhsph.edu/MCAPS/data/"
 wd <- getwd()
 dir <- file.path(wd,"testDir")
 
-## create a 'filehashRemote' object ##
-db <- new("filehashRemote", url= myurl, dir = dir, name= "MCAPS")
+## create a 'remoteDB' object ##
+db <- new("remoteDB", url= myurl, dir = dir, name= "MCAPS")
 show(db)
 show(class(db))
 show(db@url)
@@ -38,10 +38,10 @@ dbExists(db,c("01003", "01004","55079"))
 unlink(db@dir, recursive = TRUE)
 
 ##########################################################################
-## Test objects of class 'filehashLocal'
+## Test objects of class 'localDB'
 
-## create a 'filehashRemote' object ##
-dbLocal <- new("filehashLocal", dir= dir, name= "MCAPS")
+## create a 'remoteDB' object ##
+dbLocal <- new("localDB", dir= dir, name= "MCAPS")
 show(dbLocal)
 show(class(dbLocal))
 show(dbLocal@dir)
