@@ -22,13 +22,14 @@ setClass("filehashLocal",
 setMethod("dbInsert",
           signature(db = "filehashLocal", key = "character", value = "ANY"),
           function(db, key, value, overwrite = TRUE, ...) {
-              if(file.exists(local.file.path(db,key)) & !overwrite){
+              if(file.exists(local.file.path(db,key)) && !overwrite){
                   stop("cannot overwrite previously saved file")
               }		
               ## save(value, file = local.file.path(db,key))
               con <- gzfile(local.file.path(db,key))
+              open(con, "wb")
+
               tryCatch({
-                  open(con, "wb")
                   serialize(value, con)
               }, finally = {
                   if(isOpen(con))
