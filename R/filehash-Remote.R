@@ -113,12 +113,14 @@ readRemoteSIG <- function(db, key) {
     open(con, "r")  ## SIG files are text
     on.exit(close(con))
 
-    scan(con, quiet = TRUE, what = "character", sep = " ")[1]
+    val <- scan(con, quiet = TRUE, what = "character", sep = " ")[1]
+    as.character(val)
 }
 
 readLocalSIG <- function(db, key) {
     path <- local.file.path.SIG(db, key)
-    scan(path, quiet = TRUE, what = "character", sep = " ")[1]
+    val <- scan(path, quiet = TRUE, what = "character", sep = " ")[1]
+    as.character(val)
 }
 
 
@@ -250,7 +252,11 @@ local.file.path.SIG <- function(db,key){
 
 checkLocal <- function(db, key){
     ## key %in% list.files(file.path(db@dir, "data"), all.files = TRUE)
-    file.exists(file.path(db@dir, "data", key))      ## returns a vector of T/F
+    datadir <- file.path(db@dir, "data")
+
+    if(!file.exists(datadir))
+        stop("local data directory does not exist")
+    file.exists(file.path(datadir, key))      ## returns a vector of T/F
 }
 
 

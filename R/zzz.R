@@ -17,8 +17,4 @@
     
     ## Switch default filehash database type to 'Remote'
     ## filehashOption(defaultType = "Remote")
-
-    ## Register 'filehashRemote' database format
-    init <- list(create = createRemote, initialize = initializeRemote)
-    registerFormatDB("Remote", init)
 }    
