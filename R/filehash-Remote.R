@@ -25,7 +25,6 @@ setMethod("dbInsert",
               if(file.exists(local.file.path(db,key)) && !overwrite){
                   stop("cannot overwrite previously saved file")
               }		
-              ## save(value, file = local.file.path(db,key))
               con <- gzfile(local.file.path(db,key))
               open(con, "wb")
 
@@ -224,7 +223,7 @@ unMangleName <- filehash:::unMangleName
 ###############################  directory (to be used internally).	
 
 local.file.path <- function(db,key){
-    file.path(db@dir, "data", key)
+    file.path(path.expand(db@dir), "data", key)
 }
 
 ###############################
@@ -232,7 +231,7 @@ local.file.path <- function(db,key){
 ############################### directory (to be used internally) for the SIG files.	
 
 local.file.path.SIG <- function(db,key){
-    file.path(db@dir, "data", paste(key,".SIG",sep=""))
+    file.path(path.expand(db@dir), "data", paste(key,".SIG",sep=""))
 }
 
 #######################
