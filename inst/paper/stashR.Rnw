@@ -67,6 +67,19 @@ internet. This dual functionality of the \pkg{stashR} package
 offers potential applications to future work in creating research documents
 that satisfy the demands of reproducible research.
 
+\subsection{Contributions of the \pkg{stashR} Package}
+The \pkg{stashR} package adds important functionalities to data handling in R.
+These contributions include:
+\begin{itemize}
+    \item the ability to access remote databases efficiently
+    \item a set of tools for creating a local database to export to a remote
+        locale
+    \item a tool for synchronizing local copies of a database to the remote 
+        version
+    \item an abstract interface consisting of 6 methods for local and remote 
+        databases.
+\end{itemize}    
+
 
 \section{Design Rationale}
 
@@ -442,9 +455,10 @@ dbSync(fhRemote, key = c("matrix","vector"))
 
 <<remove fhRemote directory,results=hide,echo=false>>=
 unlink(fhRemote@dir, recursive = TRUE)
+unlink(fhLocal@dir, recursive = TRUE)
 @ 
 
-\subsection{Motivating Example: MCAPS database} 
+\section{Application: NMMAPS database} 
 
 to be filled in later...
  
