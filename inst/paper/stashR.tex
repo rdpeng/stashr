@@ -27,26 +27,27 @@ Biostatistics}\\\textit{Johns Hopkins Bloomberg School of Public Health}}
 
 \begin{abstract}
 The \pkg{stashR} package (a Set of Tools for Administering SHared
-Repositories) for R implements a simple key-value style database where
-character string keys are associated with data values. The key-value
-databases can be either stored locally on the user's computer or
-accessed remotely via the Internet.  Methods specific to the \pkg{stashR}
-package allow users to share data repositories or access previously
-created remote data repositories.  Methods are available to insert,
-retrieve, or delete data from the database as well as synchronize
-local copies of the data to the remote version of the database. For
-remote databases, we define `localDB' and `remoteDB' S4 classes that
-allow a user to efficiently access information from a database by
-retrieving only the data files indexed by user-specified keys. The
-local and remote counterparts of the \pkg{stashR} package offer the potential to
-enhance reproducible research by potentially allowing users of
-\pkg{Sweave} to cache their R computations for a research paper in a
-`localDB' database.  This database could then be stored on the
-Internet as a `remoteDB' database. When readers of the research paper
-wish to reproduce the computations involved in creating a specific
-figure or calculating a specific numeric value, they can access the
-`remoteDB' database and obtain the R objects involved in the
-computation.
+Repositories) for R implements a simple key-value style database
+where character string keys are associated with data values. The
+key-value databases can be either stored locally on the user's
+computer or accessed remotely via the Internet. Methods specific to
+the \pkg{stashR} package allow users to share data repositories or
+access previously created remote data repositories. In particular,
+methods are available for the S4 classes `localDB' and `remoteDB'
+to insert, retrieve, or delete data from the database as well as to
+synchronize local copies of the data to the remote version of the
+database. Users efficiently access information from a remote
+database by retrieving only the data files indexed by
+user-specified keys and caching this data in a local copy of the
+remote database. The local and remote counterparts of the \pkg{stashR}
+package offer the potential to enhance reproducible research by
+allowing users of \pkg{Sweave} to cache their R computations for a
+research paper in a `localDB' database. This database can then be
+stored on the Internet as a `remoteDB' database. When readers of
+the research paper wish to reproduce the computations involved in
+creating a specific figure or calculating a specific numeric value,
+they can access the `remoteDB' database and obtain the R objects
+involved in the computation.
 
 
 \end{abstract}
@@ -65,6 +66,19 @@ data from a `remoteDB' key-value database stored remotely on the
 internet. This dual functionality of the \pkg{stashR} package
 offers potential applications to future work in creating research documents
 that satisfy the demands of reproducible research.
+
+\subsection{Contributions of the \pkg{stashR} Package}
+The \pkg{stashR} package adds important functionalities to data handling in R.
+These contributions include:
+\begin{itemize}
+    \item the ability to access remote databases efficiently
+    \item a set of tools for creating a local database to export to a remote
+        locale
+    \item a tool for synchronizing local copies of a database to the remote 
+        version
+    \item an abstract interface consisting of 6 methods for local and remote 
+        databases.
+\end{itemize}    
 
 
 \section{Design Rationale}
@@ -323,7 +337,7 @@ create a basic `localDB' database. Note that each time we call
 > dbList(fhLocal)
 \end{Sinput}
 \begin{Soutput}
-[1] "matrix"    "dataframe" "list"      "vector"   
+[1] "vector"    "matrix"    "dataframe"
 \end{Soutput}
 \begin{Sinput}
 > l <- list(v = v, m = m, df = d)
@@ -331,7 +345,7 @@ create a basic `localDB' database. Note that each time we call
 > dbList(fhLocal)
 \end{Sinput}
 \begin{Soutput}
-[1] "matrix"    "dataframe" "list"      "vector"   
+[1] "vector"    "matrix"    "dataframe" "list"     
 \end{Soutput}
 \end{Schunk}
 
@@ -491,7 +505,7 @@ synchronizes only the specified keys.
 \end{Schunk}
 
 
-\subsection{Motivating Example: MCAPS database} 
+\section{Application: NMMAPS database} 
 
 to be filled in later...
  
