@@ -52,6 +52,20 @@
 ## }
 
 
+setMethod("initialize", "remoteDB",
+          function(.Object, ...) {
+              .Object <- callNextMethod()
+              dbCreate(.Object)
+              .Object
+          })
+
+setMethod("initialize", "localDB",
+          function(.Object, ...) {
+              .Object <- callNextMethod()
+              dbCreate(.Object)
+              .Object
+          })
+
 setMethod("dbCreate",
           signature(db = "remoteDB"),
           function(db, ...) {
