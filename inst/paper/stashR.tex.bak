@@ -8,6 +8,7 @@
 \usepackage[noae]{Sweave}
 \usepackage[margin=1in]{geometry}
 \usepackage{natbib}
+\usepackage{asa} 
 
 \title{Interacting with local and remote data repositories\\ 
 using the \textbf{stashR} package for R}
@@ -55,11 +56,13 @@ involved in the computation.
 
 \section{Overview and Motivation}
 
-The \pkg{stashR} R package is an extension to local and remote databases of the  
-\pkg{filehash} package by Roger Peng~\citep{filehash}, which allows users to work 
-interactively with data sets too large to be loaded into R as a single object. 
-The \pkg{stashR} package can be used to create a local `localDB'
-key-value database where data files are indexed by character string keys and to download
+The R package \pkg{filehash}~\cite{filehash} addresses the issue of how to work interactively 
+with large data sets that cannot be loaded into R as a single object due to 
+limitations in physical memory size. The \pkg{stashR} R package extends the 
+\pkg{filehash} package to local and remote databases. As is, the package 
+\pkg{stashR} can be used to create a local `localDB'
+key-value database where data files are indexed by character string keys. The
+\pkg{stashR} package can also be used by individuals to download
 data from a `remoteDB' key-value database stored remotely on the 
 internet. This dual functionality of the \pkg{stashR} package
 offers potential applications to future work in creating research documents
@@ -79,53 +82,9 @@ These contributions include:
 \end{itemize}  
 
 \subsection{Related R packages}  
-
-The \pkg{filehash} package allows an individual to interactively access a
-(potentially quite large) dataset through a key-value database. As
-\pkg{stashR} is an extension of \pkg{filehash}, \pkg{stashR} is
-related to many of the large data handling packages mentioned in
-\cite{filehash}. One such package is \pkg{g.data} by David
-Brahm~\citep{g.data}. One of the main ideas of \pkg{filehash} and 
-hence \pkg{stashR} is that by using keys to index the data, we 
-can efficiently download only the necessary data objects on 
-an interactive level. The \pkg{g.data} package provides interfaces
-to delayed-data packages (DDPS). DDPS efficiently accesses data by 
-exploiting the lazy evaluation feature of R to load the specified data into 
-memory only once the data is requested. An individual can interface 
-with one of the common relational databases (Oracle, MySQL or SQLite) in R by using 
-the S4 methods and generics in the \pkg{DBI} package created by the~\cite{DBI},
-along with \pkg{ROracle}, \pkg{RMySQL} or \pkg{RSQLite} respectively. 
-
-The \pkg{reposTools} package on Bioconductor by~\cite{reposTools}, which 
-mainly serves to create and interfaced with repositories of packages, has
-several features whose purposes are similar to features of the \pkg{stashR} 
-package.  Briefly, the \pkg{reposTools} package allows a user post the contents of
-a local directory to a server for distribution. While creating the remote
-repository, \pkg{resposTools} adds files to the repository that contain 
-information about the repository's contents. On the client side, 
-\pkg{reposTools} allows users to access the packages or objects in the
-remote repository and download, install or update to the user's specified
-local directory. The automatic library management feature of \pkg{reposTools}
-keeps track of which R packages are installed on the user's system as well
-as the corresponding version numbers which facilitates the updating 
-packages feature of \pkg{reposTools}.  Both the \pkg{reposTools} and \pkg{stashR}
-packages help an individual to create a remote repository to
-distribute the contents to other R users, who are provided with
-specific methods to interface with the remote repository. Both packages
-allow a user to download files from the remote repository to a local
-repository and later to `synchronize' or `update' local copies of
-files or packages to the remote version. Unlike \pkg{reposTools}, 
-the \pkg{stashR} package contains the tools to construct local repositories, 
-but \pkg{stashR} does not yet automate the posting of this repository to 
-a server as does \pkg{reposTools}. The key difference between the two 
-packages is that \pkg{reposTools} is intended for repositories 
-of R packages whereas \pkg{stashR} is designed for repositories of 
-key-value databases.
- 
-
-
-
-
+As mentioned previously,
+maDB~\cite{maDB}
+g.data~\cite{g.data} 
 
 \section{Design Rationale}
 
@@ -351,59 +310,93 @@ For objects of the class `localDB', we start out by
 defining a local directory in which we will create the 
 repository.
 
-<<define directory>>=
-wd <- getwd()
-dir <- file.path(wd,"localDBExample")
-@ 
+\begin{Schunk}
+\begin{Sinput}
+> wd <- getwd()
+> dir <- file.path(wd, "localDBExample")
+\end{Sinput}
+\end{Schunk}
 
 \noindent Next, we perform a two-step process to create the `localDB' object, 
 which we will call `fhLocal'.
-<<initialize localDB>>=
-fhLocal <- new("localDB", dir = dir, name = "localDB Example")
-dbCreate(fhLocal)
-@
+\begin{Schunk}
+\begin{Sinput}
+> fhLocal <- new("localDB", dir = dir, name = "localDB Example")
+> dbCreate(fhLocal)
+\end{Sinput}
+\end{Schunk}
 
 \noindent We now insert different types of R objects into the local repository to 
 create a basic `localDB' database. Note that each time we call 
 \code{dbList}, we see the keys indexing all of the data files we have inserted.
 
-<<insert R objects>>=
-v <- 1:10
-dbInsert(fhLocal,key = "vector", value = v, overwrite = TRUE)
-m <- matrix(1:20,5,4)
-dbInsert(fhLocal,key = "matrix", value = m, overwrite = TRUE)
-d <- data.frame(cbind(id = 1:5, age=c(12,11,15,11,14), sex = c(1,1,0,1,0)))
-dbInsert(fhLocal,key = "dataframe", value = d, overwrite = TRUE)
-
-dbList(fhLocal)
-
-l <- list(v = v, m = m, df = d)
-dbInsert(fhLocal,key = "list", value = l, overwrite = TRUE)
-
-dbList(fhLocal)
-@
+\begin{Schunk}
+\begin{Sinput}
+> v <- 1:10
+> dbInsert(fhLocal, key = "vector", value = v, overwrite = TRUE)
+> m <- matrix(1:20, 5, 4)
+> dbInsert(fhLocal, key = "matrix", value = m, overwrite = TRUE)
+> d <- data.frame(cbind(id = 1:5, age = c(12, 11, 15, 11, 14), 
++     sex = c(1, 1, 0, 1, 0)))
+> dbInsert(fhLocal, key = "dataframe", value = d, overwrite = TRUE)
+> dbList(fhLocal)
+\end{Sinput}
+\begin{Soutput}
+[1] "vector"    "matrix"    "dataframe"
+\end{Soutput}
+\begin{Sinput}
+> l <- list(v = v, m = m, df = d)
+> dbInsert(fhLocal, key = "list", value = l, overwrite = TRUE)
+> dbList(fhLocal)
+\end{Sinput}
+\begin{Soutput}
+[1] "vector"    "matrix"    "dataframe" "list"     
+\end{Soutput}
+\end{Schunk}
 
 \noindent We can fetch any of the R objects saved in our local repository.
-<<fetching>>=
-dbFetch(fhLocal, "dataframe") 
-@
+\begin{Schunk}
+\begin{Sinput}
+> dbFetch(fhLocal, "dataframe")
+\end{Sinput}
+\begin{Soutput}
+  id age sex
+1  1  12   1
+2  2  11   1
+3  3  15   0
+4  4  11   1
+5  5  14   0
+\end{Soutput}
+\end{Schunk}
 
 \noindent If we delete a data file from the local repository, \code{dbList} or
 \code{dbExists} can be used to confirm the deletion.
-<<deleting>>=
-dbDelete(fhLocal, "vector")
-dbExists(fhLocal, "vector")
-dbList(fhLocal) 
-@
+\begin{Schunk}
+\begin{Sinput}
+> dbDelete(fhLocal, "vector")
+> dbExists(fhLocal, "vector")
+\end{Sinput}
+\begin{Soutput}
+[1] FALSE
+\end{Soutput}
+\begin{Sinput}
+> dbList(fhLocal)
+\end{Sinput}
+\begin{Soutput}
+[1] "matrix"    "dataframe" "list"     
+\end{Soutput}
+\end{Schunk}
 
 
 \subsubsection{Objects of the class `remoteDB'} 
 
 The same data used in the previous example for `localDB'
 has been stored in a `remoteDB' repository on the internet at:
-<<url>>=
-myurl <- "http://www.biostat.jhsph.edu/~seckel/remoteDBExample/"
-@
+\begin{Schunk}
+\begin{Sinput}
+> myurl <- "http://www.biostat.jhsph.edu/~seckel/remoteDBExample/"
+\end{Sinput}
+\end{Schunk}
 
 In this example, we will use the `remoteDB' methods for 
 the \pkg{stashR} package interface functions: \code{dbFetch}, 
@@ -415,13 +408,14 @@ Again, we start off with the two-step process of creating a `remoteDB'
 object. The local copy of the database will be located in our working
 directory under a directory called `remoteDBExample'. 
 
-<<create remoteDB>>=
-wd <- getwd()
-dir <- file.path(wd,"remoteDBExample") 
-fhRemote <- new("remoteDB", url= myurl, 
-            dir = dir, name= "remoteDB Example")
-dbCreate(fhRemote)
-@
+\begin{Schunk}
+\begin{Sinput}
+> wd <- getwd()
+> dir <- file.path(wd, "remoteDBExample")
+> fhRemote <- new("remoteDB", url = myurl, dir = dir, name = "remoteDB Example")
+> dbCreate(fhRemote)
+\end{Sinput}
+\end{Schunk}
 
 \noindent When we run \code{dbList} on the `remoteDB' object, `fhRemote',
 we see the same four character string keys corresponding to the data values
@@ -431,10 +425,20 @@ the local copy of the database. The function \code{dbExists} can be used as a
 shortcut, when the list of keys is long, to see which elements of a vector 
 of keys are contained in the database.
 
-<<list and save>>=
-dbList(fhRemote, save = TRUE)
-dbExists(fhRemote,c("vector", "array","list", "function"))
-@
+\begin{Schunk}
+\begin{Sinput}
+> dbList(fhRemote, save = TRUE)
+\end{Sinput}
+\begin{Soutput}
+[1] "matrix"    "dataframe" "list"      "vector"   
+\end{Soutput}
+\begin{Sinput}
+> dbExists(fhRemote, c("vector", "array", "list", "function"))
+\end{Sinput}
+\begin{Soutput}
+[1]  TRUE FALSE  TRUE FALSE
+\end{Soutput}
+\end{Schunk}
 
 \noindent 
 
@@ -443,9 +447,6 @@ from \code{dbFetch}. Once we have downloaded a data file to the local cache,
 \code{dbFetch} simply looks in the local cache for the data file rather than
 downloading the file again over the internet. 
 
-<<fetching Remote vector, results=hide, echo=false>>=
-dbFetch(fhRemote, "vector") 
-@ 
 \begin{verbatim}
 > dbFetch(fhRemote, "vector") 
 trying URL 'http://www.biostat.jhsph.edu/~seckel/remoteDBExample//data/vector'
@@ -461,9 +462,6 @@ downloaded 42 bytes
  [1]  1  2  3  4  5  6  7  8  9 10
 \end{verbatim}
 
-<<fetching Remote matrix, results=hide, echo=false>>=
-dbFetch(fhRemote, "matrix") 
-@ 
 \begin{verbatim}
 > dbFetch(fhRemote, "matrix") 
 trying URL 'http://www.biostat.jhsph.edu/~seckel/remoteDBExample//data/matrix'
@@ -484,9 +482,19 @@ downloaded 42 bytes
 [5,]    5   10   15   20
 \end{verbatim}
 
-<<fetching Remote matrix2>>=
-dbFetch(fhRemote, "matrix") 
-@ 
+\begin{Schunk}
+\begin{Sinput}
+> dbFetch(fhRemote, "matrix")
+\end{Sinput}
+\begin{Soutput}
+     [,1] [,2] [,3] [,4]
+[1,]    1    6   11   16
+[2,]    2    7   12   17
+[3,]    3    8   13   18
+[4,]    4    9   14   19
+[5,]    5   10   15   20
+\end{Soutput}
+\end{Schunk}
 
 \noindent As mentioned previously, the function \code{dbSync} allows
 a user to synchronize a local copy of a remote database to the remote version
@@ -494,17 +502,13 @@ of the database. Using the \code{key = NULL} option synchronizes all data files
 in the local copy of the database, while specifying a vector of keys
 synchronizes only the specified keys. 
 
-<<synchronizing>>= 
-dbSync(fhRemote, key = NULL)
-dbSync(fhRemote, key = c("matrix","vector"))
-@
+\begin{Schunk}
+\begin{Sinput}
+> dbSync(fhRemote, key = NULL)
+> dbSync(fhRemote, key = c("matrix", "vector"))
+\end{Sinput}
+\end{Schunk}
 
-<<remove fhRemote directory,results=hide,echo=false>>=
-unlink(fhRemote@dir, recursive = TRUE)
-@ 
-<<remove fhLocal directory,results=hide,echo=false>>=
-unlink(fhLocal@dir, recursive = TRUE)
-@ 
 
 \section{Application: NMMAPS database} 
 
@@ -536,7 +540,7 @@ document.
 
 
 
-\bibliographystyle{apa}
+\bibliographystyle{asa}
 \bibliography{stashRbiblio}
 
 

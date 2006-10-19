@@ -1,4 +1,4 @@
-This is e-TeX, Version 3.141592-2.2 (MiKTeX 2.4) (preloaded format=latex 2005.9.12)  16 OCT 2006 14:03
+This is e-TeX, Version 3.141592-2.2 (MiKTeX 2.4) (preloaded format=latex 2005.9.12)  19 OCT 2006 17:58
 entering extended mode
 **stashR.tex
 (stashR.tex
@@ -221,67 +221,66 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 26.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 26.
-LaTeX Font Info:    Try loading font information for TS1+bch on input line 74.
+LaTeX Font Info:    Try loading font information for TS1+bch on input line 72.
 
 (C:\texmf\tex\latex\psnfss\ts1bch.fd
 File: ts1bch.fd 2004/10/18 font definitions for TS1/bch.
-)
-LaTeX Font Info:    Try loading font information for OT1+pcr on input line 94.
- (C:\texmf\tex\latex\psnfss\ot1pcr.fd
-File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
-)
-[1
+) [1
 
 ]
-Overfull \hbox (10.77492pt too wide) in paragraph at lines 152--162
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 140.
+
+ (C:\texmf\tex\latex\psnfss\ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
+) [2]
+Overfull \hbox (10.77492pt too wide) in paragraph at lines 198--208
 \OT1/pcr/m/n/10 dir = dir, name = name) \OT1/bch/m/n/10 or \OT1/pcr/m/n/10 new(
 "remoteDB", dir = dir, url = url, name = name) \OT1/bch/m/n/10 where
  []
 
-[2]
-Overfull \hbox (13.23491pt too wide) in paragraph at lines 210--218
+
+Overfull \hbox (13.23491pt too wide) in paragraph at lines 256--264
 []\OT1/bch/m/n/10 The func-tion \OT1/pcr/m/n/10 dbInsert(db = "localDB" or "rem
 oteDB", key = "character", value= "ANY",
  []
 
 [3]
-Overfull \hbox (22.80139pt too wide) in paragraph at lines 265--274
+Overfull \hbox (22.80139pt too wide) in paragraph at lines 311--320
 \OT1/bch/m/n/10 the repos-i-tory. The func-tion call is \OT1/pcr/m/n/10 dbDelet
 e(db = "remoteDB" or "localDB", key = "character")\OT1/bch/m/n/10 .
  []
 
-[4]
-Overfull \hbox (3.39203pt too wide) in paragraph at lines 396--401
+[4] [5]
+Overfull \hbox (3.39203pt too wide) in paragraph at lines 442--447
 [][]\OT1/bch/m/n/10 In this ex-am-ple, we will use the `re-mot-eDB' meth-ods fo
 r the \OT1/bch/b/n/10 stashR \OT1/bch/m/n/10 pack-age in-ter-face func-tions: \
 OT1/pcr/m/n/10 dbFetch\OT1/bch/m/n/10 ,
  []
 
-[5]
-LaTeX Font Info:    Try loading font information for TS1+pcr on input line 458.
+LaTeX Font Info:    Try loading font information for TS1+pcr on input line 504.
 
- (C:\texmf\tex\latex\psnfss\ts1pcr.fd
+(C:\texmf\tex\latex\psnfss\ts1pcr.fd
 File: ts1pcr.fd 2001/06/04 font definitions for TS1/pcr.
 )
-Overfull \hbox (22.24498pt too wide) in paragraph at lines 458--458
+Overfull \hbox (22.24498pt too wide) in paragraph at lines 504--504
 []\OT1/pcr/m/n/10 trying URL \TS1/pcr/m/n/10 '\OT1/pcr/m/n/10 http://www.biosta
 t.jhsph.edu/~seckel/remoteDBExample//data/vector.SIG\TS1/pcr/m/n/10 '[] 
  []
 
 
-Overfull \hbox (22.24498pt too wide) in paragraph at lines 478--478
+Overfull \hbox (22.24498pt too wide) in paragraph at lines 524--524
 []\OT1/pcr/m/n/10 trying URL \TS1/pcr/m/n/10 '\OT1/pcr/m/n/10 http://www.biosta
 t.jhsph.edu/~seckel/remoteDBExample//data/matrix.SIG\TS1/pcr/m/n/10 '[] 
  []
 
-[6] [7] (stashR.aux) ) 
+[6] (stashR.bbl) [7] (stashR.aux) ) 
 Here is how much of TeX's memory you used:
- 2224 strings out of 95898
- 28515 string characters out of 1195288
- 78202 words of memory out of 1078907
- 5179 multiletter control sequences out of 60000
- 14556 words of font info for 39 fonts, out of 500000 for 1000
+ 2236 strings out of 95898
+ 28617 string characters out of 1195288
+ 78714 words of memory out of 1078907
+ 5185 multiletter control sequences out of 60000
+ 15174 words of font info for 40 fonts, out of 500000 for 1000
  14 hyphenation exceptions out of 607
- 32i,6n,32p,271b,270s stack positions out of 1500i,500n,5000p,200000b,32768s
+ 32i,6n,32p,271b,241s stack positions out of 1500i,500n,5000p,200000b,32768s
 
-Output written on stashR.dvi (7 pages, 24640 bytes).
+Output written on stashR.dvi (7 pages, 28300 bytes).

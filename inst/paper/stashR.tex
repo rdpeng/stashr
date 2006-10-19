@@ -55,13 +55,11 @@ involved in the computation.
 
 \section{Overview and Motivation}
 
-The R package \pkg{filehash} addresses the issue of how to work interactively 
-with large data sets that cannot be loaded into R as a single object due to 
-limitations in physical memory size. The \pkg{stashR} R package extends the 
-\pkg{filehash} package to local and remote databases. As is, the package 
-\pkg{stashR} can be used to create a local `localDB'
-key-value database where data files are indexed by character string keys. The
-\pkg{stashR} package can also be used by individuals to download
+The \pkg{stashR} R package is an extension to local and remote databases of the  
+\pkg{filehash} package by Roger Peng~\citep{filehash}, which allows users to work 
+interactively with data sets too large to be loaded into R as a single object. 
+The \pkg{stashR} package can be used to create a local `localDB'
+key-value database where data files are indexed by character string keys and to download
 data from a `remoteDB' key-value database stored remotely on the 
 internet. This dual functionality of the \pkg{stashR} package
 offers potential applications to future work in creating research documents
@@ -78,7 +76,55 @@ These contributions include:
         version
     \item an abstract interface consisting of 6 methods for local and remote 
         databases.
-\end{itemize}    
+\end{itemize}  
+
+\subsection{Related R packages}  
+
+The \pkg{filehash} package allows an individual to interactively access a
+(potentially quite large) dataset through a key-value database. As
+\pkg{stashR} is an extension of \pkg{filehash}, \pkg{stashR} is
+related to many of the large data handling packages mentioned in
+\cite{filehash}. One such package is \pkg{g.data} by David
+Brahm~\citep{g.data}. One of the main ideas of \pkg{filehash} and 
+hence \pkg{stashR} is that by using keys to index the data, we 
+can efficiently download only the necessary data objects on 
+an interactive level. The \pkg{g.data} package provides interfaces
+to delayed-data packages (DDPS). DDPS efficiently accesses data by 
+exploiting the lazy evaluation feature of R to load the specified data into 
+memory only once the data is requested. An individual can interface 
+with one of the common relational databases (Oracle, MySQL or SQLite) in R by using 
+the S4 methods and generics in the \pkg{DBI} package created by the~\cite{DBI},
+along with \pkg{ROracle}, \pkg{RMySQL} or \pkg{RSQLite} respectively. 
+
+The \pkg{reposTools} package on Bioconductor by~\cite{reposTools}, which 
+mainly serves to create and interfaced with repositories of packages, has
+several features whose purposes are similar to features of the \pkg{stashR} 
+package.  Briefly, the \pkg{reposTools} package allows a user post the contents of
+a local directory to a server for distribution. While creating the remote
+repository, \pkg{resposTools} adds files to the repository that contain 
+information about the repository's contents. On the client side, 
+\pkg{reposTools} allows users to access the packages or objects in the
+remote repository and download, install or update to the user's specified
+local directory. The automatic library management feature of \pkg{reposTools}
+keeps track of which R packages are installed on the user's system as well
+as the corresponding version numbers which facilitates the updating 
+packages feature of \pkg{reposTools}.  Both the \pkg{reposTools} and \pkg{stashR}
+packages help an individual to create a remote repository to
+distribute the contents to other R users, who are provided with
+specific methods to interface with the remote repository. Both packages
+allow a user to download files from the remote repository to a local
+repository and later to `synchronize' or `update' local copies of
+files or packages to the remote version. Unlike \pkg{reposTools}, 
+the \pkg{stashR} package contains the tools to construct local repositories, 
+but \pkg{stashR} does not yet automate the posting of this repository to 
+a server as does \pkg{reposTools}. The key difference between the two 
+packages is that \pkg{reposTools} is intended for repositories 
+of R packages whereas \pkg{stashR} is designed for repositories of 
+key-value databases.
+ 
+
+
+
 
 
 \section{Design Rationale}
@@ -535,8 +581,8 @@ document.
 
 
 
-%\bibliographystyle{asa}
-%\bibliography{combined}
+\bibliographystyle{apa}
+\bibliography{stashRbiblio}
 
 
 \end{document}
