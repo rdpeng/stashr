@@ -19,6 +19,11 @@ setClass("localDB",
 ######################################################################
 ## Methods for 'localDB'
 
+setMethod("dbUnlink", signature(db = "localDB"),
+          function(db, ...) {
+              unlink(db@dir, recursive = TRUE)
+          })
+
 setMethod("dbInsert",
           signature(db = "localDB", key = "character", value = "ANY"),
           function(db, key, value, overwrite = TRUE, ...) {

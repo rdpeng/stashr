@@ -3,10 +3,11 @@
 \alias{remoteDB}
 \alias{remoteDB-class}
 \alias{localDB-class}
+\alias{dbUnlink,localDB-method}
+\alias{dbUnlink}
 \alias{dbInsert,localDB,character-method}
 \alias{dbFetch,localDB,character-method}
 \alias{dbDelete,localDB,character-method}
-%\alias{dbList,localDB,character-method}
 \alias{dbList,localDB-method}
 \alias{dbExists,localDB,character-method}
 \alias{dbDelete,remoteDB,character-method}
@@ -21,8 +22,6 @@
 \alias{dbCreate,localDB-method}
 \alias{dbCreate}
 
-\alias{setDir<-}
-\alias{setDir<-,remoteDB,character-method}
 
 \title{Classes "remoteDB" and "localDB"}
 \description{

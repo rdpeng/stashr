@@ -13,7 +13,8 @@ exportMethods(
               "dbExists",
               "dbList",
               "dbDelete",
-	      "dbSync"
+	      "dbSync",
+              "dbUnlink"
               )
 
 ## Imports
