@@ -353,6 +353,7 @@ repository.
 
 \begin{Schunk}
 \begin{Sinput}
+> library(stashR)
 > wd <- getwd()
 > dir <- file.path(wd, "localDBExample")
 \end{Sinput}
@@ -383,7 +384,7 @@ create a basic `localDB' database. Note that each time we call
 > dbList(fhLocal)
 \end{Sinput}
 \begin{Soutput}
-[1] "matrix"    "dataframe" "list"      "vector"   
+[1] "vector"    "matrix"    "dataframe"
 \end{Soutput}
 \begin{Sinput}
 > l <- list(v = v, m = m, df = d)
@@ -391,7 +392,7 @@ create a basic `localDB' database. Note that each time we call
 > dbList(fhLocal)
 \end{Sinput}
 \begin{Soutput}
-[1] "matrix"    "dataframe" "list"      "vector"   
+[1] "vector"    "matrix"    "dataframe" "list"     
 \end{Soutput}
 \end{Schunk}
 
@@ -553,36 +554,41 @@ synchronizes only the specified keys.
 
 \section{Application: NMMAPS database} 
 
-to be filled in later...
+The National Morbidity, Mortality, and Air Pollution Study (NMMAPS) is
+a large multi-site time series study of the short-term effects of
+ambient air pollution on health~\citep{nmmaps1,nmmaps2}.
+
+\section{Application: Cached computations}
+
+
  
 \section{Discussion}
 
-The \pkg{stashR} package has been designed as a
-tool for both producers and consumers of statistical documents in
-the context of streamlining and enhancing reproducible research
-documents created using \code{Sweave}. There is a need for future 
-work linking, on the producer's end, the results of R code chunks 
-of \code{Sweave} documents to a localDB database. This local 
-database would then need to be transferred in an automatic way as a
-remoteDB database to a repository on the internet. Ideally,
-this internet repository would be a central database that all
-statistical researchers could use, although individuals could 
-alternatively choose to store their data on their own server. On the
-consumer's end, we need to develop a method for allowing a user to
-`click' on a figure or numerical result in a pdf document produced
-by \code{Sweave} and then have returned to them the R objects
-(stored in the remoteDB database) used in the computation of
-their result of interest as well as the R code chunk that operates
-on these objects. In this case, the R objects used in the
-computation of each figure or numerical value would be indexed by
+The \pkg{stashR} package has been designed as a tool for both
+producers and consumers of statistical documents in the context of
+streamlining and enhancing reproducible research documents created
+using \code{Sweave}. There is a need for future work linking, on the
+producer's end, the results of R code chunks of \code{Sweave}
+documents to a localDB database. This local database would then need
+to be transferred in an automatic way as a remoteDB database to a
+repository on the internet. Ideally, this internet repository would be
+a central database that all statistical researchers could use,
+although individuals could alternatively choose to store their data on
+their own server. On the consumer's end, we need to develop a method
+for allowing a user to `click' on a figure or numerical result in a
+pdf document produced by \code{Sweave} and then have returned to them
+the R objects (stored in the remoteDB database) used in the
+computation of their result of interest as well as the R code chunk
+that operates on these objects. In this case, the R objects used in
+the computation of each figure or numerical value would be indexed by
 a key that is the name of each R code chunk in the \code{Sweave}
 document.
 
 
 
 
-\bibliographystyle{apa}
-\bibliography{stashRbiblio}
+\bibliographystyle{asa}
+\bibliography{stashRbiblio,combined}
 
 
 \end{document}
