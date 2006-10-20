@@ -514,9 +514,6 @@ The National Morbidity, Mortality, and Air Pollution Study (NMMAPS) is
 a large multi-site time series study of the short-term effects of
 ambient air pollution on health~\citep{nmmaps1,nmmaps2}.
 
-\section{Application: Cached computations}
-
-
  
 \section{Discussion}
 
