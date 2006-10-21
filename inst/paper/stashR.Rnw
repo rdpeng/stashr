@@ -9,6 +9,8 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{natbib}
 
+\renewcommand{\baselinestretch}{1.5}
+
 \title{Interacting with local and remote data repositories\\ 
 using the \textbf{stashR} package for R}
 
