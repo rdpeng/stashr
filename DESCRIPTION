@@ -5,7 +5,7 @@ LazyLoad:  yes
 Depends:  R (>= 2.3.1), methods, filehash (>= 0.8)
 Imports:  tools
 Collate:  stashR.R init.R util.R valid.R zzz.R
-Title:  A Set of Tools for Administering SHarEd Repositories
+Title:  A Set of Tools for Administering SHared Repositories
 Author:  Sandy Eckel, Roger D. Peng
 Maintainer:  Roger D. Peng <rpeng@jhsph.edu>
 Description:  A Set of Tools for Administering SHared Repositories
