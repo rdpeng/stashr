@@ -22,5 +22,6 @@ importFrom(tools, md5sum)
 import(filehash)
 
 exportMethods(
-             "setDir<-"
-             )
+              "setDir<-",
+              "initialize"
+              )
