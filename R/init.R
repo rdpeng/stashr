@@ -77,7 +77,7 @@ setMethod("dbCreate",
 
               ## create the local main directory and data sub-directory to
               ## store the data files ##
-              dir.create(db@dir)
+              dir.create(db@dir, recursive = TRUE)
               dir.create(file.path(db@dir,"data"))
 
               ## save url in the R workspace format in the main directory ##
@@ -94,7 +94,7 @@ setMethod("dbCreate",
 
               ## create the local main directory and data
               ## sub-directory to store the data files
-              dir.create(db@dir, showWarnings = FALSE)
+              dir.create(db@dir, showWarnings = FALSE, recursive = TRUE)
               dir.create(file.path(db@dir, "data"), showWarnings = FALSE,
                          recursive = TRUE)
           })

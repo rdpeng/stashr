@@ -284,9 +284,9 @@ getdata <- function(db,key){
     }
     status <- tryCatch({
         download.file(file.path(db@url, "data", key),
-                      localFiles["data"], mode = "wb", cacheOK = FALSE)
+                      localFiles["data"], mode = "wb", cacheOK = FALSE, quiet = TRUE)
         download.file(file.path(db@url, "data", paste(key, ".SIG", sep = "")),
-                      localFiles["sig"], mode = "wb", cacheOK = FALSE)
+                      localFiles["sig"], mode = "wb", cacheOK = FALSE, quiet = TRUE)
     }, error = handler, interrupt = handler)
 
     if(inherits(status, "condition"))
