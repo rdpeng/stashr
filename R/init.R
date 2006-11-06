@@ -66,6 +66,20 @@ setMethod("initialize", "localDB",
               .Object
           })
 
+createLocalDir <- function(db) {
+    ## create the local main directory and data sub-directory to
+    ## store the data files ##
+    datadir <- file.path(db@dir,"data")
+    status <- dir.create(db@dir, showWarnings = FALSE, recursive = TRUE)
+    
+    if(!status && !file.exists(db@dir))
+        stop(gettextf("problem creating directory '%s'", db@dir))
+    status <- dir.create(datadir, showWarnings = FALSE, recursive = TRUE)
+    
+    if(!status && !file.exists(datadir))
+        stop(gettextf("problem creating directory '%s'", datadir))
+}
+
 setMethod("dbCreate",
           signature(db = "remoteDB"),
           function(db, ...) {
@@ -75,11 +89,8 @@ setMethod("dbCreate",
               if (length(grep("/$", db@url, perl = TRUE)) > 0)
                   db@url <- sub("/$","", db@url)
 
-              ## create the local main directory and data sub-directory to
-              ## store the data files ##
-              dir.create(db@dir, recursive = TRUE)
-              dir.create(file.path(db@dir,"data"))
-
+              createLocalDir(db)
+ 
               ## save url in the R workspace format in the main directory ##
               myurl <- db@url 
               save(myurl, file = file.path(db@dir,"url"))
@@ -88,20 +99,10 @@ setMethod("dbCreate",
 setMethod("dbCreate",
           signature(db = "localDB"),
           function(db, ...) {
-              ## remove trailing "/" on dir and url ##
+              ## remove trailing "/" on dir ##
               if (length(grep("/$", db@dir, perl = TRUE)) > 0)
                   db@dir <- sub("/$","", db@dir)
-
-              ## create the local main directory and data
-              ## sub-directory to store the data files
-              dir.create(db@dir, showWarnings = FALSE, recursive = TRUE)
-              dir.create(file.path(db@dir, "data"), showWarnings = FALSE,
-                         recursive = TRUE)
-              status <- all(file.exists(c(db@dir, file.path(db@dir, "data"))))
-
-              if(!status)
-                  warning(gettextf("problem with directory '%s'", db@dir))
-              status
+              createLocalDir(db)
           })
 
 

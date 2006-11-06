@@ -1,6 +1,6 @@
 Package:  stashR
 Version:  0.1
-Date:  2006-11-03
+Date:  2006-11-06
 LazyLoad:  yes
 Depends:  R (>= 2.3.1), methods, filehash (>= 0.8)
 Imports:  tools
