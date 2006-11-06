@@ -97,6 +97,11 @@ setMethod("dbCreate",
               dir.create(db@dir, showWarnings = FALSE, recursive = TRUE)
               dir.create(file.path(db@dir, "data"), showWarnings = FALSE,
                          recursive = TRUE)
+              status <- all(file.exists(c(db@dir, file.path(db@dir, "data"))))
+
+              if(!status)
+                  warning(gettextf("problem with directory '%s'", db@dir))
+              status
           })
 
 
