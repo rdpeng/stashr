@@ -45,9 +45,9 @@ setMethod("dbInsert",
 
               ## update the 'keys' file
               if(!dbExists(db, key)) {
-                  conA <- file(file.path(db@dir, "keys"))
-                  open(conA, "a")
-                  on.exit(close(conA))
+                  ## conA <- file(file.path(db@dir, "keys"))
+                  ## open(conA, "a")
+                  ## on.exit(close(conA))
                   cat(key, file = file.path(db@dir,"keys"),sep = "\n",
                       append = TRUE)
               }
@@ -74,9 +74,9 @@ setMethod("dbDelete", signature(db = "localDB", key = "character"),
                   keylist <- dbList(db)
                   keyindex <- match(key,keylist)
                   newkeylist <- keylist[-keyindex]
-                  con <- file(file.path(db@dir, "keys"))
-                  open(con, "w")  ## 'keys' is a text file
-                  on.exit(close(con))
+                  ## con <- file(file.path(db@dir, "keys"))
+                  ## open(con, "w")  ## 'keys' is a text file
+                  ## on.exit(close(con))
                   cat(newkeylist, file = file.path(db@dir,"keys"),sep = "\n")
               }
           })
