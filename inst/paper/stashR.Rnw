@@ -59,7 +59,7 @@ database and obtain the R objects involved in the computation.
 
 The \pkg{stashR} R package is an extension to local and remote
 databases of the \pkg{filehash} package by Roger
-Peng~\citep{filehash}, which allows users to work interactively with
+Peng~\citep{peng:2006}, which allows users to work interactively with
 data sets too large to be loaded into R as a single object.  The
 \pkg{stashR} package can be used to create a local `localDB' key-value
 database where data files are indexed by character string keys and to
@@ -87,18 +87,18 @@ The \pkg{filehash} package allows an individual to interactively
 access a (potentially quite large) dataset through a key-value
 database. As \pkg{stashR} is an extension of \pkg{filehash},
 \pkg{stashR} is related to many of the large data handling packages
-mentioned in \cite{filehash}. One such package is \pkg{g.data} by
-David Brahm~\citep{g.data}. One of the main ideas of \pkg{filehash}
-and hence \pkg{stashR} is that by using keys to index the data, we can
-efficiently download only the necessary data objects on an interactive
-level. The \pkg{g.data} package provides interfaces to delayed-data
-packages (DDPS). DDPS efficiently accesses data by exploiting the lazy
-evaluation feature of R to load the specified data into memory only
-once the data is requested. An individual can interface with one of
-the common relational databases (Oracle, MySQL or SQLite) in R by
-using the S4 methods and generics in the \pkg{DBI} package created by
-the~\cite{DBI}, along with \pkg{ROracle}, \pkg{RMySQL} or
-\pkg{RSQLite} respectively.
+mentioned in \cite{peng:2006}. One such package is \pkg{g.data} by
+David Brahm~\citep{brahm:2002}. One of the main ideas of
+\pkg{filehash} and hence \pkg{stashR} is that by using keys to index
+the data, we can efficiently download only the necessary data objects
+on an interactive level. The \pkg{g.data} package provides interfaces
+to delayed-data packages (DDPS). DDPS efficiently accesses data by
+exploiting the lazy evaluation feature of R to load the specified data
+into memory only once the data is requested. An individual can
+interface with one of the common relational databases (Oracle, MySQL
+or SQLite) in R by using the S4 methods and generics in the \pkg{DBI}
+package created by the~\cite{DBI}, along with \pkg{ROracle},
+\pkg{RMySQL} or \pkg{RSQLite} respectively.
 
 The \pkg{reposTools} package on Bioconductor by~\cite{reposTools},
 which mainly serves to create and interfaced with repositories of
@@ -368,7 +368,7 @@ dir <- file.path(wd,"localDBExample")
 which we will call `fhLocal'.
 <<initialize localDB>>=
 fhLocal <- new("localDB", dir = dir, name = "localDB Example")
-dbCreate(fhLocal)
+## dbCreate(fhLocal)
 @
 
 \noindent We now insert different types of R objects into the local repository to 
@@ -410,7 +410,7 @@ dbList(fhLocal)
 The same data used in the previous example for `localDB'
 has been stored in a `remoteDB' repository on the internet at:
 <<url>>=
-myurl <- "http://www.biostat.jhsph.edu/~seckel/remoteDBExample/"
+myurl <- "http://www.biostat.jhsph.edu/~seckel/remoteDBExample"
 @
 
 In this example, we will use the `remoteDB' methods for 
@@ -428,7 +428,7 @@ wd <- getwd()
 dir <- file.path(wd,"remoteDBExample") 
 fhRemote <- new("remoteDB", url= myurl, 
             dir = dir, name= "remoteDB Example")
-dbCreate(fhRemote)
+## dbCreate(fhRemote)
 @
 
 \noindent When we run \code{dbList} on the `remoteDB' object, `fhRemote',
@@ -456,12 +456,12 @@ dbFetch(fhRemote, "vector")
 @ 
 \begin{verbatim}
 > dbFetch(fhRemote, "vector") 
-trying URL 'http://www.biostat.jhsph.edu/~seckel/remoteDBExample//data/vector'
+trying URL 'http://www.biostat.jhsph.edu/~seckel/remoteDBExample/data/vector'
 Content type 'text/plain; charset=UTF-8' length 59 bytes
 opened URL
 downloaded 59 bytes
 
-trying URL 'http://www.biostat.jhsph.edu/~seckel/remoteDBExample//data/vector.SIG'
+trying URL 'http://www.biostat.jhsph.edu/~seckel/remoteDBExample/data/vector.SIG'
 Content type 'text/plain; charset=UTF-8' length 42 bytes
 opened URL
 downloaded 42 bytes
@@ -474,12 +474,12 @@ dbFetch(fhRemote, "matrix")
 @ 
 \begin{verbatim}
 > dbFetch(fhRemote, "matrix") 
-trying URL 'http://www.biostat.jhsph.edu/~seckel/remoteDBExample//data/matrix'
+trying URL 'http://www.biostat.jhsph.edu/~seckel/remoteDBExample/data/matrix'
 Content type 'text/plain; charset=UTF-8' length 97 bytes
 opened URL
 downloaded 97 bytes
 
-trying URL 'http://www.biostat.jhsph.edu/~seckel/remoteDBExample//data/matrix.SIG'
+trying URL 'http://www.biostat.jhsph.edu/~seckel/remoteDBExample/data/matrix.SIG'
 Content type 'text/plain; charset=UTF-8' length 42 bytes
 opened URL
 downloaded 42 bytes
@@ -496,11 +496,11 @@ downloaded 42 bytes
 dbFetch(fhRemote, "matrix") 
 @ 
 
-\noindent As mentioned previously, the function \code{dbSync} allows
-a user to synchronize a local copy of a remote database to the remote version
-of the database. Using the \code{key = NULL} option synchronizes all data files
-in the local copy of the database, while specifying a vector of keys
-synchronizes only the specified keys. 
+\noindent As mentioned previously, the function \code{dbSync} allows a
+user to synchronize a local copy of a remote database to the remote
+version of the database. Using the \code{key = NULL} option
+synchronizes all data files in the local copy of the database, while
+specifying a vector of keys synchronizes only the specified keys.
 
 <<synchronizing>>= 
 dbSync(fhRemote, key = NULL)
@@ -518,7 +518,29 @@ unlink(fhLocal@dir, recursive = TRUE)
 
 The National Morbidity, Mortality, and Air Pollution Study (NMMAPS) is
 a large multi-site time series study of the short-term effects of
-ambient air pollution on health~\citep{nmmaps1,nmmaps2}.
+ambient air pollution on
+health~\citep{nmmaps1,nmmaps2,peng:domi:past:zege:same:2005au}.  The
+primary aims of the study were to develop methods for integrating
+national-level databases for the purposes of assessing the health
+effects of air pollution.  Another aim was to disseminate the
+assembled datasets as well as software implementing the methodology
+developed.  To this end, the Internet-based Health and Air Pollution
+Surveillance System (iHAPSS) website was created
+(http://www.ihapss.jhsph.edu/) to distribute the data, methods, and
+documentation.
+
+Currently, the multi-city database of weather, air pollution, and
+mortality time series data are available from the iHAPSS website in
+two formats.  The first format consists of separate city-specific
+comma-separated-value (CSV) files and this format is the most generic,
+suitable for reading into most statistical packages.  The second
+format is specific to the R software system and is \pkg{NMMAPSdata}
+package~\citep{peng:welt:2004}.  This R package combines all of the
+data into a single bundle and provides a few functions for reading the
+data into R.
+
+In practice, one may not be interested in purely reproducing the
+multi-city analyses of the original NMMAPS study.
 
  
 \section{Discussion}
