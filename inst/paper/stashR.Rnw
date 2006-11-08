@@ -18,11 +18,7 @@
 \title{Interacting with local and remote data\\repositories using the
 \pkg{stashR} package}
 
-\author{
-  Sandrah P. Eckel and Roger D. Peng \\
-  \textit{Department of Biostatistics}\\
-  \textit{Johns Hopkins Bloomberg School of Public Health}
-}
+\author{Sandrah P. Eckel\and Roger D. Peng}
 
 \begin{document}
 
