@@ -20,9 +20,9 @@ Type 'q()' to quit R.
 > 
 > library(stashR)
 Loading required package: filehash
-Simple key-value database (version 0.9 2006-10-10)
-A Set of Tools for Administering SHarEd Repositories (version 0.1
-2006-10-09)
+Simple key-value database (version 0.9 2006-11-08)
+A Set of Tools for Administering SHared Repositories (version 0.1
+2006-11-07)
 > 
 > ##########################################################################
 > ## Test objects of class 'remoteDB'
@@ -3037,7 +3037,7 @@ downloaded 40 bytes
 > try( dbFetch(db, "01004") )
 Error in .local(db, key, ...) : specified key not in database
 > try( dbFetch(db, "01004", offline = TRUE) )
-Error in .local(db, key, ...) : have not previously downloaded specified data and you have set 'offline = TRUE'
+Error in .local(db, key, ...) : have not previously downloaded specified data and 'offline = TRUE'
 > try( dbDelete(db,"01073") )
 Error in dbDelete(db, "01073") : cannot delete from a 'remoteDB' database
 > try( dbInsert(db,key = "01004", value = NULL) )
