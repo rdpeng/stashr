@@ -521,7 +521,7 @@ unlink(fhLocal@dir, recursive = TRUE)
 \section{Application: NMMAPS database} 
 
 The National Morbidity, Mortality, and Air Pollution Study (NMMAPS) is
-a large multi-site time series study of the short-term effects of
+a large multi-city time series study of the short-term effects of
 ambient air pollution on
 health~\citep{nmmaps1,nmmaps2,peng:domi:past:zege:same:2005au}.  The
 primary aims of the study were to develop methods for integrating
@@ -533,30 +533,31 @@ Surveillance System (iHAPSS) website was created
 (http://www.ihapss.jhsph.edu/) to distribute the data, methods, and
 documentation.
 
-Currently, the multi-city database of weather, air pollution, and
-mortality time series data are available from the iHAPSS website in
-two formats.  The first format consists of separate city-specific
-comma-separated-value (CSV) files and this format is the most generic,
-suitable for reading into most statistical packages.  The second
-format is specific to the R software system and is the
-\pkg{NMMAPSdata} package~\citep{peng:welt:2004}.  This R package
-combines all of the data into a single bundle and provides a few
-functions for reading the data into R.
+Currently, the multi-city NMMAPS database of weather, air pollution,
+and mortality time series data are available from the iHAPSS website
+in two formats.  The first format consists of separate city-specific
+comma-separated-value (CSV) files and is the most generic, suitable
+for reading into almost any statistical package.  The second format is
+specific to the R software system and is the \pkg{NMMAPSdata}
+package~\citep{peng:welt:2004}.  This R package combines all of the
+data into a single bundle and provides a few functions for reading the
+data into R.
 
 In practice, one may not be interested in purely reproducing the
 multi-city analyses of the original NMMAPS study.  Certain users may
 be interested in city-specific analyses or in pooling results over a
-small number of cities.  For example, an official working in a local
-public health offfice may be interested only in the air pollution
-health risks for his or her city.  Such an analysis may not depend on
-data from other cities.  These users would therefore only require a
-subset of the available data.
+small number of cities in a region.  For example, an official working
+in a local public health office may be interested only in the air
+pollution health risks for his or her city.  Such an analysis may not
+depend on data from other cities.  These users would therefore only
+require a subset of the available data.
 
 As an alternative to the \pkg{NMMAPSdata} package we have developed
 the \pkg{NMMAPSlite} package which takes advantage of the
 functionality made available by the \pkg{stashR} package.  This
 package, when loaded, establishes a connection to three separate
-\class{remoteDB} databases containing NMMAPS data.  The three databases are
+\class{remoteDB} databases containing NMMAPS data.  The three
+databases are
 \begin{itemize}
 \item
 \code{outcome}: daily mortality counts for 108 U.S. cities spanning
@@ -570,47 +571,60 @@ variables;
 The data from each database is associated with a key that is derived
 from the name of the city.  
 
-The \code{readCity} function in \pkg{NMMAPSlite} is the primary
-function for reading the mortality, air pollution, and weather data
-from the databases.  This function has one required argument, which is
-the abbreviated name of the cities.  A character vector of all the
-names available from the database can be obtained by calling the
-\code{listCities} function.  The \code{readCity} function fetches the
-outcome and exposure data from the \code{outcome} and \code{exposure}
-databases, respectively, and by default, merges them together in to
-one data frame and returns it to the user.  If the user sets the
-option \code{asDataFrame = FALSE}, then a list of two data frames
-named ``outcome'' and ``exposure'' is returned.  In addition, there is
-an option to collapse the age categories of the mortality/outcome data
-before merging it with the exposure data.
+The primary functions in the \pkg{NMMAPSlite} package for accessing
+the NMMAPS data are \code{readCity}, \code{getMetaData},
+\code{listCities}, and \code{initDB}.  The \code{readCity} function in
+\pkg{NMMAPSlite} is used for reading the mortality, air pollution, and
+weather data from the \code{exposure} and \code{outcome} databases.
+This function has one required argument, which is the abbreviated name
+of the cities.  A character vector of all the names available from the
+database can be obtained by calling the \code{listCities} function.
+The \code{readCity} function fetches the outcome and exposure data and
+by default, merges them together in to one data frame and returns it
+to the user.  If the user sets the option \code{asDataFrame = FALSE},
+then a list of two data frames named ``outcome'' and ``exposure'' is
+returned.  In addition, there is an option to collapse the age
+categories of the mortality/outcome data before merging it with the
+exposure data.
 
-A second function called \code{getMetaData} can be used to obtain
-objects from the \code{Meta} database.  Called without any arguments,
+The \code{getMetaData} function can be used to obtain objects from the
+\code{Meta} database.  Called with default arguments,
 \code{getMetaData} returns a character vector with the names of the
-objects that are available from the database.  If \code{getMetaData}
-is passed a non-\code{NULL} \code{name} argument, then it returns the
-object associated with that name from the \code{Meta} database.
+metadata objects that are available from the database.  If
+\code{getMetaData} is passed a non-\code{NULL} \code{name} argument,
+then it returns the object associated with that name from the
+\code{Meta} database.
 
 Before any data can be downloaded after loading/attaching the package,
 one must first call the \code{initDB} function to create the local
-directory where for caching the remote data.  The \code{initDB}
-function also initializes the \class{remoteDB} class objects with the
-correct URLs of the databases.
-
-<<Example NMMAPSlite,eval=false>>=
+directory where for caching the remote data.  By default,
+\code{initDB} creates a directory called ``NMMAPS'' in which it will
+cache local copies of the data.  The \code{initDB} function also
+initializes the \class{remoteDB} class objects with the correct URLs
+of the databases.
+<<Initialize NMMAPSlite,eval=false>>=
 library(NMMAPSlite)
 initDB(basedir = "NMMAPS")
+@ 
+After initializing the database, one can access the data using the
+above-mentioned functions.
+<<Get NMMAPS data,eval=false>>=
 listCities()[1:10]
 data <- readCity("akr")
 getMetaData()
 @ 
-
+Census data is available for each of the cities in the database and
+can be obtained by calling \code{getMetaData("census")}.  In addition,
+a short description of all of the variables available for each city
+can be found by typing \code{?variables}.
  
+
+
 \section{Discussion}
 
-The \pkg{stashR} package has been designed as a tool for both
-producers and consumers of statistical documents in the context of
-streamlining and enhancing reproducible research documents created
+The \pkg{stashR} package has been designed as a tool for both authors
+and readers of statistical documents in the context of streamlining
+and enhancing reproducible research documents created, for example, by
 using \code{Sweave}. There is a need for future work linking, on the
 producer's end, the results of R code chunks of \code{Sweave}
 documents to a localDB database. This local database would then need
