@@ -14,7 +14,11 @@
     }
     if(!capabilities("http/ftp"))
         warning("'http/ftp' capabilities not available")
-    
-    ## Switch default filehash database type to 'Remote'
-    ## filehashOption(defaultType = "Remote")
+    .stashROptions$quietDownload <- FALSE
 }    
+
+.stashROptions <- new.env()
+
+stashROption <- function(name, value) {
+    assign(name, value, .stashROptions)
+}
