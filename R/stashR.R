@@ -142,7 +142,7 @@ setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
           function(db, key, offline = FALSE, ...){
               if(offline && !checkLocal(db,key))
                   stop("have not previously downloaded specified data ", 
-                       "and you have set 'offline = TRUE'") 
+                       "and 'offline = TRUE'") 
               if(!offline && !(key %in% dbList(db)))
                   stop("specified key not in database")
               if(!offline && checkLocal(db, key)) {
