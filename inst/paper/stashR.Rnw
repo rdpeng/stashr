@@ -45,12 +45,13 @@ data in a local copy of the remote database.
 %%
 The local and remote counterparts of the \pkg{stashR} package offer
 the potential to enhance reproducible research by allowing users of
-\pkg{Sweave} to cache their R computations for a research paper in a
-\class{localDB} database. This database can then be stored on the Internet
-as a \class{remoteDB} database. When readers of the research paper wish to
-reproduce the computations involved in creating a specific figure or
-calculating a specific numeric value, they can access the \class{remoteDB}
-database and obtain the R objects involved in the computation.
+\code{Sweave} to cache their R computations for a research paper in a
+\class{localDB} database. This database can then be stored on the
+Internet as a \class{remoteDB} database. When readers of the research
+paper wish to reproduce the computations involved in creating a
+specific figure or calculating a specific numeric value, they can
+access the \class{remoteDB} database and obtain the R objects involved
+in the computation.
 
 
 \end{abstract}
