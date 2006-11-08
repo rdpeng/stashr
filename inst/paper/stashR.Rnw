@@ -54,6 +54,9 @@ database and obtain the R objects involved in the computation.
 
 \end{abstract}
 
+<<set options,results=hide,echo=false>>=
+options(width = 60)
+@ 
 
 \section{Overview and Motivation}
 
@@ -534,13 +537,66 @@ mortality time series data are available from the iHAPSS website in
 two formats.  The first format consists of separate city-specific
 comma-separated-value (CSV) files and this format is the most generic,
 suitable for reading into most statistical packages.  The second
-format is specific to the R software system and is \pkg{NMMAPSdata}
-package~\citep{peng:welt:2004}.  This R package combines all of the
-data into a single bundle and provides a few functions for reading the
-data into R.
+format is specific to the R software system and is the
+\pkg{NMMAPSdata} package~\citep{peng:welt:2004}.  This R package
+combines all of the data into a single bundle and provides a few
+functions for reading the data into R.
 
 In practice, one may not be interested in purely reproducing the
-multi-city analyses of the original NMMAPS study.
+multi-city analyses of the original NMMAPS study.  Certain users may
+be interested in city-specific analyses or in pooling results over a
+small number of cities.  For example, an official working in a local
+public health offfice may be interested only in the air pollution
+health risks for his or her city.  Such an analysis may not depend on
+data from other cities.  These users would therefore only require a
+subset of the available data.
+
+As an alternative to the \pkg{NMMAPSdata} package we have developed
+the \pkg{NMMAPSlite} package which takes advantage of the
+functionality made available by the \pkg{stashR} package.  This
+package, when loaded, establishes a connection to three separate
+`remoteDB' databases containing NMMAPS data.  The three databases are
+\begin{itemize}
+\item
+\code{outcome}: daily mortality counts for 108 U.S. cities spanning
+the years 1987--2000;
+\item
+\code{exposure}: daily time series of weather and air pollution
+variables;
+\item
+\code{Meta}: metadata for the NMMAPS cities and other information.
+\end{itemize}
+The data from each database is associated with a key that is derived
+from the name of the city.  
+
+The \code{readCity} function in \pkg{NMMAPSlite} is the primary
+function for reading the mortality, air pollution, and weather data
+from the databases.  This function has one required argument, which is
+the abbreviated name of the cities.  A character vector of all the
+names available from the database can be obtained by calling the
+\code{listCities} function.  The \code{readCity} function fetches the
+outcome and exposure data from the \code{outcome} and \code{exposure}
+databases, respectively, and by default, merges them together in to
+one data frame and returns it to the user.  If the user sets the
+option \code{asDataFrame = FALSE}, then a list of two data frames
+named ``outcome'' and ``exposure'' is returned.  In addition, there is
+an option to collapse the age categories of the mortality/outcome data
+before merging it with the exposure data.
+
+A second function called \code{getMetaData} can be used to obtain
+objects from the \code{Meta} database.  Called without any arguments,
+\code{getMetaData} returns a character vector with the names of the
+objects that are available from the database.  If \code{getMetaData}
+is passed a non-\code{NULL} \code{name} argument, then it returns the
+object associated with that name from the \code{Meta} database.
+
+<<Example NMMAPSlite,eval=false>>=
+library(NMMAPSlite)
+initDB(basedir = "NMMAPS")
+listCities()[1:10]
+data <- readCity("akr")
+getMetaData()
+@ 
 
  
 \section{Discussion}
