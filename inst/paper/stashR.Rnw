@@ -56,7 +56,36 @@ in the computation.
 options(width = 60)
 @ 
 
-\section{Overview and Motivation}
+\section{Overview}
+
+Most scientific research is conducted by collecting data, 
+performing a statistical analysis on the data, obtaining results
+and then publishing these results in a paper. To 
+verify scientific findings we can either replicate or reproduce
+the result of a previous study. Replication is
+the act of collecting an independent data set in the same manner
+as the original study and then proceeding again through the
+process of scientific research to address the uncertainty in 
+the results of the first study. Reproduction of 
+scientific research is the act of using the same data as the 
+original study and performing another statistical analysis to
+analyze the sensitivity of the results of the initial study. 
+While replication is the highest standard of verification, in
+most cases, reproduction is the most practical way to verify
+the results of a study. 
+
+Truly reproducible research can be achieved by making the data 
+used for statistical analysis available to prospective analysts. 
+To disseminate the data, we need a system for physical data 
+distribution. This system would ideally manage data updates 
+by automatically synchronizing each prospective analyst's
+local copy of the data to the remote, master copy of the data. 
+The \pkg{stashR} package is such a system.
+
+
+
+
+\section{The \pkg{stashR} Package}
 
 The \pkg{stashR} R package is an extension to local and remote
 databases of the \pkg{filehash} package by Roger
