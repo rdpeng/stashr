@@ -58,146 +58,125 @@ options(width = 60)
 
 \section{Overview}
 
-Most scientific research is conducted by collecting data, 
-performing a statistical analysis on the data, obtaining results
-and then publishing these results in a paper. To 
-verify scientific findings we can either replicate or reproduce
-the result of a previous study. Replication is
-the act of collecting an independent data set in the same manner
-as the original study and then proceeding again through the
-process of scientific research to address the uncertainty in 
-the results of the first study. Reproduction of 
+We conduct scientific research by collecting data, 
+analyzing and summarizing the evidence in the data
+and then publishing substantive results in a paper. To 
+verify scientific results we must either replicate or, at
+a minimum, reproduce the findings of a previous study. Replication is
+the act of collecting an independent data set in a similar manner
+to the original study and then using the data to address a similar
+scientific question of interest. Reproduction of 
 scientific research is the act of using the same data as the 
-original study and performing another statistical analysis to
-analyze the sensitivity of the results of the initial study. 
-While replication is the highest standard of verification, in
-most cases, reproduction is the most practical way to verify
-the results of a study. 
+original study and performing additional statistical analyses. 
+Replication is the highest standard of verification. Through
+replication, researchers can address the uncertainty inherent 
+in collecting a data sample from a larger population and
+improve upon any shortcomings of previous data collection 
+designs. Reproducibility allows researchers to
+evaluate the sensitivity of the results from the initial 
+statistical analysis of a study. Although replication is ideal, 
+in many cases reproduction 
+is the most practical way to verify the results of a study. 
+In some instances, such as epidemiologic studies of national 
+databases, reproduction is the only way to verify the scientific 
+findings of a study.
 
 Truly reproducible research can be achieved by making the data 
 used for statistical analysis available to prospective analysts. 
-To disseminate the data, we need a system for physical data 
-distribution. This system would ideally manage data updates 
-by automatically synchronizing each prospective analyst's
-local copy of the data to the remote, master copy of the data. 
-The \pkg{stashR} package is such a system.
-
+Given the framework of reproduction, we need to
+be able to distribute potentially large data sets and computations.
+To disseminate accurate data, we need a system for physical data 
+distribution that manages data updates by automatically 
+synchronizing each prospective analyst's local copy of the data 
+to the remote, master copy of the data. It follows that we need 
+software to help manage both the distribution and
+synchronization/caching of this data. We introduce stashR to 
+fill this need.
 
 
 
 \section{The \pkg{stashR} Package}
 
-The \pkg{stashR} R package is an extension to local and remote
-databases of the \pkg{filehash} package by Roger
-Peng~\citep{peng:2006}, which allows users to work interactively with
-data sets too large to be loaded into R as a single object.  The
-\pkg{stashR} package can be used to create a local \class{localDB} key-value
-database where data files are indexed by character string keys and to
-download data from a \class{remoteDB} key-value database stored remotely on
-the internet. This dual functionality of the \pkg{stashR} package
-offers potential applications to future work in creating research
-documents that satisfy the demands of reproducible research.
+The \pkg{stashR} package is an extension to local and remote
+databases of the \pkg{filehash} package by~\citep{peng:2006}, 
+which allows users to work interactively with data sets too large 
+to be loaded into R as a single object by alternatively using a
+key-value database. A key-value database is a collection of data
+files, each indexed by a character string ``key". One example of a
+key-value database is a multi-center study consisting of data 
+from 4 cities (New York, Los Angeles, Chicago and Seattle) 
+where data for each city is stored in a file named `ny', `la', 
+`chicago', and `seattle' respectively. In this case, the 
+key-value database allows a researcher to download data from 
+a particular city of interest instead of downloading the entire 
+dataset at once. The \pkg{stashR} package can be used to create 
+a local \class{localDB} key-value database and to download data 
+from a \class{remoteDB} key-value database stored remotely on
+the internet. A local key-value database, \class{localDB}, 
+is stored locally on the user's computer so that the user has control over the 
+content of the database. A remote key-value database, \class{remoteDB}, is stored
+on a remote server. A \class{remoteDB} user can download data from the remote
+server to a local copy of the database on his or her own computer.  
+This dual functionality of the \pkg{stashR} package addresses the need for
+managing data distribution and synchronizing cached data copies in
+fully reproducible research.
 
-\subsection{Contributions of the \pkg{stashR} Package}
-The \pkg{stashR} package adds important functionalities to data handling in R.
+The \pkg{stashR} package adds important functionalities to data handling and
+distribution in R.
 These contributions include:
 \begin{itemize}
     \item the ability to access remote databases efficiently
-    \item a set of tools for creating a local database to export to a remote
-        locale
+    \item a set of tools for creating a local database for exporting to a 
+        remotely accessible server
     \item a tool for synchronizing local copies of a database to the remote 
         version
-    \item an abstract interface consisting of 6 methods for local and remote 
+    \item an abstract interface for interacting with local and remote 
         databases.
 \end{itemize}  
-
-\subsection{Related R packages}  
-
-The \pkg{filehash} package allows an individual to interactively
-access a (potentially quite large) dataset through a key-value
-database. As \pkg{stashR} is an extension of \pkg{filehash},
-\pkg{stashR} is related to many of the large data handling packages
-mentioned in \cite{peng:2006}. One such package is \pkg{g.data} by
-David Brahm~\citep{brahm:2002}. One of the main ideas of
-\pkg{filehash} and hence \pkg{stashR} is that by using keys to index
-the data, we can efficiently download only the necessary data objects
-on an interactive level. The \pkg{g.data} package provides interfaces
-to delayed-data packages (DDPS). DDPS efficiently accesses data by
-exploiting the lazy evaluation feature of R to load the specified data
-into memory only once the data is requested. An individual can
-interface with one of the common relational databases (Oracle, MySQL
-or SQLite) in R by using the S4 methods and generics in the \pkg{DBI}
-package created by the~\cite{DBI}, along with \pkg{ROracle},
-\pkg{RMySQL} or \pkg{RSQLite} respectively.
-
-The \pkg{reposTools} package on Bioconductor by~\cite{reposTools},
-which mainly serves to create and interfaced with repositories of
-packages, has several features whose purposes are similar to features
-of the \pkg{stashR} package.  Briefly, the \pkg{reposTools} package
-allows a user post the contents of a local directory to a server for
-distribution. While creating the remote repository, \pkg{resposTools}
-adds files to the repository that contain information about the
-repository's contents. On the client side, \pkg{reposTools} allows
-users to access the packages or objects in the remote repository and
-download, install or update to the user's specified local
-directory. The automatic library management feature of
-\pkg{reposTools} keeps track of which R packages are installed on the
-user's system as well as the corresponding version numbers which
-facilitates the updating packages feature of \pkg{reposTools}.  Both
-the \pkg{reposTools} and \pkg{stashR} packages help an individual to
-create a remote repository to distribute the contents to other R
-users, who are provided with specific methods to interface with the
-remote repository. Both packages allow a user to download files from
-the remote repository to a local repository and later to `synchronize'
-or `update' local copies of files or packages to the remote
-version. Unlike \pkg{reposTools}, the \pkg{stashR} package contains
-the tools to construct local repositories, but \pkg{stashR} does not
-yet automate the posting of this repository to a server as does
-\pkg{reposTools}. The key difference between the two packages is that
-\pkg{reposTools} is intended for repositories of R packages whereas
-\pkg{stashR} is designed for repositories of key-value databases.
- 
-
-
-
 
 
 \section{Design Rationale}
 
+\subsection{Remote vs. Local}
+
+The \pkg{stashR} package is designed for interacting with both local
+and remote data repositories. A repository is structured set of files
+in which data and metadata are stored to facilitate data accessibility. 
+Each of the main user interface functions in \pkg{stashR} is a generic function 
+with specific methods defined for repository objects of class \class{localDB}, 
+the local version of a key-value database, and for objects of class 
+\class{remoteDB}, the remote version of a key-value database. A 
+\class{localDB} data repository is stored on a user's local disk
+whereas a \class{remoteDB} data repository is stored on a remote 
+server on which the user typically does not have the right to edit files. 
+When interacting with a \class{localDB} data repository, 
+the user can insert, fetch, delete and list
+keys of the available data files. When interacting with a \class{remoteDB}
+data repository, the user creates a copy of the repository on his or her
+local disk that contains only the desired data files from the remote 
+repository. The user interface functions for the \class{remoteDB} 
+repository are similar to those for the 'localDB' repository. When the 
+user fetches data from a remote repository, it is either accessed using 
+the local cache, or downloaded from the remote repository if it has not 
+previously been downloaded. The \pkg{stashR} package also has a feature 
+to synchronize the local copy of a repository to the remote repository.
 
 \subsection{Repository Layout} \label{layout}
 
-The repository is composed of a root directory containing a data
-directory and a text file,`keys', that lists of each of the character
-keys corresponding to a data file in the data directory. The data
+The \class{remoteDB} repository consists of a root directory 
+containing a data directory, a text file,`keys', that lists of each of the character
+keys corresponding to a data file in the data directory and a text
+file, `url' that lists the repository's URL on the remote server. The data
 directory contains compressed data files labelled according to their
 corresponding character key. Each data file has a corresponding `.SIG'
 text file that lists the 32-byte MD5 checksum from running
 \code{md5sum()} on the data file (see the R package \pkg{tools} for
-more details) and the data file's identifying character key. We will
-discuss the role of the `.SIG' files in greater detail in
-Sections~\ref{synch-rationale} and~\ref{synch-interface}.
+more details) and the data file's identifying character key. The
+`.SIG' files allow for synchronization of the local data copies to the 
+master version of the data repository on the remote server. 
+The \class{localDB} repository has an identical layout to the 
+\class{remoteDB} repository except that it does not have a `url' file.
  
-\subsection{Remote vs. Local}
-
-The \pkg{stashR} package is designed for interacting with both local
-and remote data repositories. Each of the main user interface
-functions in \pkg{stashR} is a generic function with specific methods
-defined for repository objects of class \class{localDB}, the local version
-of a key-value database, and for objects of class \class{remoteDB}, the
-remote version of a key-value database. When interacting with a
-\class{localDB} data repository, the user can insert, fetch, delete and list
-keys of the available data files. When interacting with a \class{remoteDB}
-data repository, the user creates a local copy of the repository that
-contains only the desired data files from the remote repository. The
-user interface functions for the \class{remoteDB}repository are similar to
-those for the 'localDB' repository. When the user fetches data from a
-remote repository, it is either accessed using the local cache, or
-downloaded from the remote repository if it has not previously been
-downloaded. The \pkg{stashR} package also has a feature to synchronize
-the local copy of a repository to the remote repository.
-
-
 \subsection{Caching and Synchronization} \label{synch-rationale}
 
 The \pkg{stashR} package allows users to cache or access cached data
@@ -227,7 +206,7 @@ to the remote version of the data.
 
 \section{Interface}
 
-\subsection{Creating a Local remoteDB database}
+\subsection{Creating a \class{localDB} repository or a local copy of a \class{remoteDB} repository}
 
 There are two steps to creating a \class{localDB} or a \class{remoteDB}
 object. The first step is to call \code{new("localDB", dir = dir, name
@@ -235,7 +214,7 @@ object. The first step is to call \code{new("localDB", dir = dir, name
 where `dir' is a character string specifying the local directory in
 which to create the new \class{localDB} repository of the local copy of the
 \class{remoteDB} repository. The `url' argument is unique to objects of the
-\class{remoteDB} class and it specifies as a character string the url of the
+\class{remoteDB} class and it specifies as a character string the URL of the
 root directory of the remote key-value database. The `name' argument
 is a character string specifying the label that will be associated
 with the \class{localDB} or \class{remoteDB} repository.
@@ -254,7 +233,7 @@ the functions \code{dbFetch}, \code{dbInsert}, \code{dbList},
 \code{dbExists}, \code{dbDelete} and \code{dbSync}.  Each of these
 functions is generic and has a specific method for objects of the
 \class{remoteDB} and \class{localDB} classes (with the exception of \code{dbSync},
-as we shall see in Section~\ref{synch-interface}). The first argument
+which is only available for the \class{remoteDB} class). The first argument
 for any of the above functions is an object of class \class{remoteDB} or
 \class{localDB}.
 
@@ -271,9 +250,9 @@ copy of the \class{remoteDB} repository. If the data and .SIG files indexed
 by the key do not exist, then \code{dbFetch} downloads the two files
 from the remote repository to the local copy and reads the data file.
 If the data and .SIG file do exist in the local copy of the
-repository, then \code{dbFetch} compares the MD5 sumcheck stored in
-the .SIG file from the local repository to the MD5 sumcheck stored in
-the .SIG file in the remote repository. If the MD5 sumchecks are the
+repository, then \code{dbFetch} compares the MD5 checksum stored in
+the .SIG file from the local repository to the MD5 checksum stored in
+the .SIG file in the remote repository. If the MD5 checksums are the
 same, then \code{dbFetch} reads the file from the local
 repository. Otherwise, \code{dbFetch} downloads the updated version of
 the data and .SIG files from the remote repository and reads the data
@@ -645,8 +624,57 @@ a short description of all of the variables available for each city
 can be found by typing \code{?variables}.
  
 
-
 \section{Discussion}
+
+\subsection{Related R packages}  
+
+The \pkg{filehash} package allows an individual to interactively
+access a (potentially quite large) dataset through a key-value
+database located locally on the user's disk. As \pkg{stashR} 
+is an extension of \pkg{filehash},
+\pkg{stashR} is related to many of the large data handling packages
+mentioned in \cite{peng:2006}. One such package is \pkg{g.data} by
+David Brahm~\citep{brahm:2002}. One of the main ideas of
+\pkg{filehash} and hence \pkg{stashR} is that by using keys to index
+the data, we can efficiently download only the necessary data objects
+on an interactive level. The \pkg{g.data} package provides interfaces
+to delayed-data packages (DDPS). DDPS efficiently accesses data by
+exploiting the lazy evaluation feature of R to load the specified data
+into memory only once the data is requested. An individual can
+interface with one of the common relational databases (Oracle, MySQL
+or SQLite) in R by using the S4 methods and generics in the \pkg{DBI}
+package created by the~\cite{DBI}, along with \pkg{ROracle},
+\pkg{RMySQL} or \pkg{RSQLite} respectively.
+
+The \pkg{reposTools} package on Bioconductor by~\cite{reposTools},
+which mainly serves to create and interfaced with repositories of
+R packages, has several features whose purposes are similar to features
+of the \pkg{stashR} package.  Briefly, the \pkg{reposTools} package
+allows a user post the contents of a local directory to a server for
+distribution. While creating the remote repository, \pkg{resposTools}
+adds files to the repository that contain information about the
+repository's contents. On the client side, \pkg{reposTools} allows
+users to access the packages or objects in the remote repository and
+download, install or update to the user's specified local
+directory. The automatic library management feature of
+\pkg{reposTools} keeps track of which R packages are installed on the
+user's system as well as the corresponding version numbers which
+facilitates the updating packages feature of \pkg{reposTools}.  Both
+the \pkg{reposTools} and \pkg{stashR} packages help an individual to
+create a remote repository to distribute the contents to other R
+users, who are provided with specific methods to interface with the
+remote repository. Both packages allow a user to download files from
+the remote repository to a local repository and later to `synchronize'
+or `update' local copies of files or packages to the remote
+version. Unlike \pkg{reposTools}, the \pkg{stashR} package contains
+the tools to construct local repositories, but \pkg{stashR} does not
+yet automate the posting of this repository to a server as does
+\pkg{reposTools}. The key difference between the two packages is that
+\pkg{reposTools} is intended for repositories of R packages whereas
+\pkg{stashR} is designed for repositories of key-value databases which
+can store arbitrary R data objects.
+
+\subsection{Extensions and future work}
 
 The \pkg{stashR} package has been designed as a tool for both authors
 and readers of statistical documents in the context of streamlining
