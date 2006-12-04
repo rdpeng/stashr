@@ -115,6 +115,53 @@
 \author{Sandy Eckel, Roger D. Peng}
 
 \examples{
-## ???
+\dontrun{
+## Objects of the class localDB
+
+wd <- getwd()
+dir <- file.path(wd,"localDBExample")
+
+## Create local stashR data repository 'localDBExample'
+fhLocal <- new("localDB", dir = dir, name = "localDBExample")
+
+## Insert key-value data into 'localDBExample' 
+v <- 1:10
+dbInsert(fhLocal,key = "vector", value = v, overwrite = TRUE)
+m <- matrix(1:20,5,4)
+dbInsert(fhLocal,key = "matrix", value = m, overwrite = TRUE)
+d <- data.frame(cbind(id = 1:5, age=c(12,11,15,11,14), sex = c(1,1,0,1,0)))
+dbInsert(fhLocal,key = "dataframe", value = d, overwrite = TRUE)
+l <- list(v = v, m = m, df = d)
+dbInsert(fhLocal, key = "list", value = l, overwrite = TRUE)
+
+dbList(fhLocal)
+
+dbFetch(fhLocal, "dataframe") 
+dbDelete(fhLocal, "vector")
+dbExists(fhLocal, "vector")
+dbList(fhLocal) 
+
+
+## Objects of the class remoteDB
+
+## The same key-value data used in the previous example for localDB
+## has been stored in a remoteDB repository on the internet at:
+myurl <- "http://www.biostat.jhsph.edu/~seckel/remoteDBExample"
+
+wd <- getwd()
+dir <- file.path(wd,"remoteDBExample") 
+## Create local copy of data repository 'remoteDBExample'
+fhRemote <- new("remoteDB", url= myurl, 
+            dir = dir, name= "remoteDBExample")
+
+dbList(fhRemote, save = TRUE)
+dbExists(fhRemote,c("vector", "array","list", "function"))
+## downloads 'vector' data from the remoteDB repository
+dbFetch(fhRemote, "vector") 
+## fetches without downloading again 
+dbFetch(fhRemote, "vector") 
+## synchronize all local copies of the data to the remote version
+dbSync(fhRemote, key = NULL)
+}
 }
 \keyword{classes}
