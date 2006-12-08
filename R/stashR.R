@@ -239,16 +239,6 @@ local.file.path.SIG <- function(db,key){
     file.path(path.expand(db@dir), "data", paste(key,".SIG",sep=""))
 }
 
-#######################
-## getlist ############ Reads the 'keys' file from the server. Has an option 
-####################### to save the repository's list of keys in local dir.
-
-## getlist <- function(db){
-##     con <- url(file.path(db@url,"keys"))
-##     open(con, "rb")
-##     on.exit(close(con))
-##     readLines(con)
-## }
 
 #################### Returns TRUE if data file for 'key' is in local dir, otherwise
 ## checkLocal ###### returns FALSE. We have 'key' allowed to be a character vector
@@ -264,11 +254,9 @@ checkLocal <- function(db, key){
 }
 
 
-## Seven Functions #########################################################
-############################################################################
 
 ####################
-## 3) getdata ###### old 'fetch()', but now downloads the key & the SIG file
+## getdata ######### downloads the key & the SIG file
 ####################
 
 getdata <- function(db,key){
@@ -297,7 +285,7 @@ getdata <- function(db,key){
 }
 
 ####################
-## 4) read ######### Reads file associated with specified key from the local directory.
+## read ############ Reads file associated with specified key from the local directory.
 #################### Returns the data object associated with the key.
 
 read <- function(db, key){
@@ -309,56 +297,6 @@ read <- function(db, key){
     unserialize(con) 
 }
 
-#################### Checks if the key exists in the local directory. If it doesn't, 
-## 5) fetch ######## 'fetch' just downloads the data file & SIG file. If the key exists in  
-#################### the local dir, then 'fetch' compares the SIG file in the local dir to the SIG
-#################### file in the repository. If the SIGS are the same, 'fetch' reads the file from 
-#################### the local dir and otherwise call getdata() to re-download the data
-#################### file & SIG file. If 'offline=TRUE', 'fetch' skips the downloading step.
-#################### The function returns the data object associated with the key.
 
-## library(tools)
-
-## fetch <- function(db, key, offline = FALSE){
-##     if(offline && !checkLocal(db,key)) stop("haven't previously downloaded specified data,
-## 				and you have set 'offline = TRUE'") 
-##     if(!offline && !key%in%getlist(db)) stop("Specified data does not exist") 
-##     if(!offline && checkLocal(db,key)) 
-##     {if(!md5sum(local.file.path(db,key)) 
-##         == scan(local.file.path.SIG(db,key),quiet=TRUE,what="character",sep=" ")[1])
-##          getdata(db,key)
-##  }
-##     if(!checkLocal(db,key)) getdata(db,key)
-##     read(db,key)
-## } 
-
-#################### Updates all key/data pairs in the local directory by checking the
-## 6) update ####### SIGs if 'key' is 'NULL'.  If 'key' is a character vector, then it
-#################### only updates the specified key/data pairs (in which case, it first
-#################### checks to ensure that all specified keys' files have been previously saved).
-
-## update <- function(db, key = NULL){
-##     if(!is.null(key) & !all(checkLocal(db,key))) 
-##         stop("not all files referenced in the 'key' vector were previously downloaded, no files updated")
-##     if(is.null(key)) 
-##     {list.local.files <- list.files(file.path(db@dir,"data"))
-##      key <- list.local.files[-grep(".SIG", list.local.files)]
-##  }
-##     for (i in key){ 
-##         if(!md5sum(local.file.path(db,i)) 
-##            == scan(local.file.path.SIG(db,i),quiet=TRUE,what="character",sep=" ")[1])
-##             getdata(db,i)
-##     }	
-## }
-
-#################### Saves an R object ('value') as a file in the local directory.
-## 7) insert ####### Can specify whether overwriting is OK. The new file is 
-#################### associated with a specified key.
-
-## insert <- function(db,key,value,overwrite=FALSE){
-##     if(file.exists(local.file.path(db,key)) & !overwrite)
-##         stop("cannot overwrite previously saved file")
-##     else	{save(value, file = local.file.path(db,key))}
-## }
 
 
