@@ -23,7 +23,8 @@ import(filehash)
 
 exportMethods(
               "setDir<-",
-              "initialize"
+              "initialize",
+              "copyDB"
               )
 
 export("stashROption")
