@@ -11,7 +11,7 @@ setGeneric("copyDB", function(db, ...) standardGeneric("copyDB"))
 setMethod("copyDB", "localDB",
           function(db, dir, ...) {
               if(identical(dir, db@dir))
-                  stop("cannot copy 'localDB' database to original directory")
+                  stop("cannot copy 'localDB' object to original directory")
               newdb <- new("localDB", dir = dir, name = db@name)
               keys <- dbList(db)
 
