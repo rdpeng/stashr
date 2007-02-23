@@ -2,7 +2,8 @@
     dcf <- read.dcf(file.path(lib, pkg, "DESCRIPTION"))
     msg <- gettextf("%s (version %s %s)", dcf[, "Title"],
                     as.character(dcf[, "Version"]), dcf[, "Date"])
-    writeLines(strwrap(msg))
+    ## writeLines(strwrap(msg))
+    message(paste(strwrap(msg), collapse = "\n"))    
 }
 
 .onLoad <- function(lib, pkg) {
