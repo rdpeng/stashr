@@ -32,22 +32,16 @@ setMethod("dbInsert",
               }		
               con <- gzfile(local.file.path(db,key))
               open(con, "wb")
+              on.exit(close(con))
+              serialize(value, con)
 
-              tryCatch({
-                  serialize(value, con)
-              }, finally = {
-                  if(isOpen(con))
-                      close(con)
-              })
+              ## Write MD5 digest
               s <- unname(md5sum(local.file.path(db,key)))
               s2 <- paste(s, key, sep="  ")
               writeLines(s2, con = local.file.path.SIG(db,key))
 
               ## update the 'keys' file
               if(!dbExists(db, key)) {
-                  ## conA <- file(file.path(db@dir, "keys"))
-                  ## open(conA, "a")
-                  ## on.exit(close(conA))
                   cat(key, file = file.path(db@dir,"keys"),sep = "\n",
                       append = TRUE)
               }
@@ -84,17 +78,9 @@ setMethod("dbDelete", signature(db = "localDB", key = "character"),
 setMethod("dbList", "localDB",
           function(db, ...){
               con <- file(file.path(db@dir, "keys"))
-
-              handler <- function(cond) {
-                  character(0)
-              }
-              tryCatch({
-                  open(con, "r")  ## 'keys' is a text file
-                  readLines(con)
-              }, error = handler, warning = handler, finally = {
-                  if(isOpen(con))
-                      close(con)
-              })
+              open(con, "r")
+              on.exit(close(con))
+              readLines(con)
           })
 
 setMethod("dbExists", signature(db = "localDB", key = "character"),
@@ -163,15 +149,10 @@ setMethod("dbDelete", signature(db = "remoteDB", key = "character"),
 setMethod("dbList", "remoteDB",
           function(db, save = FALSE, ...){
               con <- url(file.path(db@url, "keys"))
-              mylist <- tryCatch({
-                  open(con, "r")  ## 'keys' file is text
-                  readLines(con)
-              }, error = function(err) {
-                  character(0)
-              }, finally = {
-                  if(isOpen(con))
-                      close(con)
-              })
+              open(con, "r")  ## 'keys' file is text
+              on.exit(close(con))
+              readLines(con)
+
               if (save)
                   cat(mylist, file = file.path(db@dir,"keys"),sep = "\n")
               mylist
