@@ -46,8 +46,7 @@ setMethod("dbInsert",
               if(!file.exists(keyfile))
                   file.create(keyfile)
               if(!dbExists(db, key)) {
-                  cat(key, file = file.path(db@dir,"keys"),sep = "\n",
-                      append = TRUE)
+                  cat(key, file = keyfile, sep = "\n", append = TRUE)
               }
           })
 
