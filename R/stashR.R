@@ -41,6 +41,10 @@ setMethod("dbInsert",
               writeLines(s2, con = local.file.path.SIG(db,key))
 
               ## update the 'keys' file
+              keyfile <- file.path(db@dir, "keys")
+
+              if(!file.exists(keyfile))
+                  file.create(keyfile)
               if(!dbExists(db, key)) {
                   cat(key, file = file.path(db@dir,"keys"),sep = "\n",
                       append = TRUE)
@@ -151,7 +155,7 @@ setMethod("dbList", "remoteDB",
               con <- url(file.path(db@url, "keys"))
               open(con, "r")  ## 'keys' file is text
               on.exit(close(con))
-              readLines(con)
+              mylist <- readLines(con)
 
               if (save)
                   cat(mylist, file = file.path(db@dir,"keys"),sep = "\n")
