@@ -1,7 +1,8 @@
 .onAttach <- function(lib, pkg) {
     dcf <- read.dcf(file.path(lib, pkg, "DESCRIPTION"))
-    msg <- gettextf("%s (%s %s)", dcf[, "Title"],
+    msg <- gettextf("%s (version %s %s)", dcf[, "Title"],
                     as.character(dcf[, "Version"]), dcf[, "Date"])
+    ## writeLines(strwrap(msg))
     message(paste(strwrap(msg), collapse = "\n"))    
 }
 
@@ -14,6 +15,7 @@
     }
     if(!capabilities("http/ftp"))
         warning("'http/ftp' capabilities not available")
+    ## .stashROptions$quietDownload <- FALSE
     stashROption("quietDownload", FALSE)
 }    
 

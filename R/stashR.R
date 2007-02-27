@@ -32,21 +32,24 @@ setMethod("dbInsert",
               }		
               con <- gzfile(local.file.path(db,key))
               open(con, "wb")
-              on.exit(close(con))
-              serialize(value, con)
 
-              ## Write MD5 digest
+              tryCatch({
+                  serialize(value, con)
+              }, finally = {
+                  if(isOpen(con))
+                      close(con)
+              })
               s <- unname(md5sum(local.file.path(db,key)))
               s2 <- paste(s, key, sep="  ")
               writeLines(s2, con = local.file.path.SIG(db,key))
 
               ## update the 'keys' file
-              keyfile <- file.path(db@dir, "keys")
-
-              if(!file.exists(keyfile))
-                  file.create(keyfile)
               if(!dbExists(db, key)) {
-                  cat(key, file = keyfile, sep = "\n", append = TRUE)
+                  ## conA <- file(file.path(db@dir, "keys"))
+                  ## open(conA, "a")
+                  ## on.exit(close(conA))
+                  cat(key, file = file.path(db@dir,"keys"),sep = "\n",
+                      append = TRUE)
               }
           })
 
@@ -81,9 +84,17 @@ setMethod("dbDelete", signature(db = "localDB", key = "character"),
 setMethod("dbList", "localDB",
           function(db, ...){
               con <- file(file.path(db@dir, "keys"))
-              open(con, "r")
-              on.exit(close(con))
-              readLines(con)
+
+              handler <- function(cond) {
+                  character(0)
+              }
+              tryCatch({
+                  open(con, "r")  ## 'keys' is a text file
+                  readLines(con)
+              }, error = handler, warning = handler, finally = {
+                  if(isOpen(con))
+                      close(con)
+              })
           })
 
 setMethod("dbExists", signature(db = "localDB", key = "character"),
@@ -152,10 +163,15 @@ setMethod("dbDelete", signature(db = "remoteDB", key = "character"),
 setMethod("dbList", "remoteDB",
           function(db, save = FALSE, ...){
               con <- url(file.path(db@url, "keys"))
-              open(con, "r")  ## 'keys' file is text
-              on.exit(close(con))
-              mylist <- readLines(con)
-
+              mylist <- tryCatch({
+                  open(con, "r")  ## 'keys' file is text
+                  readLines(con)
+              }, error = function(err) {
+                  character(0)
+              }, finally = {
+                  if(isOpen(con))
+                      close(con)
+              })
               if (save)
                   cat(mylist, file = file.path(db@dir,"keys"),sep = "\n")
               mylist
@@ -190,6 +206,15 @@ setMethod("dbSync", signature(db = "remoteDB"),
           })
 
 
+
+######################################################################
+## For case-insensitive file systems, objects with the same name but
+## differ by capitalization might get clobbered.  `mangleName()'
+## inserts a "@" before each capital letter and `unMangleName()'
+## reverses the operation.
+
+mangleName <- filehash:::mangleName
+unMangleName <- filehash:::unMangleName
 
 ######################################################################
 
