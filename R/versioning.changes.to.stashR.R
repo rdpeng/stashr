@@ -34,7 +34,7 @@ objectVersion <- function(db, key){
 ## file
 
 latestReposVersionNum <- function(db){ 
-	info <- latestReposVersionInfo(db)
+	info <- reposVersionInfo(db)
 	if(length(info)!=0){
 		as.numeric(strsplit(info[length(info)], " : ")[[1]][1])
 	}
@@ -47,7 +47,7 @@ latestReposVersionNum <- function(db){
 
 updatedReposVersionInfo <- function(db, key){  ######### 
 	reposV <- latestReposVersionNum(db)+1
-	info <- latestReposVersionInfo(db)
+	info <- reposVersionInfo(db)
 	if(length(info)!=0){
 		keyFiles <- strsplit(info[length(info)], " : ")[[1]][2]
 		keyFilesSep <- strsplit(keyFiles," ")[[1]]
@@ -58,7 +58,7 @@ updatedReposVersionInfo <- function(db, key){  #########
                 else
                     others <- keyFilesSep[-v]
 		updatedKeyFiles <- paste(paste(others, collapse=" "), 
-                                         paste(key,latestObjectVersion(db,key)+1,
+                                         paste(key,objectVersion(db,key)+1,
                                                sep="."),
                                          sep=" ")
 	}
@@ -100,7 +100,7 @@ setMethod("dbInsert",
           signature(db = "localDB", key = "character", value = "ANY"),
           function(db, key, value, ...) {
 
-	      vn <- latestObjectVersion(db,key) + 1
+	      vn <- objectVersion(db,key) + 1
 	
               con <- gzfile(local.file.path(db,key,vn))
               open(con, "wb")
@@ -128,7 +128,7 @@ setMethod("dbInsert",
 checkLocal <- function(db, key){
     	## key %in% list.files(file.path(db@dir, "data"), all.files = TRUE)
     	datadir <- file.path(db@dir, "data")
-	vn <- latestObjectVersion(db,key)
+	vn <- objectVersion(db,key)
 	
 	if(!file.exists(datadir))
         stop("local data directory does not exist")
@@ -138,7 +138,7 @@ checkLocal <- function(db, key){
 read <- function(db, key){
     if(!checkLocal(db,key))
         stop(gettextf("files associated with key '%s' not yet downloaded", key))
-    vn <- latestObjectVersion(db,key)
+    vn <- objectVersion(db,key)
     con <- gzfile(local.file.path(db,key,vn))
     open(con, "rb")
     on.exit(close(con))
