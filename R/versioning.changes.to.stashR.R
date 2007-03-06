@@ -1,12 +1,12 @@
 
-## function returning the integer corresponding to the lastest version 
+## function returning the integer corresponding to the lastest version
 ## of the specified key. Returns zero if new key.
 
 ## use readLines to find last line, returns as character string
 latestReposVersionInfo <- function(db){
 	if(file.exists(file.path(db@dir, "version"))){  
 		con <- file(file.path(db@dir, "version"))
-		open(con, "rw")  ## 'version' is a text file
+		open(con, "r")  ## 'version' is a text file
 		on.exit(close(con))
 		VerList <- readLines(con)
 		VerList[length(VerList)]
@@ -27,8 +27,9 @@ latestObjectVersion <- function(db, key){  ## still under development....
 	else 0
 }
 
-## function returning the integer corresponding to the lastest 
-## repos version by reading first integer of the last line of the version file
+## function returning the integer corresponding to the lastest repos
+## version by reading first integer of the last line of the version
+## file
 
 latestReposVersionNum <- function(db){ 
 	info <- latestReposVersionInfo(db)
@@ -39,9 +40,9 @@ latestReposVersionNum <- function(db){
 }
 
 
-## reads last line of the version file
-## creates new info on repository version to be inserted in last line of the version file
-## updates 
+## reads last line of the version file creates new info on repository
+## version to be inserted in last line of the version file updates
+
 updatedReposVersionInfo <- function(db, key){  ######### 
 	reposV <- latestReposVersionNum(db)+1
 	info <- latestReposVersionInfo(db)
@@ -49,10 +50,15 @@ updatedReposVersionInfo <- function(db, key){  #########
 		keyFiles <- strsplit(info[length(info)], " : ")[[1]][2]
 		keyFilesSep <- strsplit(keyFiles," ")[[1]]
 		v <- grep(paste("^",key,"\\.[1-9]+$",sep=""),keyFilesSep)
-		ifelse(length(v)==0, others <- keyFilesSep, others <- keyFilesSep[-v])
-		updatedKeyFiles <- paste(
-						paste(others, collapse=" "), 
-						paste(key,latestObjectVersion(db,key)+1,sep="."), sep=" ")
+
+		if(length(v)==0)
+                    others <- keyFilesSep
+                else
+                    others <- keyFilesSep[-v])
+		updatedKeyFiles <- paste(paste(others, collapse=" "), 
+                                         paste(key,latestObjectVersion(db,key)+1,
+                                               sep="."),
+                                         sep=" ")
 	}
 	else updatedKeyFiles <- paste(key,1,sep=".")
 	paste(reposV, updatedKeyFiles, sep = " : ") 
@@ -61,8 +67,9 @@ updatedReposVersionInfo <- function(db, key){  #########
 
 ######### updating version file ########## 
 updateVersion <- function(db,key){
-	cat(updatedReposVersionInfo(db,key), file = file.path(dbLocal@dir,"version"),
-		sep = "\n", append = TRUE)
+	cat(updatedReposVersionInfo(db,key),
+            file = file.path(dbLocal@dir,"version"),
+            sep = "\n", append = TRUE)
 }
 
 
@@ -93,22 +100,22 @@ setMethod("dbInsert",
 
 	      vn <- latestObjectVersion(db,key) + 1
 	
-            con <- gzfile(local.file.path(db,key,vn))
-            open(con, "wb")
-
-            tryCatch({
+              con <- gzfile(local.file.path(db,key,vn))
+              open(con, "wb")
+              
+              tryCatch({
                   serialize(value, con)
-            }, finally = {
+              }, finally = {
                   if(isOpen(con))
                       close(con)
-                })
-            s <- unname(md5sum(local.file.path(db,key,vn)))
-            s2 <- paste(s, key, vn, sep="  ")
-            writeLines(s2, con = local.file.path.SIG(db,key,vn))
-
-            ## update the 'version' file
-		updateVersion(db,key)
-
+              })
+              s <- unname(md5sum(local.file.path(db,key,vn)))
+              s2 <- paste(s, key, vn, sep="  ")
+              writeLines(s2, con = local.file.path.SIG(db,key,vn))
+              
+              ## update the 'version' file
+              updateVersion(db,key)
+              
           })
 
 
