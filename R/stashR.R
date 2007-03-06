@@ -208,15 +208,6 @@ setMethod("dbSync", signature(db = "remoteDB"),
 
 
 ######################################################################
-## For case-insensitive file systems, objects with the same name but
-## differ by capitalization might get clobbered.  `mangleName()'
-## inserts a "@" before each capital letter and `unMangleName()'
-## reverses the operation.
-
-mangleName <- filehash:::mangleName
-unMangleName <- filehash:::unMangleName
-
-######################################################################
 
 
 ########################################################################
