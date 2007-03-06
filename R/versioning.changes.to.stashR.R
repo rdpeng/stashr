@@ -1,21 +1,23 @@
-
 ## function returning the integer corresponding to the lastest version
 ## of the specified key. Returns zero if new key.
 
 ## use readLines to find last line, returns as character string
-latestReposVersionInfo <- function(db){
+reposVersionInfo <- function(db){
 	if(file.exists(file.path(db@dir, "version"))){  
 		con <- file(file.path(db@dir, "version"))
 		open(con, "r")  ## 'version' is a text file
 		on.exit(close(con))
 		VerList <- readLines(con)
-		VerList[length(VerList)]
+		ifelse(db@reposVersion == - 1, 
+			rvn <- length(VerList), 
+			rvn <- db@reposVersion)
+		VerList[rvn]
 	}
 	else NULL	
 }
 
-latestObjectVersion <- function(db, key){  ## still under development....
-	info <- latestReposVersionInfo(db)
+objectVersion <- function(db, key){ 
+	info <- reposVersionInfo(db)
 	if(length(info)!=0){
 		keyFiles <- strsplit(info[length(info)], " : ")[[1]][2]
 		keyFilesSep <- strsplit(keyFiles," ")[[1]]
@@ -151,4 +153,25 @@ setMethod("dbFetch", signature(db = "localDB", key = "character"),
               read(db, key)
           })
 
+
+setMethod("dbList", "localDB",
+          function(db, ...){
+              con <- file(file.path(db@dir, "keys"))
+
+              handler <- function(cond) {
+                  character(0)
+              }
+              tryCatch({
+                  open(con, "r")  ## 'keys' is a text file
+                  readLines(con)
+              }, error = handler, warning = handler, finally = {
+                  if(isOpen(con))
+                      close(con)
+              })
+          })
+
+setMethod("dbExists", signature(db = "localDB", key = "character"),
+          function(db, key, ...){
+              key %in% dbList(db)	# returns a vector of T/F
+          })
 
