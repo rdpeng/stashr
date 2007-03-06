@@ -4,13 +4,17 @@
 ## Use 'http://' type URLs
 setClass("remoteDB",
          representation(url = "character",
-                        dir = "character"),
+                        dir = "character",
+			reposVersion = "numeric"),
+	 prototype = list(reposVersion = -1), 
          contains = "filehash"
          )
 
 ## For local directories
 setClass("localDB",
-         representation(dir = "character"),
+         representation(dir = "character",
+			reposVersion = "numeric"),
+	 prototype = list(reposVersion = -1),
          contains = "filehash"
          )
 
