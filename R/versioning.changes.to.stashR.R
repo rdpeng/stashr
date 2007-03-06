@@ -54,7 +54,7 @@ updatedReposVersionInfo <- function(db, key){  #########
 		if(length(v)==0)
                     others <- keyFilesSep
                 else
-                    others <- keyFilesSep[-v])
+                    others <- keyFilesSep[-v]
 		updatedKeyFiles <- paste(paste(others, collapse=" "), 
                                          paste(key,latestObjectVersion(db,key)+1,
                                                sep="."),
