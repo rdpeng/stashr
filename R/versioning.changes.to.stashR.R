@@ -31,6 +31,9 @@ objectVersion <- function(db, key){
 	else 0
 }
 
+
+
+
 ## function returning the integer corresponding to the lastest repos
 ## version by reading first integer of the last line of the version
 ## file
@@ -48,6 +51,14 @@ latestReposVersionNum <- function(db){
 ## version to be inserted in last line of the version file updates
 ## keepKey = FALSE deletes the key from the version information
 
+
+## BUG: need to read the key file version number from the 
+## files corresponding to keys in data file instead of from 
+## last line of the repository's version file
+##(since if I remove all keys from current version and then
+## re-insert data using an old key, as is, the numbering system
+## starts up again at 1 and we lose the old version of the file
+
 updatedReposVersionInfo <- function(db, key, keepKey = TRUE){ 
 	reposV <- latestReposVersionNum(db)+1
 	info <- reposVersionInfo(db)
@@ -60,7 +71,14 @@ updatedReposVersionInfo <- function(db, key, keepKey = TRUE){
                     others <- keyFilesSep
                 else
                     others <- keyFilesSep[-v]
-		othersCollapsed <- paste(others, collapse=" ")
+		if(length(others)==0)
+			othersCollapsed <- paste(others, collapse=" ")
+		else{	
+			if(length(others)==1 & is.na(others[1]))
+				othersCollapsed <- character(0)
+			else 
+				othersCollapsed <- paste(others, collapse=" ")
+		}
 		newKeyInfo <- paste(key,objectVersion(db,key)+1, sep=".")
 		if(keepKey)
 			updatedKeyFiles <- paste(othersCollapsed, newKeyInfo, sep=" ")
@@ -72,6 +90,7 @@ updatedReposVersionInfo <- function(db, key, keepKey = TRUE){
 	updatedKeyFiles <- gsub("^ ","",updatedKeyFiles)
 	paste(reposV, updatedKeyFiles, sep = ":") 
 }
+
 
 
 ######### updating version file ########## 
@@ -164,8 +183,11 @@ setMethod("dbList", "localDB",
 		info <- reposVersionInfo(db)
 		if(length(info)!=0){
 			keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
-			keyFilesSep <- strsplit(keyFiles," ")[[1]]
-			gsub("\\.[0-9]+$", "", keyFilesSep)
+			if(!is.na(keyFiles)){
+				keyFilesSep <- strsplit(keyFiles," ")[[1]]
+				gsub("\\.[0-9]+$", "", keyFilesSep)
+			}
+			else character(0)
 		}
           })
 
