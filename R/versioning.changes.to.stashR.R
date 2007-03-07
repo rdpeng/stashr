@@ -16,12 +16,14 @@ reposVersionInfo <- function(db){
 	else NULL	
 }
 
+## returns most recent "object version" associated with a given key
+
 objectVersion <- function(db, key){ 
 	info <- reposVersionInfo(db)
 	if(length(info)!=0){
-		keyFiles <- strsplit(info[length(info)], " : ")[[1]][2]
+		keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
 		keyFilesSep <- strsplit(keyFiles," ")[[1]]
-		v <- grep(paste("^",key,"\\.[1-9]+$",sep=""),keyFilesSep,value=TRUE)
+		v <- grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFilesSep,value=TRUE)
 		currNum <- as.numeric(substring(v,nchar(key)+2))
 		if(length(currNum)==0) currNum <- 0
 		currNum
@@ -36,7 +38,7 @@ objectVersion <- function(db, key){
 latestReposVersionNum <- function(db){ 
 	info <- reposVersionInfo(db)
 	if(length(info)!=0){
-		as.numeric(strsplit(info[length(info)], " : ")[[1]][1])
+		as.numeric(strsplit(info[length(info)], ":")[[1]][1])
 	}
 	else 0
 }
@@ -44,12 +46,13 @@ latestReposVersionNum <- function(db){
 
 ## reads last line of the version file creates new info on repository
 ## version to be inserted in last line of the version file updates
+## keepKey = FALSE deletes the key from the version information
 
-updatedReposVersionInfo <- function(db, key){  ######### 
+updatedReposVersionInfo <- function(db, key, keepKey = TRUE){ 
 	reposV <- latestReposVersionNum(db)+1
 	info <- reposVersionInfo(db)
 	if(length(info)!=0){
-		keyFiles <- strsplit(info[length(info)], " : ")[[1]][2]
+		keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
 		keyFilesSep <- strsplit(keyFiles," ")[[1]]
 		v <- grep(paste("^",key,"\\.[1-9]+$",sep=""),keyFilesSep)
 
@@ -57,19 +60,23 @@ updatedReposVersionInfo <- function(db, key){  #########
                     others <- keyFilesSep
                 else
                     others <- keyFilesSep[-v]
-		updatedKeyFiles <- paste(paste(others, collapse=" "), 
-                                         paste(key,objectVersion(db,key)+1,
-                                               sep="."),
-                                         sep=" ")
+		othersCollapsed <- paste(others, collapse=" ")
+		newKeyInfo <- paste(key,objectVersion(db,key)+1, sep=".")
+		if(keepKey)
+			updatedKeyFiles <- paste(othersCollapsed, newKeyInfo, sep=" ")
+		else
+			updatedKeyFiles <- othersCollapsed
 	}
 	else updatedKeyFiles <- paste(key,1,sep=".")
-	paste(reposV, updatedKeyFiles, sep = " : ") 
+	# remove leading space resulting from intially inserting same key twice#
+	updatedKeyFiles <- gsub("^ ","",updatedKeyFiles)
+	paste(reposV, updatedKeyFiles, sep = ":") 
 }
 
 
 ######### updating version file ########## 
-updateVersion <- function(db,key){
-	cat(updatedReposVersionInfo(db,key),
+updateVersion <- function(db,key, keepKey = TRUE){
+	cat(updatedReposVersionInfo(db,key,keepKey),
             file = file.path(dbLocal@dir,"version"),
             sep = "\n", append = TRUE)
 }
@@ -156,18 +163,12 @@ setMethod("dbFetch", signature(db = "localDB", key = "character"),
 
 setMethod("dbList", "localDB",
           function(db, ...){
-              con <- file(file.path(db@dir, "keys"))
-
-              handler <- function(cond) {
-                  character(0)
-              }
-              tryCatch({
-                  open(con, "r")  ## 'keys' is a text file
-                  readLines(con)
-              }, error = handler, warning = handler, finally = {
-                  if(isOpen(con))
-                      close(con)
-              })
+		info <- reposVersionInfo(db)
+		if(length(info)!=0){
+			keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+			keyFilesSep <- strsplit(keyFiles," ")[[1]]
+			gsub("\\.[1-9]+$", "", keyFilesSep)
+		}
           })
 
 setMethod("dbExists", signature(db = "localDB", key = "character"),
@@ -175,3 +176,18 @@ setMethod("dbExists", signature(db = "localDB", key = "character"),
               key %in% dbList(db)	# returns a vector of T/F
           })
 
+## no longer delete files from repository, just delete key from latest line
+## of the version file
+setMethod("dbDelete", signature(db = "localDB", key = "character"),
+          function(db, key, ...){
+			updateVersion(db,key, keepKey = FALSE)
+			if(!key%in%dbList(db)) warning("Specified key does not exist in current version")		  
+          })
+
+
+############################################
+## remote DB ###############################
+############################################
+
+
+	
