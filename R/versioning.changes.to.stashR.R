@@ -178,9 +178,9 @@ setMethod("dbExists", signature(db = "localDB", key = "character"),
 ## of the version file
 setMethod("dbDelete", signature(db = "localDB", key = "character"),
           function(db, key, ...){
-			updateVersion(db,key, keepKey = FALSE)
 			if(!key%in%dbList(db)) warning("Specified key does not exist in current version")		  
-          })
+ 			updateVersion(db,key, keepKey = FALSE)
+         })
 
 
 ############################################
@@ -199,7 +199,7 @@ setMethod("dbDelete", signature(db = "localDB", key = "character"),
 
 getdata <- function(db,key){
     localFiles <- c(data = local.file.path(db, key),
-                    sig = local.file.path.SIG(db, key)
+                    sig = local.file.path.SIG(db, key))
 
     handler <- function(cond) {
         ## If a condition is thrown (e.g. error or interrupt), delete
