@@ -87,16 +87,16 @@ updateVersion <- function(db,key, keepKey = TRUE){
 ## local.file.path ############  Creates a file path in the local data  
 ###############################  directory (to be used internally).	
 
-local.file.path <- function(db,key, objVerNum){
-    file.path(path.expand(db@dir), "data", paste(key,".",objVerNum,sep=""))
+local.file.path <- function(db,key,objVerNum=objectVersion(db, key)){
+    	file.path(path.expand(db@dir), "data", paste(key,".",objVerNum,sep=""))
 }
 
 ###############################
 ## local.file.path.SIG ######## Creates a file path in the local data  
 ############################### directory (to be used internally) for the SIG files.	
 
-local.file.path.SIG <- function(db,key, objVerNum){
-    file.path(path.expand(db@dir), "data", paste(key,".",objVerNum,".SIG",sep=""))
+local.file.path.SIG <- function(db,key,objVerNum=objectVersion(db, key)){
+	file.path(path.expand(db@dir), "data", paste(key,".",objVerNum,".SIG",sep=""))
 }
 
 
@@ -135,18 +135,16 @@ setMethod("dbInsert",
 checkLocal <- function(db, key){
     	## key %in% list.files(file.path(db@dir, "data"), all.files = TRUE)
     	datadir <- file.path(db@dir, "data")
-	vn <- objectVersion(db,key)
 	
 	if(!file.exists(datadir))
         stop("local data directory does not exist")
-    	file.exists(local.file.path(db,key,vn))      ## returns a vector of T/F
+    	file.exists(local.file.path(db,key))      ## returns a vector of T/F
 }
 
 read <- function(db, key){
     if(!checkLocal(db,key))
         stop(gettextf("files associated with key '%s' not yet downloaded", key))
-    vn <- objectVersion(db,key)
-    con <- gzfile(local.file.path(db,key,vn))
+    con <- gzfile(local.file.path(db,key))
     open(con, "rb")
     on.exit(close(con))
     unserialize(con) 
@@ -200,8 +198,8 @@ setMethod("dbDelete", signature(db = "localDB", key = "character"),
 ####################
 
 getdata <- function(db,key){
-    localFiles <- c(data = local.file.path(db, key, objectVersion(db,key)),
-                    sig = local.file.path.SIG(db, key, objectVersion(db,key))
+    localFiles <- c(data = local.file.path(db, key),
+                    sig = local.file.path.SIG(db, key)
 
     handler <- function(cond) {
         ## If a condition is thrown (e.g. error or interrupt), delete
