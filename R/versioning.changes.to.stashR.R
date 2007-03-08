@@ -29,7 +29,7 @@ objectVersion <- function(db, key){
 	## we need to look in the data directory at the data files)  ##
 	## for remoteDB:
 	## read pertinent line of the version file from the internet ##
-	if(class(db)=="localDB")}
+	if(class(db)=="localDB"){
 		allFiles <- list.files(file.path(db@dir,"data"))
 		keyFiles <- allFiles[-grep("\\.SIG$",allFiles)]	## returns character(0) if no files
 		o <- order(keyFiles[grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFiles)],decreasing=FALSE)
@@ -253,10 +253,10 @@ getdata <- function(db,key){
         cond
     }
     status <- tryCatch({
-        download.file(file.path(db@url, "data", paste(key, objectVersion(db,key),sep="."),
+        download.file(file.path(db@url, "data", paste(key, objectVersion(db,key),sep=".")),
                       localFiles["data"], mode = "wb", cacheOK = FALSE )#,
                       #quiet = .stashROptions$quietDownload)
-        download.file(file.path(db@url, "data", paste(key, objectVersion(db,key), ".SIG", sep = "")),
+        download.file(file.path(db@url, "data", paste(key, objectVersion(db,key), "SIG", sep = ".")),
                       localFiles["sig"], mode = "wb", cacheOK = FALSE )#,
                       #quiet = .stashROptions$quietDownload)
     }, error = handler, interrupt = handler)
