@@ -26,17 +26,25 @@ objectVersion <- function(db, key){
 	## determine last version of the object in the repository 	##
 	## (note this object may have been previously deleted, so   ##
 	## we need to look in the data directory at the data files) ##
-	allFiles <- list.files(file.path(db@dir,"data"))
-	keyFiles <- allFiles[-grep("\\.SIG$",allFiles)]	## returns character(0) if no files
-	o <- order(keyFiles[grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFiles)],decreasing=FALSE)
-	oFiles <- keyFiles[o]
-	latestFile <-oFiles[length(oFiles)]
-	if(length(latestFile)!=0){
-		latestFileSplit <- strsplit(latestFile,"\\.")[[1]]
-		lastObjVer <- as.numeric(latestFileSplit[length(latestFileSplit)])
+	if(class(db)=="localDB")}
+		allFiles <- list.files(file.path(db@dir,"data"))
+		keyFiles <- allFiles[-grep("\\.SIG$",allFiles)]	## returns character(0) if no files
+		o <- order(keyFiles[grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFiles)],decreasing=FALSE)
+		oFiles <- keyFiles[o]
+		latestFile <-oFiles[length(oFiles)]
+		if(length(latestFile)!=0){
+			latestFileSplit <- strsplit(latestFile,"\\.")[[1]]
+			lastObjVer <- as.numeric(latestFileSplit[length(latestFileSplit)])
+		}
+		else lastObjVer <- 0
+		lastObjVer
 	}
-	else lastObjVer <- 0
-	lastObjVer
+	else{ 
+	
+	## basically need to use old objectVersion where we just look at last line of version file
+
+	
+	}
 }
 
 
@@ -236,12 +244,12 @@ getdata <- function(db,key){
         cond
     }
     status <- tryCatch({
-        download.file(file.path(db@url, "data", key, objectVersion(db,key)),
-                      localFiles["data"], mode = "wb", cacheOK = FALSE,
-                      quiet = .stashROptions$quietDownload)
+        download.file(file.path(db@url, "data", paste(key, objectVersion(db,key),sep="."),
+                      localFiles["data"], mode = "wb", cacheOK = FALSE )#,
+                      #quiet = .stashROptions$quietDownload)
         download.file(file.path(db@url, "data", paste(key, objectVersion(db,key), ".SIG", sep = "")),
-                      localFiles["sig"], mode = "wb", cacheOK = FALSE,
-                      quiet = .stashROptions$quietDownload)
+                      localFiles["sig"], mode = "wb", cacheOK = FALSE )#,
+                      #quiet = .stashROptions$quietDownload)
     }, error = handler, interrupt = handler)
 
     if(inherits(status, "condition"))
