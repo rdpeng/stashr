@@ -94,7 +94,7 @@ updatedReposVersionInfo <- function(db, key, keepKey = TRUE){
 ######### updating version file ########## 
 updateVersion <- function(db,key, keepKey = TRUE){
 	cat(updatedReposVersionInfo(db,key,keepKey),
-            file = file.path(dbLocal@dir,"version"),
+            file = file.path(db@dir,"version"),
             sep = "\n", append = TRUE)
 }
 
