@@ -255,7 +255,7 @@ getdata <- function(db,key){
     status <- tryCatch({
         download.file(file.path(db@url, "data", paste(key, objectVersion(db,key),sep=".")),
                       localFiles["data"], mode = "wb", cacheOK = FALSE )#,
-                      #quiet = .stashROptions$quietDownload)
+                      #quiet = .stashROptions$quietDownload)		## I commented these out because they were causing an error
         download.file(file.path(db@url, "data", paste(key, objectVersion(db,key), "SIG", sep = ".")),
                       localFiles["sig"], mode = "wb", cacheOK = FALSE )#,
                       #quiet = .stashROptions$quietDownload)
@@ -274,13 +274,13 @@ setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
                        "and 'offline = TRUE'") 
               if(!offline && !(key %in% dbList(db)))
                   stop("specified key not in database")
-		  # ignoring .SIG files for now ?	
+		  # ignoring .SIG files for now 			
               #if(!offline && checkLocal(db, key)) {
               #    ## Check the remote/local MD5 hash value
               #    if(!checkSIG(db, key))
               #        getdata(db,key)
               #}
-              if(!checkLocal(db, key))
+              if(!checkLocal(db, key))	## downloads new key's files if key version has changed
                   getdata(db,key)
               read(db, key)
           })
@@ -306,4 +306,49 @@ setMethod("dbList", "remoteDB",
 setMethod("dbExists", signature(db = "remoteDB", key = "character"),
           function(db, key, ...){
               key %in% dbList(db)  ## returns a vector of TRUE/FALSE
+          })
+
+
+checkRemote<- function(db, key.v){
+		info <- reposVersionInfo(db)
+		if(length(info)!=0){
+			keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+			keyFilesSep <- strsplit(keyFiles," ")[[1]]
+			key.v%in%keyFilesSep
+		}
+		else FALSE
+}
+
+
+
+setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
+
+setMethod("dbSync", signature(db = "remoteDB"),
+          function(db, key = NULL, ...){
+		## only update if reposVersion = -1 ##
+		if(db@reposVersion == -1){
+
+              if(!is.null(key) && !all(checkLocal(db,key))) 
+                  stop("not all files referenced in the 'key' vector were ",
+                       "previously downloaded, no files updated")
+              if(is.null(key)) {
+                  list.local.files <- list.files(file.path(db@dir, "data"),
+                                                 all.files = FALSE)
+                 # use <- !file.info(list.local.files)$isdir  ## exclude directories (causes error?)
+                 # list.local.files <- list.local.files[use]
+
+                  dontuse <- grep(".SIG", list.local.files, fixed = TRUE)
+                  key <- list.local.files[-dontuse]
+              }
+		  ## see if the version of the repository has changed ## ## still needs work!
+
+              	for (i in key){ 
+               	   #if(!checkSIG(db, i)) # ignore .SIG files for now
+			   # but, still need to make sure this getdata only gets new data when necessary
+			   if(!checkRemote(db,i)) 
+               	       getdata(db,i)
+              	}	
+		 
+		} # end of if reposVersion = -1
+		else print("no synchronization for a remoteDB object with a fixed version")
           })
