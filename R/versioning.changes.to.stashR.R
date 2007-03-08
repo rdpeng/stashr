@@ -3,8 +3,12 @@
 
 ## use readLines to find last line, returns as character string
 reposVersionInfo <- function(db){
-	if(file.exists(file.path(db@dir, "version"))){  
-		con <- file(file.path(db@dir, "version"))
+	if(class(db)=="localDB")
+		verDir <- db@dir
+	else  verDir <- db@url
+	if({class(db)=="localDB" & file.exists(file.path(verDir, "version"))}
+		| class(db)=="remoteDB"){  
+		con <- file(file.path(verDir, "version"))
 		open(con, "r")  ## 'version' is a text file
 		on.exit(close(con))
 		VerList <- readLines(con)
@@ -13,7 +17,7 @@ reposVersionInfo <- function(db){
 			rvn <- db@reposVersion)
 		VerList[rvn]
 	}
-	else NULL	
+	else character(0)	
 }
 
 ## returns most recent "object version" associated with a given key
