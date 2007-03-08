@@ -18,17 +18,21 @@ reposVersionInfo <- function(db){
 
 ## returns most recent "object version" associated with a given key
 
-objectVersion <- function(db, key){ 
-	info <- reposVersionInfo(db)
-	if(length(info)!=0){
-		keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
-		keyFilesSep <- strsplit(keyFiles," ")[[1]]
-		v <- grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFilesSep,value=TRUE)
-		currNum <- as.numeric(substring(v,nchar(key)+2))
-		if(length(currNum)==0) currNum <- 0
-		currNum
+objectVersion <- function(db, key){
+	## determine last version of the object in the repository 	##
+	## (note this object may have been previously deleted, so   ##
+	## we need to look in the data directory at the data files) ##
+	allFiles <- list.files(file.path(db@dir,"data"))
+	keyFiles <- allFiles[-grep("\\.SIG$",allFiles)]	## returns character(0) if no files
+	o <- order(keyFiles[grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFiles)],decreasing=FALSE)
+	oFiles <- keyFiles[o]
+	latestFile <-oFiles[length(oFiles)]
+	if(length(latestFile)!=0){
+		latestFileSplit <- strsplit(latestFile,"\\.")[[1]]
+		lastObjVer <- as.numeric(latestFileSplit[length(latestFileSplit)])
 	}
-	else 0
+	else lastObjVer <- 0
+	lastObjVer
 }
 
 
@@ -52,14 +56,8 @@ latestReposVersionNum <- function(db){
 ## keepKey = FALSE deletes the key from the version information
 
 
-## BUG: need to read the key file version number from the 
-## files corresponding to keys in data file instead of from 
-## last line of the repository's version file
-##(since if I remove all keys from current version and then
-## re-insert data using an old key, as is, the numbering system
-## starts up again at 1 and we lose the old version of the file
-
-updatedReposVersionInfo <- function(db, key, keepKey = TRUE){ 
+updatedReposVersionInfo <- function(db, key, keepKey = TRUE){
+	## find and remove key (for updating) from latest repository version info ##
 	reposV <- latestReposVersionNum(db)+1
 	info <- reposVersionInfo(db)
 	if(length(info)!=0){
@@ -126,7 +124,11 @@ setMethod("dbInsert",
           signature(db = "localDB", key = "character", value = "ANY"),
           function(db, key, value, ...) {
 
-	      vn <- objectVersion(db,key) + 1
+              ## update the 'version' file ##
+              updateVersion(db,key)
+
+		  ## update the data files ##
+	        vn <- objectVersion(db,key) + 1
 	
               con <- gzfile(local.file.path(db,key,vn))
               open(con, "wb")
@@ -141,8 +143,7 @@ setMethod("dbInsert",
               s2 <- paste(s, key, vn, sep="  ")
               writeLines(s2, con = local.file.path.SIG(db,key,vn))
               
-              ## update the 'version' file
-              updateVersion(db,key)
+
               
           })
 
