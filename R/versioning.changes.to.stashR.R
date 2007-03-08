@@ -20,12 +20,15 @@ reposVersionInfo <- function(db){
 	else character(0)	
 }
 
-## returns most recent "object version" associated with a given key
+## returns "object version" associated with a given key
 
 objectVersion <- function(db, key){
-	## determine last version of the object in the repository 	##
-	## (note this object may have been previously deleted, so   ##
-	## we need to look in the data directory at the data files) ##
+	## for localDB: 
+	## determine last version of the object in the repository 	 ##
+	## (note this object may have been previously deleted, so    ##
+	## we need to look in the data directory at the data files)  ##
+	## for remoteDB:
+	## read pertinent line of the version file from the internet ##
 	if(class(db)=="localDB")}
 		allFiles <- list.files(file.path(db@dir,"data"))
 		keyFiles <- allFiles[-grep("\\.SIG$",allFiles)]	## returns character(0) if no files
@@ -40,10 +43,16 @@ objectVersion <- function(db, key){
 		lastObjVer
 	}
 	else{ 
-	
-	## basically need to use old objectVersion where we just look at last line of version file
-
-	
+		info <- reposVersionInfo(db)
+		if(length(info)!=0){
+			keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+			keyFilesSep <- strsplit(keyFiles," ")[[1]]
+			v <- grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFilesSep,value=TRUE)
+			currNum <- as.numeric(substring(v,nchar(key)+2))
+			if(length(currNum)==0) currNum <- 0
+			currNum
+		}
+		else 0
 	}
 }
 
