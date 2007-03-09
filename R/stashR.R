@@ -39,7 +39,7 @@ setMethod("dbInsert",
               
               ## update the data files ##
               vn <- objectVersion(db,key) + 1
-	
+              
               con <- gzfile(local.file.path(db,key,vn), "wb")
               on.exit(close(con))
               serialize(value, con)
@@ -64,7 +64,7 @@ setMethod("dbDelete", signature(db = "localDB", key = "character"),
               if(!(key %in% dbList(db)))
                   warning("specified key does not exist in current version")
               updateVersion(db,key, keepKey = FALSE)
-         })
+          })
 
 
 setMethod("dbList", "localDB",
@@ -130,15 +130,15 @@ checkSIG <- function(db, key) {
 ## relevant version of the repository stored on the specified URL
 
 checkRemote<- function(db, key.v){
-		info <- reposVersionInfo(db)
-		if(length(info)!=0){
-			keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
-			keyFilesSep <- strsplit(keyFiles," ")[[1]]
-			key.v%in%keyFilesSep
-		}
-		else FALSE
+    info <- reposVersionInfo(db)
+    if(length(info)!=0){
+        keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+        keyFilesSep <- strsplit(keyFiles," ")[[1]]
+        key.v%in%keyFilesSep
+    }
+    else FALSE
 }
-                   
+
 
 setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
           function(db, key, offline = FALSE, ...){
@@ -147,12 +147,12 @@ setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
                        "and 'offline = TRUE'") 
               if(!offline && !(key %in% dbList(db)))
                   stop("specified key not in database")
-		  # ignoring .SIG files for now 			
-              #if(!offline && checkLocal(db, key)) {
-              #    ## Check the remote/local MD5 hash value
-              #    if(!checkSIG(db, key))
-              #        getdata(db,key)
-              #}
+                                        # ignoring .SIG files for now 			
+                                        #if(!offline && checkLocal(db, key)) {
+                                        #    ## Check the remote/local MD5 hash value
+                                        #    if(!checkSIG(db, key))
+                                        #        getdata(db,key)
+                                        #}
               if(!checkLocal(db, key))	## downloads new key's files if key version has changed
                   getdata(db,key)
               read(db, key)
@@ -165,12 +165,12 @@ setMethod("dbDelete", signature(db = "remoteDB", key = "character"),
 
 setMethod("dbList", "remoteDB",
           function(db, ...){
-		info <- reposVersionInfo(db)
-		if(length(info)!=0){
-			keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
-			keyFilesSep <- strsplit(keyFiles," ")[[1]]
-			gsub("\\.[0-9]+$", "", keyFilesSep)
-		}
+              info <- reposVersionInfo(db)
+              if(length(info)!=0){
+                  keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+                  keyFilesSep <- strsplit(keyFiles," ")[[1]]
+                  gsub("\\.[0-9]+$", "", keyFilesSep)
+              }
           })
 
 setMethod("dbExists", signature(db = "remoteDB", key = "character"),
@@ -185,7 +185,7 @@ setMethod("dbSync", signature(db = "remoteDB"),
           function(db, key = NULL, ...){
               ## only update if reposVersion = -1 ##
               if(db@reposVersion != -1)
-                  stop("no synchronization for a 'remoteDB' object "
+                  stop("no synchronization for a 'remoteDB' object ",
                        "with a fixed version")
               if(!is.null(key) && !all(checkLocal(db,key))) 
                   stop("not all files referenced in the 'key' vector were ",
@@ -242,7 +242,7 @@ reposVersionInfo <- function(db){
     else
         verDir <- db@url
     if((inherits(db, "localDB") && file.exists(file.path(verDir, "version")))
-        || inherits(db, "remoteDB")) {  
+       || inherits(db, "remoteDB")) {  
         con <- file(file.path(verDir, "version"), "r") ## 'version' is a text file
         on.exit(close(con))
 
@@ -305,11 +305,11 @@ objectVersion <- function(db, key){
 ## file
 
 latestReposVersionNum <- function(db){ 
-	info <- reposVersionInfo(db)
-	if(length(info)!=0){
-		as.numeric(strsplit(info[length(info)], ":")[[1]][1])
-	}
-	else 0
+    info <- reposVersionInfo(db)
+    if(length(info)!=0){
+        as.numeric(strsplit(info[length(info)], ":")[[1]][1])
+    }
+    else 0
 }
 
 
@@ -319,45 +319,45 @@ latestReposVersionNum <- function(db){
 
 
 updatedReposVersionInfo <- function(db, key, keepKey = TRUE){
-	## find and remove key (for updating) from latest repository version info ##
-	reposV <- latestReposVersionNum(db)+1
-	info <- reposVersionInfo(db)
-	if(length(info)!=0){
-		keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
-		keyFilesSep <- strsplit(keyFiles," ")[[1]]
-		v <- grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFilesSep)
+    ## find and remove key (for updating) from latest repository version info ##
+    reposV <- latestReposVersionNum(db)+1
+    info <- reposVersionInfo(db)
+    if(length(info)!=0){
+        keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+        keyFilesSep <- strsplit(keyFiles," ")[[1]]
+        v <- grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFilesSep)
 
-		if(length(v)==0)
-                    others <- keyFilesSep
-                else
-                    others <- keyFilesSep[-v]
-		if(length(others)==0)
-			othersCollapsed <- paste(others, collapse=" ")
-		else{	
-			if(length(others)==1 & is.na(others[1]))
-				othersCollapsed <- character(0)
-			else 
-				othersCollapsed <- paste(others, collapse=" ")
-		}
-		newKeyInfo <- paste(key,objectVersion(db,key)+1, sep=".")
-		if(keepKey)
-			updatedKeyFiles <- paste(othersCollapsed, newKeyInfo, sep=" ")
-		else
-			updatedKeyFiles <- othersCollapsed
-	}
-	else updatedKeyFiles <- paste(key,1,sep=".")
-	# remove leading space resulting from intially inserting same key twice#
-	updatedKeyFiles <- gsub("^ ","",updatedKeyFiles)
-	paste(reposV, updatedKeyFiles, sep = ":") 
+        if(length(v)==0)
+            others <- keyFilesSep
+        else
+            others <- keyFilesSep[-v]
+        if(length(others)==0)
+            othersCollapsed <- paste(others, collapse=" ")
+        else{	
+            if(length(others)==1 & is.na(others[1]))
+                othersCollapsed <- character(0)
+            else 
+                othersCollapsed <- paste(others, collapse=" ")
+        }
+        newKeyInfo <- paste(key,objectVersion(db,key)+1, sep=".")
+        if(keepKey)
+            updatedKeyFiles <- paste(othersCollapsed, newKeyInfo, sep=" ")
+        else
+            updatedKeyFiles <- othersCollapsed
+    }
+    else updatedKeyFiles <- paste(key,1,sep=".")
+                                        # remove leading space resulting from intially inserting same key twice#
+    updatedKeyFiles <- gsub("^ ","",updatedKeyFiles)
+    paste(reposV, updatedKeyFiles, sep = ":") 
 }
 
 
 
 ######### updating version file ########## 
 updateVersion <- function(db,key, keepKey = TRUE){
-	cat(updatedReposVersionInfo(db,key,keepKey),
-            file = file.path(db@dir,"version"),
-            sep = "\n", append = TRUE)
+    cat(updatedReposVersionInfo(db,key,keepKey),
+        file = file.path(db@dir,"version"),
+        sep = "\n", append = TRUE)
 }
 
 
@@ -366,7 +366,7 @@ updateVersion <- function(db,key, keepKey = TRUE){
 ###############################  directory (to be used internally).	
 
 local.file.path <- function(db, key, objVerNum = objectVersion(db, key)){
-    	file.path(path.expand(db@dir), "data", paste(key,".",objVerNum,sep=""))
+    file.path(path.expand(db@dir), "data", paste(key,".",objVerNum,sep=""))
 }
 
 ###############################
@@ -374,7 +374,7 @@ local.file.path <- function(db, key, objVerNum = objectVersion(db, key)){
 ############################### directory (to be used internally) for the SIG files.	
 
 local.file.path.SIG <- function(db, key, objVerNum = objectVersion(db, key)){
-	file.path(path.expand(db@dir), "data", paste(key,".",objVerNum,".SIG",sep=""))
+    file.path(path.expand(db@dir), "data", paste(key,".",objVerNum,".SIG",sep=""))
 }
 
 
