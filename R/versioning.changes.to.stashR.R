@@ -345,10 +345,15 @@ setMethod("dbSync", signature(db = "remoteDB"),
               	for (i in key){ 
                	   #if(!checkSIG(db, i)) # ignore .SIG files for now
 			   # but, still need to make sure this getdata only gets new data when necessary
-			   if(!checkRemote(db,i)) 
-               	       getdata(db,i)
+			   if(!checkRemote(db,i)){ 
+				 # load updated data #
+               	       getdata(db,gsub("\\.[0-9]+","",i))
+				 # delete the old data and .SIG file #
+				 file.remove(file.path(db@dir,"data",i))
+				 file.remove(file.path(db@dir,"data",paste(i,".SIG",sep="")))
+			   }
               	}	
 		 
-		} # end of if reposVersion = -1
+		} 
 		else print("no synchronization for a remoteDB object with a fixed version")
           })
