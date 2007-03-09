@@ -38,3 +38,20 @@ setMethod("currentReposVersion", "remoteDB",
           function(db, ...) {
               getCurrentReposVersion(db)
           })
+
+setGeneric("currentReposVersion<-",
+           function(db, value) standardGeneric("currentReposVersion<-"))
+
+setReplaceMethod("currentReposVersion",
+                 signature(db = "remoteDB", value = "numeric"),
+                 function(db, value) {
+                     db@reposVersion <- value
+                     db
+                 })
+
+setReplaceMethod("currentReposVersion",
+                 signature(db = "localDB", value = "numeric"),
+                 function(db, value) {
+                     db@reposVersion <- value
+                     db
+                 })

@@ -21,7 +21,8 @@ exportMethods(
               "setDir<-",
               "initialize",
               "copyDB",
-              "currentReposVersion"
+              "currentReposVersion",
+              "currentReposVersion<-"
               )
 
 export("stashROption")
