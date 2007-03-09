@@ -317,13 +317,6 @@ objectVersion <- function(db, key){
     ## for remoteDB:
     ## read pertinent line of the version file from the internet ##
     if(inherits(db, "localDB")) {
-        ## allFiles <- list.files(file.path(db@dir,"data"))
-        ## keyFiles <- allFiles[-grep("\\.SIG$",allFiles)]
-        ## returns character(0) if no files       
-        ## o <- order(keyFiles[grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFiles)],
-        ##            decreasing = FALSE)
-        ## oFiles <- keyFiles[o]
-
         keyFiles <- getKeyFiles(db, key)
         use <- grep(paste("^", key, "\\.[0-9]+$", sep=""), keyFiles)
         oFiles <- sortByVersionNumber(keyFiles[use])
