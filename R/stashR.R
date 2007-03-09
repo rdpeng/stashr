@@ -96,6 +96,11 @@ setMethod("dbExists", signature(db = "localDB", key = "character"),
 ######################################################################
 ## Method definitions for 'remoteDB'
 
+## currently ignoring (but maintaining) .SIG files and the associated utility functions
+## readRemoteSIG, readLocalSIG and checkSIG
+######################################################################
+
+
 setMethod("dbInsert",
           signature(db = "remoteDB", key = "character", value = "ANY"),
           function(db, key, value, ...) {
@@ -126,7 +131,21 @@ checkSIG <- function(db, key) {
 
     isTRUE(localSIG == remoteSIG)
 }
-                       
+
+
+## Returns TRUE if a specific version of a key's file is included in the 
+## relevant version of the repository stored on the specified URL
+
+checkRemote<- function(db, key.v){
+		info <- reposVersionInfo(db)
+		if(length(info)!=0){
+			keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+			keyFilesSep <- strsplit(keyFiles," ")[[1]]
+			key.v%in%keyFilesSep
+		}
+		else FALSE
+}
+                   
 
 setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
           function(db, key, offline = FALSE, ...){
@@ -250,6 +269,7 @@ checkLocal <- function(db, key){
 
 
 
+
 ####################
 ## getdata ######### downloads the key & the SIG file
 ####################
@@ -266,18 +286,20 @@ getdata <- function(db,key){
         cond
     }
     status <- tryCatch({
-        download.file(file.path(db@url, "data", key),
-                      localFiles["data"], mode = "wb", cacheOK = FALSE,
-                      quiet = .stashROptions$quietDownload)
-        download.file(file.path(db@url, "data", paste(key, ".SIG", sep = "")),
-                      localFiles["sig"], mode = "wb", cacheOK = FALSE,
-                      quiet = .stashROptions$quietDownload)
+        download.file(file.path(db@url, "data", paste(key, objectVersion(db,key),sep=".")),
+                      localFiles["data"], mode = "wb", cacheOK = FALSE )#,
+                      #quiet = .stashROptions$quietDownload)		## I commented these out because they were causing an error
+        download.file(file.path(db@url, "data", paste(key, objectVersion(db,key), "SIG", sep = ".")),
+                      localFiles["sig"], mode = "wb", cacheOK = FALSE )#,
+                      #quiet = .stashROptions$quietDownload)
     }, error = handler, interrupt = handler)
 
     if(inherits(status, "condition"))
         stop(gettextf("problem downloading data for key '%s': %s",
                       key, conditionMessage(status)))
 }
+
+
 
 ####################
 ## read ############ Reads file associated with specified key from the local directory.
