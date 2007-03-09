@@ -37,11 +37,11 @@ setMethod("dbInsert",
               if(db@reposVersion != -1) 
                   stop("inserting keys into pervious versions not allowed")
                   
-              ## update the 'version' file ##
-              updateVersion(db,key)
-              
               ## update the data files ##
               vn <- objectVersion(db,key) + 1
+              
+              ## update the 'version' file ##
+              updateVersion(db,key)
               
               con <- gzfile(local.file.path(db,key,vn), "wb")
               on.exit(close(con))
@@ -66,9 +66,9 @@ setMethod("dbDelete", signature(db = "localDB", key = "character"),
           function(db, key, ...) {
               if(db@reposVersion != -1) 
                   stop("deleting keys from previous versions not allowed")
-
               if(!(key %in% dbList(db)))
-                  warning("specified key does not exist in current version")
+                  stop("specified key does not exist in current version")
+              
               updateVersion(db,key, keepKey = FALSE)
           })
 
@@ -76,6 +76,7 @@ setMethod("dbDelete", signature(db = "localDB", key = "character"),
 setMethod("dbList", "localDB",
           function(db, ...){
               info <- reposVersionInfo(db)
+
               if(length(info)!=0){
                   keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
                   if(!is.na(keyFiles)){
@@ -85,6 +86,8 @@ setMethod("dbList", "localDB",
                   else
                       character(0)
               }
+              else
+                  character(0)
           })
 
 setMethod("dbExists", signature(db = "localDB", key = "character"),
@@ -92,6 +95,7 @@ setMethod("dbExists", signature(db = "localDB", key = "character"),
               key %in% dbList(db)	# returns a vector of T/F
           })
 
+## db <- new("localDB",dir="testlocal",name="test")
 
 ######################################################################
 ## Method definitions for 'remoteDB'
@@ -241,17 +245,17 @@ setMethod("dbSync", signature(db = "remoteDB"),
 ## Utility Functions  ##################################################
 ########################################################################
 
-setGeneric("versionFile", function(x, ...) standardGeneric("versionFile"))
+setGeneric("versionFile", function(db, ...) standardGeneric("versionFile"))
 
 ## Return the path for the 'version' file
 setMethod("versionFile", "localDB",
-          function(x, ...) {
+          function(db, ...) {
               file.path(db@dir, "version")
           })
 
 ## Return the URL for the 'version' file
 setMethod("versionFile", "remoteDB",
-          function(x, ...) {
+          function(db, ...) {
               file.path(db@url, "version")
           })
           
@@ -278,33 +282,51 @@ reposVersionInfo <- function(db){
         character(0)	
 }
 
-## returns "object version" associated with a given key
+## 'getKeyFiles' uses the 'version' file instead of reading the 'data'
+## directory directly
 
 getKeyFiles <- function(db, key) {
     version <- readLines(versionFile(db))
 
     ## Strip repository version numbers
     v <- sub("^[0-9]+:", "", version)
-    unlist(strsplit(vf, " ", fixed = TRUE))
+    keyFiles <- unlist(strsplit(v, " ", fixed = TRUE), use.names = FALSE)
+
+    if(is.null(keyFiles))
+        keyFiles <- character(0)
+    keyFiles
 }
+
+sortByVersionNumber <- function(keyFiles) {
+    splitFiles <- strsplit(keyFiles, ".", fixed = TRUE)
+
+    ## The object version number is always at the end
+    num <- sapply(splitFiles, function(x) x[length(x)])
+    num <- as.numeric(num)
+    keyFiles[order(num, decreasing = FALSE)]
+}
+
+## returns "object version" associated with a given key
 
 objectVersion <- function(db, key){
     ## for localDB: 
     ## determine last version of the object in the repository    ##
     ## (note this object may have been previously deleted, so    ##
     ## we need to look in the data directory at the data files)  ##
+    ##
     ## for remoteDB:
     ## read pertinent line of the version file from the internet ##
     if(inherits(db, "localDB")) {
         ## allFiles <- list.files(file.path(db@dir,"data"))
-        ## keyFiles <- allFiles[-grep("\\.SIG$",allFiles)]	 ## returns character(0) if no files       
+        ## keyFiles <- allFiles[-grep("\\.SIG$",allFiles)]
+        ## returns character(0) if no files       
         ## o <- order(keyFiles[grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFiles)],
         ##            decreasing = FALSE)
         ## oFiles <- keyFiles[o]
 
         keyFiles <- getKeyFiles(db, key)
         use <- grep(paste("^", key, "\\.[0-9]+$", sep=""), keyFiles)
-        oFiles <- sort(keyFiles[use], decreasing = FALSE)
+        oFiles <- sortByVersionNumber(keyFiles[use])
         latestFile <- oFiles[length(oFiles)]
 
         if(length(latestFile) != 0){
@@ -355,6 +377,7 @@ updatedReposVersionInfo <- function(db, key, keepKey = TRUE){
     ## find and remove key (for updating) from latest repository version info ##
     reposV <- latestReposVersionNum(db)+1
     info <- reposVersionInfo(db)
+
     if(length(info)!=0){
         keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
         keyFilesSep <- strsplit(keyFiles," ")[[1]]
