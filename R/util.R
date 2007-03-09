@@ -55,3 +55,16 @@ setReplaceMethod("currentReposVersion",
                      db@reposVersion <- value
                      db
                  })
+
+convertOldStashR <- function() {
+    infiles <- dir(".", all.files = TRUE)
+    use <- !file.info(infiles)$isdir
+    infiles <- infiles[use]
+    outfiles <- sub("\\.SIG$", ".1.SIG", infiles)
+    sigfiles <- grep("\\.SIG$", outfiles)
+    outfiles[-sigfiles] <- paste(outfiles[-sigfiles], "1", sep = ".")
+
+    for(i in seq(along = infiles)) {
+        file.rename(infiles[i], outfiles[i])
+    }
+}
