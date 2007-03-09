@@ -24,7 +24,7 @@ reposVersionInfo <- function(db){
 
 objectVersion <- function(db, key){
 	## for localDB: 
-	## determine last version of the object in the repository 	 ##
+	## determine last version of the object in the repository    ##
 	## (note this object may have been previously deleted, so    ##
 	## we need to look in the data directory at the data files)  ##
 	## for remoteDB:
@@ -184,7 +184,7 @@ checkLocal <- function(db, key){
 
 read <- function(db, key){
     if(!checkLocal(db,key))
-        stop(gettextf("files associated with key '%s' not yet downloaded", key))
+        stop(gettextf("files associated with key not yet downloaded", key))
     con <- gzfile(local.file.path(db,key))
     open(con, "rb")
     on.exit(close(con))
@@ -218,7 +218,7 @@ setMethod("dbExists", signature(db = "localDB", key = "character"),
               key %in% dbList(db)	# returns a vector of T/F
           })
 
-## no longer delete files from repository, just delete key from latest line
+## doesn't delete files from repository, just deletes key from latest line
 ## of the version file
 setMethod("dbDelete", signature(db = "localDB", key = "character"),
           function(db, key, ...){
@@ -233,7 +233,7 @@ setMethod("dbDelete", signature(db = "localDB", key = "character"),
 
 ## note dbInsert stays the same (doesn't work for remoteDB) ##
 
-## currently ignoring dbSync and the associated utility functions
+## currently ignoring (but maintaining) .SIG files and the associated utility functions
 ## readRemoteSIG, readLocalSIG and checkSIG
 
 
