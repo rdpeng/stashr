@@ -78,7 +78,7 @@ setMethod("dbList", "localDB",
               info <- reposVersionInfo(db)
 
               if(length(info)!=0){
-                  keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+                  keyFiles <- strsplit(info, ":")[[1]][2]
 
                   if(!is.na(keyFiles)){
                       keyFilesSep <- strsplit(keyFiles," ")[[1]]
@@ -97,6 +97,8 @@ setMethod("dbExists", signature(db = "localDB", key = "character"),
           })
 
 ## db <- new("localDB",dir="testlocal",name="test")
+
+## db <- new("remoteDB",url="http://www.biostat.jhsph.edu/~seckel/remoteDBExampleVersioning", dir="remotelocal",name="remote")
 
 
 
@@ -145,8 +147,9 @@ checkSIG <- function(db, key) {
 
 checkRemote<- function(db, key.v){
     info <- reposVersionInfo(db)
-    if(length(info)!=0){
-        keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+
+    if(length(info) != 0){
+        keyFiles <- strsplit(info, ":")[[1]][2]
         keyFilesSep <- strsplit(keyFiles," ")[[1]]
         key.v%in%keyFilesSep
     }
@@ -156,17 +159,8 @@ checkRemote<- function(db, key.v){
 
 setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
           function(db, key, ...){
-              if(!checkLocal(db,key))
-                  stop("have not previously downloaded specified data ", 
-                       "and 'offline = TRUE'") 
               if(!(key %in% dbList(db)))
                   stop("specified key not in database")
-              ## ignoring .SIG files for now 			
-              ##if(!offline && checkLocal(db, key)) {
-              ##    ## Check the remote/local MD5 hash value
-              ##    if(!checkSIG(db, key))
-              ##        getdata(db,key)
-              ##}
 
               ## downloads new key's files if key version has changed
               if(!checkLocal(db, key))	
@@ -182,11 +176,16 @@ setMethod("dbDelete", signature(db = "remoteDB", key = "character"),
 setMethod("dbList", "remoteDB",
           function(db, ...){
               info <- reposVersionInfo(db)
-              if(length(info)!=0){
-                  keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
-                  keyFilesSep <- strsplit(keyFiles," ")[[1]]
+
+              if(length(info) != 0){
+                  keyFiles <- strsplit(info, ":")[[1]][2]
+                  keyFilesSep <- strsplit(keyFiles," ", fixed = TRUE)[[1]]
+
+                  ## Strip the object version numbers off
                   gsub("\\.[0-9]+$", "", keyFilesSep)
               }
+              else
+                  character(0)
           })
 
 setMethod("dbExists", signature(db = "remoteDB", key = "character"),
@@ -269,9 +268,10 @@ setMethod("versionFile", "remoteDB",
 ## 'db@reposVersion', returns as character string
 
 readVersionFileLine <- function(db) {
+    ## Note:  'file' takes complete URLs as well as file paths
     con <- file(versionFile(db), "r") ## 'version' is a text file
     on.exit(close(con))
-
+                  
     VerList <- readLines(con)
 
     if(length(VerList) > 0) {
@@ -402,7 +402,7 @@ setMethod("objectVersion", "remoteDB",
 latestReposVersionNum <- function(db){ 
     info <- reposVersionInfo(db)
     if(length(info)!=0){
-        as.numeric(strsplit(info[length(info)], ":")[[1]][1])
+        as.numeric(strsplit(info, ":")[[1]][1])
     }
     else 0
 }
@@ -419,7 +419,7 @@ updatedReposVersionInfo <- function(db, key, keepKey = TRUE){
     info <- reposVersionInfo(db)
 
     if(length(info)!=0){
-        keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+        keyFiles <- strsplit(info, ":")[[1]][2]
         keyFilesSep <- strsplit(keyFiles," ")[[1]]
         v <- grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFilesSep)
 
