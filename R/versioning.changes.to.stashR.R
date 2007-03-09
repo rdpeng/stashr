@@ -344,14 +344,21 @@ setMethod("dbSync", signature(db = "remoteDB"),
 
               	for (i in key){ 
                	   #if(!checkSIG(db, i)) # ignore .SIG files for now
-			   # but, still need to make sure this getdata only gets new data when necessary
-			   if(!checkRemote(db,i)){ 
+			   # download new files when key is in latest repos version, but we 
+			   # don't the corresponding updated version of the key 
+			   if(!checkRemote(db,i) & dbExists(db,gsub("\\.[0-9]+","",i))){ 
 				 # load updated data #
                	       getdata(db,gsub("\\.[0-9]+","",i))
 				 # delete the old data and .SIG file #
 				 file.remove(file.path(db@dir,"data",i))
 				 file.remove(file.path(db@dir,"data",paste(i,".SIG",sep="")))
 			   }
+			   ## delete files associated with keys that have been deleted ## 
+			   if(!dbExists(db,gsub("\\.[0-9]+","",i))){
+			   	 # delete the old data and .SIG file #
+				 file.remove(file.path(db@dir,"data",i))
+				 file.remove(file.path(db@dir,"data",paste(i,".SIG",sep="")))
+			   }	
               	}	
 		 
 		} 
