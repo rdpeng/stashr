@@ -27,7 +27,6 @@ createLocalDir <- function(db) {
     
     if(!status && !file.exists(datadir))
         stop(gettextf("problem creating directory '%s'", datadir))
-    file.create(file.path(db@dir, "version"))
 }
 
 setMethod("dbCreate",
@@ -53,6 +52,7 @@ setMethod("dbCreate",
               if (length(grep("/$", db@dir, perl = TRUE)) > 0)
                   db@dir <- sub("/$","", db@dir)
               createLocalDir(db)
+              file.create(file.path(db@dir, "version"))
           })
 
 
