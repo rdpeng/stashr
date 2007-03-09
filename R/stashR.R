@@ -198,8 +198,8 @@ setMethod("dbExists", signature(db = "remoteDB", key = "character"),
               key %in% dbList(db)  ## returns a vector of TRUE/FALSE
           })
 
-stripVersion <- function(key) {
-    gsub("\\.[0-9]+", "", key)
+stripVersion <- function(key.v) {
+    gsub("\\.[0-9]+", "", key.v)
 }
 
 setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
@@ -214,19 +214,19 @@ setMethod("dbSync", signature(db = "remoteDB"),
                   stop("not all files referenced in the 'key' vector were ",
                        "previously downloaded, no files updated")
               
-              if(is.null(key)) {
-                  list.local.files <- list.files(file.path(db@dir, "data"),
-                                                 full.names = TRUE,
-                                                 all.files = TRUE)
-                  ## exclude directories (causes error?)                      
-                  use <- !file.info(list.local.files)$isdir  
-                  list.local.files <- basename(list.local.files[use])
-                  
-                  dontuse <- grep("\\.SIG$", list.local.files)
-                  key <- list.local.files[-dontuse]
-              }
-              else {
+              list.local.files <- list.files(file.path(db@dir, "data"),
+                                             full.names = TRUE, all.files = TRUE)
+              ## exclude directories (causes error?)                      
+              use <- !file.info(list.local.files)$isdir  
+              list.local.files <- basename(list.local.files[use])
+              dontuse <- grep("\\.SIG$", list.local.files)
+              list.local.files <- list.local.files[-dontuse]
 
+              key <- if(is.null(key)) 
+                  list.local.files
+              else {
+                  use <- stripVersion(list.local.files) %in% key
+                  list.local.files[use]
               }
               ## see if the version of the repository has changed
               ## still needs work!
