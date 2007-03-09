@@ -1,15 +1,21 @@
 \name{utils}
+
 \alias{setDir<-}
 \alias{setDir<-,remoteDB,character-method}
+
 \alias{initialize,remoteDB-method}
 \alias{initialize,localDB-method}
+
 \alias{copyDB}
 \alias{copyDB,localDB-method}
+
 \alias{currentReposVersion}
 \alias{currentReposVersion,localDB-method}
-\alias{currentReposVersion,remote-method}
-\alias{currentReposVersion<-,localDB-method}
-\alias{currentReposVersion<-,remote-method}
+\alias{currentReposVersion,remoteDB-method}
+
+\alias{currentReposVersion<-}
+\alias{currentReposVersion<-,localDB,numeric-method}
+\alias{currentReposVersion<-,remoteDB,numeric-method}
 
 \title{Set directory for remote database}
 
@@ -21,7 +27,7 @@
 setDir(db) <- value
 copyDB(db, ...)
 currentReposVersion(db, ...)
-cuurentReposVersion(db) <- value
+currentReposVersion(db) <- value
 
 \S4method{initialize}{localDB}(.Object, ...)
 \S4method{initialize}{remoteDB}(.Object, ...)
