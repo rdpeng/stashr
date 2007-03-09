@@ -28,7 +28,7 @@ setMethod("dbUnlink", signature(db = "localDB"),
               unlink(db@dir, recursive = TRUE)
           })
 
-## new dbInsert ## (note: I got rid of overwrite option)
+## new dbInsert ## (note: I removed overwrite option)
 
 setMethod("dbInsert",
           signature(db = "localDB", key = "character", value = "ANY"),
