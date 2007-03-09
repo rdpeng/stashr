@@ -135,12 +135,13 @@ setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
                        "and 'offline = TRUE'") 
               if(!offline && !(key %in% dbList(db)))
                   stop("specified key not in database")
-              if(!offline && checkLocal(db, key)) {
-                  ## Check the remote/local MD5 hash value
-                  if(!checkSIG(db, key))
-                      getdata(db,key)
-              }
-              if(!checkLocal(db, key))
+		  # ignoring .SIG files for now 			
+              #if(!offline && checkLocal(db, key)) {
+              #    ## Check the remote/local MD5 hash value
+              #    if(!checkSIG(db, key))
+              #        getdata(db,key)
+              #}
+              if(!checkLocal(db, key))	## downloads new key's files if key version has changed
                   getdata(db,key)
               read(db, key)
           })
