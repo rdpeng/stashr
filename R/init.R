@@ -52,7 +52,9 @@ setMethod("dbCreate",
               if (length(grep("/$", db@dir, perl = TRUE)) > 0)
                   db@dir <- sub("/$","", db@dir)
               createLocalDir(db)
-              file.create(file.path(db@dir, "version"))
+
+              if(!file.exists(versionFile(db)))
+                  file.create(versionFile(db))
           })
 
 
