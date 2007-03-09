@@ -17,14 +17,17 @@ exportMethods(
               "dbUnlink"
               )
 
+exportMethods(
+              "setDir<-",
+              "initialize",
+              "copyDB",
+              "currentReposVersion"
+              )
+
+export("stashROption")
+
+
 ## Imports
 importFrom(tools, md5sum)
 import(filehash)
 
-exportMethods(
-              "setDir<-",
-              "initialize",
-              "copyDB"
-              )
-
-export("stashROption")

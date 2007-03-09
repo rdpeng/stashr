@@ -19,3 +19,22 @@ setMethod("copyDB", "localDB",
                   dbInsert(newdb, key, dbFetch(db, key))
               newdb
           })
+
+getCurrentReposVersion <- function(db) {
+    info <- reposVersionInfo(db)
+    num <- strsplit(info, ":", fixed = TRUE)[[1]][1]
+    as.numeric(num)
+}
+
+setGeneric("currentReposVersion",
+           function(db, ...) standardGeneric("currentReposVersion"))
+
+setMethod("currentReposVersion", "localDB",
+          function(db, ...) {
+              getCurrentReposVersion(db)
+          })
+
+setMethod("currentReposVersion", "remoteDB",
+          function(db, ...) {
+              getCurrentReposVersion(db)
+          })
