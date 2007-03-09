@@ -241,16 +241,30 @@ setMethod("dbSync", signature(db = "remoteDB"),
 ## Utility Functions  ##################################################
 ########################################################################
 
+setGeneric("versionFile", function(x, ...) standardGeneric("versionFile"))
+
+## Return the path for the 'version' file
+setMethod("versionFile", "localDB",
+          function(x, ...) {
+              file.path(db@dir, "version")
+          })
+
+## Return the URL for the 'version' file
+setMethod("versionFile", "remoteDB",
+          function(x, ...) {
+              file.path(db@url, "version")
+          })
+          
 
 ## use readLines to find last line, returns as character string
 reposVersionInfo <- function(db){
-    if(inherits(db, "localDB"))
-        verDir <- db@dir
-    else
-        verDir <- db@url
-    if((inherits(db, "localDB") && file.exists(file.path(verDir, "version")))
+    ## if(inherits(db, "localDB"))
+    ##     verDir <- db@dir
+    ## else
+    ##     verDir <- db@url
+    if((inherits(db, "localDB") && file.exists(versionFile(db)))
        || inherits(db, "remoteDB")) {  
-        con <- file(file.path(verDir, "version"), "r") ## 'version' is a text file
+        con <- file(versionFile(db), "r") ## 'version' is a text file
         on.exit(close(con))
 
         VerList <- readLines(con)
@@ -266,6 +280,14 @@ reposVersionInfo <- function(db){
 
 ## returns "object version" associated with a given key
 
+getKeyFiles <- function(db, key) {
+    version <- readLines(versionFile(db))
+
+    ## Strip repository version numbers
+    v <- sub("^[0-9]+:", "", version)
+    unlist(strsplit(vf, " ", fixed = TRUE))
+}
+
 objectVersion <- function(db, key){
     ## for localDB: 
     ## determine last version of the object in the repository    ##
@@ -274,15 +296,19 @@ objectVersion <- function(db, key){
     ## for remoteDB:
     ## read pertinent line of the version file from the internet ##
     if(inherits(db, "localDB")) {
-        allFiles <- list.files(file.path(db@dir,"data"))
-        keyFiles <- allFiles[-grep("\\.SIG$",allFiles)]	 ## returns character(0) if no files
-        o <- order(keyFiles[grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFiles)],
-                   decreasing = FALSE)
-        oFiles <- keyFiles[o]
-        latestFile <-oFiles[length(oFiles)]
+        ## allFiles <- list.files(file.path(db@dir,"data"))
+        ## keyFiles <- allFiles[-grep("\\.SIG$",allFiles)]	 ## returns character(0) if no files       
+        ## o <- order(keyFiles[grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFiles)],
+        ##            decreasing = FALSE)
+        ## oFiles <- keyFiles[o]
 
-        if(length(latestFile)!=0){
-            latestFileSplit <- strsplit(latestFile,"\\.")[[1]]
+        keyFiles <- getKeyFiles(db, key)
+        use <- grep(paste("^", key, "\\.[0-9]+$", sep=""), keyFiles)
+        oFiles <- sort(keyFiles[use], decreasing = FALSE)
+        latestFile <- oFiles[length(oFiles)]
+
+        if(length(latestFile) != 0){
+            latestFileSplit <- strsplit(latestFile,".", fixed = TRUE)[[1]]
             lastObjVer <- as.numeric(latestFileSplit[length(latestFileSplit)])
         }
         else
@@ -363,8 +389,7 @@ updatedReposVersionInfo <- function(db, key, keepKey = TRUE){
 ######### updating version file ########## 
 updateVersion <- function(db,key, keepKey = TRUE){
     cat(updatedReposVersionInfo(db,key,keepKey),
-        file = file.path(db@dir,"version"),
-        sep = "\n", append = TRUE)
+        file = versionFile(db), sep = "\n", append = TRUE)
 }
 
 
