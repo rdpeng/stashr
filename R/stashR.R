@@ -28,34 +28,35 @@ setMethod("dbUnlink", signature(db = "localDB"),
               unlink(db@dir, recursive = TRUE)
           })
 
+## new dbInsert ## (note: I got rid of overwrite option)
+
 setMethod("dbInsert",
           signature(db = "localDB", key = "character", value = "ANY"),
-          function(db, key, value, overwrite = TRUE, ...) {
-              if(file.exists(local.file.path(db,key)) && !overwrite){
-                  stop("cannot overwrite previously saved file")
-              }		
-              con <- gzfile(local.file.path(db,key))
-              open(con, "wb")
+          function(db, key, value, ...) {
 
+              ## update the 'version' file ##
+              updateVersion(db,key)
+
+		  ## update the data files ##
+	        vn <- objectVersion(db,key) + 1
+	
+              con <- gzfile(local.file.path(db,key,vn))
+              open(con, "wb")
+              
               tryCatch({
                   serialize(value, con)
               }, finally = {
                   if(isOpen(con))
                       close(con)
               })
-              s <- unname(md5sum(local.file.path(db,key)))
-              s2 <- paste(s, key, sep="  ")
-              writeLines(s2, con = local.file.path.SIG(db,key))
+              s <- unname(md5sum(local.file.path(db,key,vn)))
+              s2 <- paste(s, key, vn, sep="  ")
+              writeLines(s2, con = local.file.path.SIG(db,key,vn))
+              
 
-              ## update the 'keys' file
-              if(!dbExists(db, key)) {
-                  ## conA <- file(file.path(db@dir, "keys"))
-                  ## open(conA, "a")
-                  ## on.exit(close(conA))
-                  cat(key, file = file.path(db@dir,"keys"),sep = "\n",
-                      append = TRUE)
-              }
+              
           })
+
 
 setMethod("dbFetch", signature(db = "localDB", key = "character"),
           function(db, key, ...) {
