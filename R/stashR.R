@@ -225,6 +225,9 @@ setMethod("dbSync", signature(db = "remoteDB"),
                   dontuse <- grep("\\.SIG$", list.local.files)
                   key <- list.local.files[-dontuse]
               }
+              else {
+
+              }
               ## see if the version of the repository has changed
               ## still needs work!
               

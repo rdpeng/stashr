@@ -18,15 +18,12 @@ show(db@dir)
 
 
 ## other prelim steps necessary ##
-dbCreate(db)
+## dbCreate(db)
 
 ## test the methods ##
 dbList(db)
-dbList(db, save = TRUE)
 dbFetch(db, "01073") 
-dbFetch(db, "01073", offline = TRUE) 
 try( dbFetch(db, "01004") )
-try( dbFetch(db, "01004", offline = TRUE) )
 try( dbDelete(db,"01073") )
 try( dbInsert(db,key = "01004", value = NULL) )
 dbSync(db, key = NULL)
@@ -49,11 +46,10 @@ show(dbLocal@dir)
 dbCreate(dbLocal)
 
 ## test the methods  ##
-dbInsert(dbLocal,key = "01004", value = 1:10, overwrite = FALSE)
-try( dbInsert(dbLocal,key = "01004", value = 1:10, overwrite = FALSE) )
+dbInsert(dbLocal,key = "01004", value = 1:10)
 dbList(dbLocal)
-dbInsert(dbLocal,key = "01005", value = rep(5,10), overwrite = FALSE)
-dbInsert(dbLocal,key = "01006", value = matrix(1,5,4), overwrite = FALSE)
+dbInsert(dbLocal,key = "01005", value = rep(5,10))
+dbInsert(dbLocal,key = "01006", value = matrix(1,5,4))
 dbList(dbLocal)
 dbFetch(dbLocal, "01004")  
 try( dbFetch(dbLocal, "01073") )
