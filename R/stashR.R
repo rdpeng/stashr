@@ -149,13 +149,18 @@ checkRemote<- function(db, key.v){
     info <- reposVersionInfo(db)
 
     if(length(info) != 0){
-        keyFiles <- strsplit(info, ":")[[1]][2]
-        keyFilesSep <- strsplit(keyFiles," ")[[1]]
-        key.v%in%keyFilesSep
+        keyFiles <- strsplit(info, ":", fixed = TRUE)[[1]][2]
+        keyFilesSep <- strsplit(keyFiles, " ", fixed = TRUE)[[1]]
+        key.v %in% keyFilesSep
     }
-    else FALSE
+    else
+        FALSE
 }
 
+outOfDate <- function(db, key) {
+    info <- reposVersionInfo(db)
+    objectVersion(db, key)
+}
 
 setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
           function(db, key, ...){
@@ -193,6 +198,9 @@ setMethod("dbExists", signature(db = "remoteDB", key = "character"),
               key %in% dbList(db)  ## returns a vector of TRUE/FALSE
           })
 
+stripVersion <- function(key) {
+    gsub("\\.[0-9]+", "", key)
+}
 
 setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
 
@@ -202,10 +210,10 @@ setMethod("dbSync", signature(db = "remoteDB"),
               if(db@reposVersion != -1)
                   stop("no synchronization for a 'remoteDB' object ",
                        "with a fixed version")
-              if(!is.null(key) && !all(checkLocal(db,key))) 
+              if(!is.null(key) && !all(checkLocal(db, key))) 
                   stop("not all files referenced in the 'key' vector were ",
                        "previously downloaded, no files updated")
-
+              
               if(is.null(key)) {
                   list.local.files <- list.files(file.path(db@dir, "data"),
                                                  full.names = TRUE,
@@ -217,28 +225,31 @@ setMethod("dbSync", signature(db = "remoteDB"),
                   dontuse <- grep("\\.SIG$", list.local.files)
                   key <- list.local.files[-dontuse]
               }
-              
               ## see if the version of the repository has changed
               ## still needs work!
               
               for (i in key){ 
-                  ##if(!checkSIG(db, i)) # ignore .SIG files for now
-                  ## download new files when key is in latest repos version, but we 
-                  ## don't the corresponding updated version of the key
-                  if(!checkRemote(db,i) && dbExists(db, gsub("\\.[0-9]+","",i))){ 
-                      ## load updated data #
-                      getdata(db, gsub("\\.[0-9]+","",i))
-
-                      ## delete the old data and .SIG file #
-                      file.remove(file.path(db@dir,"data",i))
-                      file.remove(file.path(db@dir,"data",paste(i,".SIG",sep="")))
-                  }
                   ## delete files associated with keys that have been deleted ## 
-                  if(!dbExists(db,gsub("\\.[0-9]+","",i))){
+                  if(!dbExists(db, stripVersion(i))) {
                       ## delete the old data and .SIG file #
-                      file.remove(file.path(db@dir,"data",i))
-                      file.remove(file.path(db@dir,"data",paste(i,".SIG",sep="")))
-                  }	
+                      file.remove(file.path(db@dir, "data", i),
+                                  file.path(db@dir, "data",
+                                            paste(i, "SIG", sep = ".")))
+                  }
+                  else {  ## key exists in database
+                      ## download new files when key is in latest
+                      ## repos version, but we don't the corresponding
+                      ## updated version of the key
+                      if(!checkRemote(db, i)) { 
+                          ## load updated data #
+                          getdata(db, stripVersion(i))
+                          
+                          ## delete the old data and .SIG file #
+                          file.remove(file.path(db@dir, "data", i),
+                                      file.path(db@dir, "data",
+                                                paste(i, "SIG", sep = ".")))
+                      }
+                  }
               }	
           })
 
@@ -316,7 +327,7 @@ setMethod("reposVersionInfo", "remoteDB",
 ## for remoteDB:
 ## read pertinent line of the version file from the internet ##
 
-getKeyFiles <- function(db, key) {
+getKeyFiles <- function(db) {
     version <- readLines(versionFile(db))
 
     ## Strip repository version numbers
@@ -362,7 +373,7 @@ getSpecificObjectVersion <- function(db, key) {
 ## version number for an object
 
 calculateLatestObjectVersion <- function(db, key) {
-    keyFiles <- getKeyFiles(db, key)
+    keyFiles <- getKeyFiles(db)
 
     use <- grep(paste("^", key, "\\.[0-9]+$", sep=""), keyFiles)
     oFiles <- sortByVersionNumber(keyFiles[use])
@@ -532,8 +543,8 @@ getdata <- function(db,key){
 
 read <- function(db, key){
     if(!checkLocal(db,key))
-        stop(gettextf("files associated with key not yet downloaded", key))
-    con <- gzfile(local.file.path(db,key), "rb")
+        stop(gettextf("files associated with key '%s' not yet downloaded", key))
+    con <- gzfile(local.file.path(db, key), "rb")
     on.exit(close(con))
     unserialize(con) 
 }
