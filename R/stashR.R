@@ -86,20 +86,18 @@ setMethod("dbDelete", signature(db = "localDB", key = "character"),
               }
           })
 
+
 setMethod("dbList", "localDB",
           function(db, ...){
-              con <- file(file.path(db@dir, "keys"))
-
-              handler <- function(cond) {
-                  character(0)
-              }
-              tryCatch({
-                  open(con, "r")  ## 'keys' is a text file
-                  readLines(con)
-              }, error = handler, warning = handler, finally = {
-                  if(isOpen(con))
-                      close(con)
-              })
+		info <- reposVersionInfo(db)
+		if(length(info)!=0){
+			keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+			if(!is.na(keyFiles)){
+				keyFilesSep <- strsplit(keyFiles," ")[[1]]
+				gsub("\\.[0-9]+$", "", keyFilesSep)
+			}
+			else character(0)
+		}
           })
 
 setMethod("dbExists", signature(db = "localDB", key = "character"),
