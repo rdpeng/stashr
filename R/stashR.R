@@ -34,6 +34,9 @@ setMethod("dbUnlink", signature(db = "localDB"),
 setMethod("dbInsert",
           signature(db = "localDB", key = "character", value = "ANY"),
           function(db, key, value, ...) {
+              if(db@reposVersion != -1) 
+                  stop("inserting keys into pervious versions not allowed")
+                  
               ## update the 'version' file ##
               updateVersion(db,key)
               
@@ -60,7 +63,10 @@ setMethod("dbFetch", signature(db = "localDB", key = "character"),
 ## doesn't delete files from repository, just deletes key from latest line
 ## of the version file
 setMethod("dbDelete", signature(db = "localDB", key = "character"),
-          function(db, key, ...){
+          function(db, key, ...) {
+              if(db@reposVersion != -1) 
+                  stop("deleting keys from previous versions not allowed")
+
               if(!(key %in% dbList(db)))
                   warning("specified key does not exist in current version")
               updateVersion(db,key, keepKey = FALSE)
@@ -76,7 +82,8 @@ setMethod("dbList", "localDB",
                       keyFilesSep <- strsplit(keyFiles," ")[[1]]
                       gsub("\\.[0-9]+$", "", keyFilesSep)
                   }
-                  else character(0)
+                  else
+                      character(0)
               }
           })
 
