@@ -152,19 +152,21 @@ checkRemote<- function(db, key.v){
 
 
 setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
-          function(db, key, offline = FALSE, ...){
-              if(offline && !checkLocal(db,key))
+          function(db, key, ...){
+              if(!checkLocal(db,key))
                   stop("have not previously downloaded specified data ", 
                        "and 'offline = TRUE'") 
-              if(!offline && !(key %in% dbList(db)))
+              if(!(key %in% dbList(db)))
                   stop("specified key not in database")
-                                        # ignoring .SIG files for now 			
-                                        #if(!offline && checkLocal(db, key)) {
-                                        #    ## Check the remote/local MD5 hash value
-                                        #    if(!checkSIG(db, key))
-                                        #        getdata(db,key)
-                                        #}
-              if(!checkLocal(db, key))	## downloads new key's files if key version has changed
+              ## ignoring .SIG files for now 			
+              ##if(!offline && checkLocal(db, key)) {
+              ##    ## Check the remote/local MD5 hash value
+              ##    if(!checkSIG(db, key))
+              ##        getdata(db,key)
+              ##}
+
+              ## downloads new key's files if key version has changed
+              if(!checkLocal(db, key))	
                   getdata(db,key)
               read(db, key)
           })
@@ -260,12 +262,10 @@ setMethod("versionFile", "remoteDB",
           })
           
 
-## use readLines to find last line, returns as character string
+## use readLines to find last line or line corresponding to
+## 'db@reposVersion', returns as character string
+
 reposVersionInfo <- function(db){
-    ## if(inherits(db, "localDB"))
-    ##     verDir <- db@dir
-    ## else
-    ##     verDir <- db@url
     if((inherits(db, "localDB") && file.exists(versionFile(db)))
        || inherits(db, "remoteDB")) {  
         con <- file(versionFile(db), "r") ## 'version' is a text file
@@ -284,6 +284,16 @@ reposVersionInfo <- function(db){
 
 ## 'getKeyFiles' uses the 'version' file instead of reading the 'data'
 ## directory directly
+
+## returns "object version" associated with a given key
+## 
+## for localDB: 
+## determine last version of the object in the repository    ##
+## (note this object may have been previously deleted, so    ##
+## we need to look in the data directory at the data files)  ##
+##
+## for remoteDB:
+## read pertinent line of the version file from the internet ##
 
 getKeyFiles <- function(db, key) {
     version <- readLines(versionFile(db))
@@ -306,44 +316,60 @@ sortByVersionNumber <- function(keyFiles) {
     keyFiles[order(num, decreasing = FALSE)]
 }
 
-## returns "object version" associated with a given key
 
-objectVersion <- function(db, key){
-    ## for localDB: 
-    ## determine last version of the object in the repository    ##
-    ## (note this object may have been previously deleted, so    ##
-    ## we need to look in the data directory at the data files)  ##
-    ##
-    ## for remoteDB:
-    ## read pertinent line of the version file from the internet ##
-    if(inherits(db, "localDB")) {
-        keyFiles <- getKeyFiles(db, key)
-        use <- grep(paste("^", key, "\\.[0-9]+$", sep=""), keyFiles)
-        oFiles <- sortByVersionNumber(keyFiles[use])
-        latestFile <- oFiles[length(oFiles)]
+## Get the version number for an object corresponding to
+## 'db@reposVersion'
 
-        if(length(latestFile) != 0){
-            latestFileSplit <- strsplit(latestFile,".", fixed = TRUE)[[1]]
-            lastObjVer <- as.numeric(latestFileSplit[length(latestFileSplit)])
-        }
+getSpecificObjectVersion <- function(db, key) {
+    info <- reposVersionInfo(db)
+    currNum <- 0
+    
+    if(length(info) != 0){
+        keyFiles <- strsplit(info, ":")[[1]][2]
+        keyFilesSep <- strsplit(keyFiles, " ", fixed = TRUE)[[1]]
+        v <- grep(paste("^", key, "\\.[0-9]+$", sep = ""),
+                  keyFilesSep, value = TRUE)
+        currNum <- if(length(v) > 0)
+            as.numeric(substring(v, nchar(key) + 2))
         else
-            lastObjVer <- 0
-        lastObjVer
+            0
     }
-    else { 
-        info <- reposVersionInfo(db)
-
-        if(length(info)!=0){
-            keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
-            keyFilesSep <- strsplit(keyFiles," ")[[1]]
-            v <- grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFilesSep,value=TRUE)
-            currNum <- as.numeric(substring(v,nchar(key)+2))
-            if(length(currNum)==0) currNum <- 0
-            currNum
-        }
-        else 0
-    }
+    currNum
 }
+
+## For 'db@reposVersion == -1' in a 'localDB', figure out the latest
+## version number for an object
+
+calculateLatestObjectVersion <- function(db, key) {
+    keyFiles <- getKeyFiles(db, key)
+
+    use <- grep(paste("^", key, "\\.[0-9]+$", sep=""), keyFiles)
+    oFiles <- sortByVersionNumber(keyFiles[use])
+    latestFile <- oFiles[length(oFiles)]
+    
+    if(length(latestFile) != 0){
+        latestFileSplit <- strsplit(latestFile,".", fixed=TRUE)[[1]]
+        lastObjVer <- latestFileSplit[length(latestFileSplit)]
+        as.numeric(lastObjVer)
+    }
+    else
+        0
+}
+
+setGeneric("objectVersion", function(db, ...) standardGeneric("objectVersion"))
+
+setMethod("objectVersion", "localDB",
+          function(db, key, ...) {
+              if(db@reposVersion == -1)
+                  calculateLatestObjectVersion(db, key)
+              else 
+                  getSpecificObjectVersion(db, key)
+          })
+
+setMethod("objectVersion", "remoteDB",
+          function(db, key, ...) {
+              getSpecificObjectVersion(db, key)
+          })
 
 
 
@@ -413,8 +439,8 @@ updateVersion <- function(db,key, keepKey = TRUE){
 ## local.file.path ############  Creates a file path in the local data  
 ###############################  directory (to be used internally).	
 
-local.file.path <- function(db, key, objVerNum = objectVersion(db, key)){
-    file.path(path.expand(db@dir), "data", paste(key,".",objVerNum,sep=""))
+local.file.path <- function(db, key, objVerNum = objectVersion(db, key)) {
+    file.path(db@dir, "data", paste(key, objVerNum, sep="."))
 }
 
 ###############################
@@ -422,7 +448,7 @@ local.file.path <- function(db, key, objVerNum = objectVersion(db, key)){
 ############################### directory (to be used internally) for the SIG files.	
 
 local.file.path.SIG <- function(db, key, objVerNum = objectVersion(db, key)){
-    file.path(path.expand(db@dir), "data", paste(key,".",objVerNum,".SIG",sep=""))
+    file.path(db@dir, "data", paste(key, objVerNum, "SIG", sep = "."))
 }
 
 
@@ -432,7 +458,6 @@ local.file.path.SIG <- function(db, key, objVerNum = objectVersion(db, key)){
 #################### with more than one key.
 
 checkLocal <- function(db, key){
-    ## key %in% list.files(file.path(db@dir, "data"), all.files = TRUE)
     datadir <- file.path(db@dir, "data")
     
     if(!file.exists(datadir))
