@@ -414,14 +414,12 @@ getdata <- function(db,key){
         remotePath <- file.path(db@url, "data",
                                 paste(key, objectVersion(db, key), sep="."))
         download.file(remotePath, localFiles["data"], mode = "wb",
-                      cacheOK = FALSE)
-        ##quiet = .stashROptions$quietDownload)
-        ## I commented these out because they were causing an error
+                      cacheOK = FALSE, quiet = stashROption("quietDownload"))
+
         remoteSIGPath <- file.path(db@url, "data",
                                    paste(key, objectVersion(db,key),"SIG",sep="."))
         download.file(remoteSIGPath, localFiles["sig"], mode = "wb",
-                      cacheOK = FALSE)
-        ##quiet = .stashROptions$quietDownload)
+                      cacheOK = FALSE, quiet = stashROption("quietDownload"))
     }, error = handler, interrupt = handler)
 
     if(inherits(status, "condition"))

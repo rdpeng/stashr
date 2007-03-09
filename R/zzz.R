@@ -2,7 +2,6 @@
     dcf <- read.dcf(file.path(lib, pkg, "DESCRIPTION"))
     msg <- gettextf("%s (%s %s)", dcf[, "Title"],
                     as.character(dcf[, "Version"]), dcf[, "Date"])
-    ## writeLines(strwrap(msg))
     message(paste(strwrap(msg), collapse = "\n"))    
 }
 
@@ -15,12 +14,14 @@
     }
     if(!capabilities("http/ftp"))
         warning("'http/ftp' capabilities not available")
-    ## .stashROptions$quietDownload <- FALSE
     stashROption("quietDownload", FALSE)
 }    
 
 .stashROptions <- new.env()
 
 stashROption <- function(name, value) {
-    assign(name, value, .stashROptions)
+    if(missing(value))
+        get(name, .stashROptions, inherits = FALSE)
+    else
+        assign(name, value, .stashROptions, inherits = FALSE)
 }
