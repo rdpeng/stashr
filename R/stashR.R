@@ -152,20 +152,13 @@ setMethod("dbDelete", signature(db = "remoteDB", key = "character"),
           })
 
 setMethod("dbList", "remoteDB",
-          function(db, save = FALSE, ...){
-              con <- url(file.path(db@url, "keys"))
-              mylist <- tryCatch({
-                  open(con, "r")  ## 'keys' file is text
-                  readLines(con)
-              }, error = function(err) {
-                  character(0)
-              }, finally = {
-                  if(isOpen(con))
-                      close(con)
-              })
-              if (save)
-                  cat(mylist, file = file.path(db@dir,"keys"),sep = "\n")
-              mylist
+          function(db, ...){
+		info <- reposVersionInfo(db)
+		if(length(info)!=0){
+			keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+			keyFilesSep <- strsplit(keyFiles," ")[[1]]
+			gsub("\\.[0-9]+$", "", keyFilesSep)
+		}
           })
 
 setMethod("dbExists", signature(db = "remoteDB", key = "character"),
@@ -178,22 +171,44 @@ setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
 
 setMethod("dbSync", signature(db = "remoteDB"),
           function(db, key = NULL, ...){
+		## only update if reposVersion = -1 ##
+		if(db@reposVersion == -1){
+
               if(!is.null(key) && !all(checkLocal(db,key))) 
                   stop("not all files referenced in the 'key' vector were ",
                        "previously downloaded, no files updated")
               if(is.null(key)) {
                   list.local.files <- list.files(file.path(db@dir, "data"),
-                                                 all.files = TRUE)
-                  use <- !file.info(list.local.files)$isdir  ## exclude directories
-                  list.local.files <- list.local.files[use]
+                                                 all.files = FALSE)
+                 # use <- !file.info(list.local.files)$isdir  ## exclude directories (causes error?)
+                 # list.local.files <- list.local.files[use]
 
                   dontuse <- grep(".SIG", list.local.files, fixed = TRUE)
                   key <- list.local.files[-dontuse]
               }
-              for (i in key){ 
-                  if(!checkSIG(db, i))
-                      getdata(db,i)
-              }	
+		  ## see if the version of the repository has changed ## ## still needs work!
+
+              	for (i in key){ 
+               	   #if(!checkSIG(db, i)) # ignore .SIG files for now
+			   # download new files when key is in latest repos version, but we 
+			   # don't the corresponding updated version of the key 
+			   if(!checkRemote(db,i) & dbExists(db,gsub("\\.[0-9]+","",i))){ 
+				 # load updated data #
+               	       getdata(db,gsub("\\.[0-9]+","",i))
+				 # delete the old data and .SIG file #
+				 file.remove(file.path(db@dir,"data",i))
+				 file.remove(file.path(db@dir,"data",paste(i,".SIG",sep="")))
+			   }
+			   ## delete files associated with keys that have been deleted ## 
+			   if(!dbExists(db,gsub("\\.[0-9]+","",i))){
+			   	 # delete the old data and .SIG file #
+				 file.remove(file.path(db@dir,"data",i))
+				 file.remove(file.path(db@dir,"data",paste(i,".SIG",sep="")))
+			   }	
+              	}	
+		 
+		} 
+		else print("no synchronization for a remoteDB object with a fixed version")
           })
 
 
