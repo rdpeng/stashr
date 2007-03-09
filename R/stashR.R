@@ -65,26 +65,13 @@ setMethod("dbFetch", signature(db = "localDB", key = "character"),
               read(db, key)
           })
 
+## doesn't delete files from repository, just deletes key from latest line
+## of the version file
 setMethod("dbDelete", signature(db = "localDB", key = "character"),
           function(db, key, ...){
-              if(file.exists(local.file.path(db,key))) 
-                  file.remove(local.file.path(db,key))
-              else stop("specified file does not exist")
-              if(file.exists(local.file.path.SIG(db,key))) 
-                  file.remove(local.file.path.SIG(db,key))
-              else stop("specified .SIG file does not exist")
-
-              ## Delete the key from the 'keys' file ##
-              if(dbExists(db,key)) {	
-                  keylist <- dbList(db)
-                  keyindex <- match(key,keylist)
-                  newkeylist <- keylist[-keyindex]
-                  ## con <- file(file.path(db@dir, "keys"))
-                  ## open(con, "w")  ## 'keys' is a text file
-                  ## on.exit(close(con))
-                  cat(newkeylist, file = file.path(db@dir,"keys"),sep = "\n")
-              }
-          })
+			if(!key%in%dbList(db)) warning("Specified key does not exist in current version")		  
+ 			updateVersion(db,key, keepKey = FALSE)
+         })
 
 
 setMethod("dbList", "localDB",
