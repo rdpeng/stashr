@@ -79,6 +79,7 @@ setMethod("dbList", "localDB",
 
               if(length(info)!=0){
                   keyFiles <- strsplit(info[length(info)], ":")[[1]][2]
+
                   if(!is.na(keyFiles)){
                       keyFilesSep <- strsplit(keyFiles," ")[[1]]
                       gsub("\\.[0-9]+$", "", keyFilesSep)
@@ -96,6 +97,8 @@ setMethod("dbExists", signature(db = "localDB", key = "character"),
           })
 
 ## db <- new("localDB",dir="testlocal",name="test")
+
+
 
 ######################################################################
 ## Method definitions for 'remoteDB'
@@ -262,16 +265,16 @@ setMethod("versionFile", "remoteDB",
           })
           
 
-## use readLines to find last line or line corresponding to
+## use readLines to find last line or the line corresponding to
 ## 'db@reposVersion', returns as character string
 
-reposVersionInfo <- function(db){
-    if((inherits(db, "localDB") && file.exists(versionFile(db)))
-       || inherits(db, "remoteDB")) {  
-        con <- file(versionFile(db), "r") ## 'version' is a text file
-        on.exit(close(con))
+readVersionFileLine <- function(db) {
+    con <- file(versionFile(db), "r") ## 'version' is a text file
+    on.exit(close(con))
 
-        VerList <- readLines(con)
+    VerList <- readLines(con)
+
+    if(length(VerList) > 0) {
         rvn <- if(db@reposVersion == -1) 
             length(VerList)
         else
@@ -279,8 +282,26 @@ reposVersionInfo <- function(db){
         VerList[rvn]
     }
     else
-        character(0)	
+        character(0)
 }
+
+setGeneric("reposVersionInfo",
+           function(db, ...) standardGeneric("reposVersionInfo"))
+
+setMethod("reposVersionInfo", "localDB",
+          function(db, ...) {
+              if(file.exists(versionFile(db))) 
+                  readVersionFileLine(db)
+              else
+                  character(0)
+          })
+
+setMethod("reposVersionInfo", "remoteDB",
+          function(db, ...) {
+              readVersionFileLine(db)
+          })
+
+
 
 ## 'getKeyFiles' uses the 'version' file instead of reading the 'data'
 ## directory directly
@@ -420,8 +441,9 @@ updatedReposVersionInfo <- function(db, key, keepKey = TRUE){
         else
             updatedKeyFiles <- othersCollapsed
     }
-    else updatedKeyFiles <- paste(key,1,sep=".")
-                                        # remove leading space resulting from intially inserting same key twice#
+    else
+        updatedKeyFiles <- paste(key,1,sep=".")
+    ## remove leading space resulting from intially inserting same key twice#
     updatedKeyFiles <- gsub("^ ","",updatedKeyFiles)
     paste(reposV, updatedKeyFiles, sep = ":") 
 }
