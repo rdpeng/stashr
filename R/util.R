@@ -22,34 +22,39 @@ setMethod("copyDB", "localDB",
 
 getCurrentReposVersion <- function(db) {
     info <- reposVersionInfo(db)
-    num <- strsplit(info, ":", fixed = TRUE)[[1]][1]
-    as.numeric(num)
+
+    if(length(info) > 0) {
+        num <- strsplit(info, ":", fixed = TRUE)[[1]][1]
+        as.numeric(num)
+    }
+    else
+        0
 }
 
-setGeneric("currentReposVersion",
-           function(db, ...) standardGeneric("currentReposVersion"))
+setGeneric("reposVersion",
+           function(db, ...) standardGeneric("reposVersion"))
 
-setMethod("currentReposVersion", "localDB",
+setMethod("reposVersion", "localDB",
           function(db, ...) {
               getCurrentReposVersion(db)
           })
 
-setMethod("currentReposVersion", "remoteDB",
+setMethod("reposVersion", "remoteDB",
           function(db, ...) {
               getCurrentReposVersion(db)
           })
 
-setGeneric("currentReposVersion<-",
-           function(db, value) standardGeneric("currentReposVersion<-"))
+setGeneric("reposVersion<-",
+           function(db, value) standardGeneric("reposVersion<-"))
 
-setReplaceMethod("currentReposVersion",
+setReplaceMethod("reposVersion",
                  signature(db = "remoteDB", value = "numeric"),
                  function(db, value) {
                      db@reposVersion <- value
                      db
                  })
 
-setReplaceMethod("currentReposVersion",
+setReplaceMethod("reposVersion",
                  signature(db = "localDB", value = "numeric"),
                  function(db, value) {
                      db@reposVersion <- value
@@ -67,4 +72,8 @@ convertOldStashR <- function() {
     for(i in seq(along = infiles)) {
         file.rename(infiles[i], outfiles[i])
     }
+    keys <- infiles[-sigfiles]
+    vline <- paste("1", paste(keys, "1", sep = ".", collapse = " "), sep = ":")
+    writeLines(vline, "../version")
+
 }
