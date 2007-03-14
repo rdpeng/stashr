@@ -35,7 +35,7 @@ setMethod("dbInsert",
           signature(db = "localDB", key = "character", value = "ANY"),
           function(db, key, value, ...) {
               if(db@reposVersion != -1) 
-                  stop("inserting keys into pervious versions not allowed")
+                  stop("inserting key into pervious version not allowed")
                   
               ## update the data files ##
               vn <- objectVersion(db,key) + 1
@@ -56,7 +56,7 @@ setMethod("dbInsert",
 setMethod("dbFetch", signature(db = "localDB", key = "character"),
           function(db, key, ...) {
               if(!checkLocal(db,key)) 
-                  stop("specified data does not exist") 
+                  stop(gettextf("key '%s' not in database", key))
               read(db, key)
           })
 
@@ -65,9 +65,9 @@ setMethod("dbFetch", signature(db = "localDB", key = "character"),
 setMethod("dbDelete", signature(db = "localDB", key = "character"),
           function(db, key, ...) {
               if(db@reposVersion != -1) 
-                  stop("deleting keys from previous versions not allowed")
+                  stop("deleting key from previous version not allowed")
               if(!(key %in% dbList(db)))
-                  stop("specified key does not exist in current version")
+                  stop(gettextf("key '%s' not in current version", key))
               
               updateVersion(db,key, keepKey = FALSE)
           })
@@ -165,7 +165,7 @@ outOfDate <- function(db, key) {
 setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
           function(db, key, ...){
               if(!(key %in% dbList(db)))
-                  stop("specified key not in database")
+                  stop(gettextf("key '%s' not in database", key))
 
               ## downloads new key's files if key version has changed
               if(!checkLocal(db, key))	
@@ -310,12 +310,22 @@ setMethod("reposVersionInfo", "localDB",
                   character(0)
           })
 
+cacheVersionFile <- function(db) {
+    rpath <- versionFile(db)
+    download.file(rpath, file.path(db@dir, "version"), mode = "w",
+                  cacheOK = FALSE, quiet = TRUE)
+}
+
 setMethod("reposVersionInfo", "remoteDB",
           function(db, ...) {
+              cacheVersionFile(db)
               readVersionFileLine(db)
           })
 
-
+setAs("remoteDB", "localDB",
+      function(from) {
+          new("localDB", dir = from@dir, name = from@name)
+      })
 
 ## 'getKeyFiles' uses the 'version' file instead of reading the 'data'
 ## directory directly
@@ -396,14 +406,14 @@ setGeneric("objectVersion", function(db, ...) standardGeneric("objectVersion"))
 setMethod("objectVersion", "localDB",
           function(db, key, ...) {
               if(db@reposVersion == -1)
-                  calculateLatestObjectVersion(db, key)
+                  sapply(key, function(x) calculateLatestObjectVersion(db, x))
               else 
-                  getSpecificObjectVersion(db, key)
+                  sapply(key, function(x) getSpecificObjectVersion(db, x))
           })
 
 setMethod("objectVersion", "remoteDB",
           function(db, key, ...) {
-              getSpecificObjectVersion(db, key)
+              sapply(key, function(x) getSpecificObjectVersion(db, x))
           })
 
 
@@ -546,7 +556,7 @@ getdata <- function(db,key){
 
 read <- function(db, key){
     if(!checkLocal(db,key))
-        stop(gettextf("files associated with key '%s' not yet downloaded", key))
+        stop(gettextf("data for key '%s' not yet downloaded", key))
     con <- gzfile(local.file.path(db, key), "rb")
     on.exit(close(con))
     unserialize(con) 
