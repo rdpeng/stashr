@@ -9,13 +9,13 @@
 \alias{copyDB}
 \alias{copyDB,localDB-method}
 
-\alias{currentReposVersion}
-\alias{currentReposVersion,localDB-method}
-\alias{currentReposVersion,remoteDB-method}
+\alias{reposVersion}
+\alias{reposVersion,localDB-method}
+\alias{reposVersion,remoteDB-method}
 
-\alias{currentReposVersion<-}
-\alias{currentReposVersion<-,localDB,numeric-method}
-\alias{currentReposVersion<-,remoteDB,numeric-method}
+\alias{reposVersion<-}
+\alias{reposVersion<-,localDB,numeric-method}
+\alias{reposVersion<-,remoteDB,numeric-method}
 
 \title{Set directory for remote database}
 
@@ -26,8 +26,8 @@
 \usage{
 setDir(db) <- value
 copyDB(db, ...)
-currentReposVersion(db, ...)
-currentReposVersion(db) <- value
+reposVersion(db, ...)
+reposVersion(db) <- value
 
 \S4method{initialize}{localDB}(.Object, ...)
 \S4method{initialize}{remoteDB}(.Object, ...)
@@ -56,8 +56,10 @@ currentReposVersion(db) <- value
   \code{copyDB} is used to copy a \code{"localDB"} database to another
   location (i.e. directory).
 
-  \code{currentReposVersion} returns the current repository version
-  number.
+  \code{reposVersion} returns the current repository version
+  number and the replacement method can be used to set the repository to
+  a different version number.  A repository version of \code{-1}
+  indicates the most recent version.
 }
 
-\keyword{utilities}
+\keyword{methods}
