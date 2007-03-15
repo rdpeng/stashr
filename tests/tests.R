@@ -52,6 +52,9 @@ if(!is.null(nsl("www.biostat.jhsph.edu"))) {
 ##########################################################################
 ## Test objects of class 'localDB'
 
+wd <- getwd()
+dir <- file.path(wd,"testDir")
+
 ## create a 'remoteDB' object ##
 dbLocal <- new("localDB", dir= dir, name= "MCAPS")
 show(dbLocal)
@@ -86,5 +89,15 @@ dbDelete(dbLocal,"01005")
 dbList(dbLocal)
 dbExists(dbLocal,key="01004")
 dbExists(dbLocal,key="01006")
+
+## Weird object names
+dbInsert(dbLocal, "x.1", 1)
+dbInsert(dbLocal, "x.1", 2)
+dbInsert(dbLocal, "x.2", 3)
+dbInsert(dbLocal, "y.1.1.1", 4)
+
+dbList(dbLocal)
+dbFetch(dbLocal, "x.2")
+
 
 dbUnlink(dbLocal)

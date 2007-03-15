@@ -1,5 +1,5 @@
 
-R version 2.5.0 Under development (unstable) (2007-03-12 r40828)
+R version 2.4.1 Patched (2007-03-13 r40832)
 Copyright (C) 2007 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -102,6 +102,9 @@ Error in .local(db, ...) : not all files referenced in the 'key' vector were pre
 > ##########################################################################
 > ## Test objects of class 'localDB'
 > 
+> wd <- getwd()
+> dir <- file.path(wd,"testDir")
+> 
 > ## create a 'remoteDB' object ##
 > dbLocal <- new("localDB", dir= dir, name= "MCAPS")
 > show(dbLocal)
@@ -158,6 +161,18 @@ Error in dbDelete(dbLocal, "01004") : key '01004' not in current version
 [1] FALSE
 > dbExists(dbLocal,key="01006")
 [1] TRUE
+> 
+> ## Weird object names
+> dbInsert(dbLocal, "x.1", 1)
+> dbInsert(dbLocal, "x.1", 2)
+> dbInsert(dbLocal, "x.2", 3)
+> dbInsert(dbLocal, "y.1.1.1", 4)
+> 
+> dbList(dbLocal)
+[1] "01006"   "x.1"     "x.2"     "y.1.1.1"
+> dbFetch(dbLocal, "x.2")
+[1] 3
+> 
 > 
 > dbUnlink(dbLocal)
 > 
