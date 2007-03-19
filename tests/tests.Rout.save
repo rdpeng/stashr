@@ -30,50 +30,51 @@ A Set of Tools for Administering SHared Repositories (0.2 2007-03-12)
 > ## Test objects of class 'remoteDB'
 > ## Only run these tests if Internet connectivity is available
 > 
-> if(!is.null(nsl("www.biostat.jhsph.edu"))) {
-+     myurl <- "http://www.biostat.jhsph.edu/MCAPS/data/"
-+ 
-+     ## create a 'remoteDB' object ##
-+     db <- new("remoteDB", url= myurl, dir = dir, name= "MCAPS")
-+     show(db)
-+     show(class(db))
-+     show(db@url)
-+     show(db@dir)
-+ 
-+ 
-+     ## other prelim steps necessary ##
-+     ## dbCreate(db)
-+ 
-+     ## test the methods ##
-+     dbList(db)
-+     x <- dbFetch(db, "01073")
-+     str(x)
-+ 
-+     try( dbFetch(db, "01004") )
-+     try( dbDelete(db,"01073") )
-+     try( dbInsert(db,key = "01004", value = 1) )
-+ 
-+     dbSync(db)
-+     dir(file.path(db@dir, "data"))
-+ 
-+     dbSync(db, key = "01073")
-+     dir(file.path(db@dir, "data"))
-+ 
-+     try( dbSync(db, key = c("01004","01073")) )
-+     dir(file.path(db@dir, "data"))
-+     dbExists(db,c("01073", "01004","55079"))
-+ 
-+     ## remove db@dir directory ##
-+     unlink(db@dir, recursive = TRUE)
-+ } else {
-+     cat("UNABLE TO CONNECT TO www.biostat.jhsph.edu\n")
-+ }
+> myurl <- "http://www.biostat.jhsph.edu/MCAPS/data/"
+> 
+> ## create a 'remoteDB' object ##
+> db <- new("remoteDB", url= myurl, dir = dir, name= "MCAPS")
+> show(db)
 'remoteDB' database 'MCAPS'
+> show(class(db))
 [1] "remoteDB"
 attr(,"package")
 [1] "stashR"
+> show(db@url)
 [1] "http://www.biostat.jhsph.edu/MCAPS/data/"
+> show(db@dir)
 [1] "/home/rpeng/projects/R-packages/stashR.Rcheck/tests/testDir"
+> 
+> 
+> ## other prelim steps necessary ##
+> ## dbCreate(db)
+> 
+> ## test the methods ##
+> try( dbList(db) )
+  [1] "01073" "01089" "01097" "01101" "02020" "04013" "04019" "05119" "06001"
+ [10] "06013" "06019" "06029" "06037" "06065" "06067" "06071" "06073" "06075"
+ [19] "06077" "06081" "06085" "06099" "08001" "08005" "08031" "09001" "09003"
+ [28] "09009" "10003" "11001" "12001" "12011" "12031" "12033" "12057" "12071"
+ [37] "12073" "12081" "12086" "12095" "12099" "12103" "12117" "12127" "13051"
+ [46] "13063" "13067" "13089" "13121" "15003" "16001" "17031" "17043" "17089"
+ [55] "17097" "17111" "17119" "17163" "17197" "17201" "18003" "18097" "18141"
+ [64] "19153" "20091" "20173" "21067" "21111" "22017" "22033" "22051" "22071"
+ [73] "23005" "24003" "24005" "24031" "24033" "24510" "25005" "25009" "25013"
+ [82] "25017" "25021" "25023" "25025" "25027" "26049" "26065" "26081" "26099"
+ [91] "26125" "26139" "26145" "26161" "26163" "27037" "27053" "27123" "27137"
+[100] "28049" "29095" "29189" "29510" "32003" "32031" "33011" "33015" "34003"
+[109] "34007" "34013" "34015" "34017" "34023" "34027" "34031" "34039" "35001"
+[118] "36001" "36005" "36007" "36029" "36047" "36055" "36059" "36061" "36063"
+[127] "36065" "36067" "36081" "36085" "36103" "36119" "37021" "37063" "37067"
+[136] "37081" "37119" "37183" "39017" "39035" "39049" "39061" "39085" "39093"
+[145] "39095" "39099" "39113" "39151" "39153" "39155" "40109" "40143" "41039"
+[154] "41051" "41067" "42003" "42011" "42041" "42043" "42045" "42049" "42069"
+[163] "42071" "42095" "42101" "42133" "44007" "45019" "45045" "45063" "45079"
+[172] "45083" "47037" "47093" "47157" "48029" "48061" "48085" "48113" "48141"
+[181] "48167" "48201" "48215" "48245" "48309" "48339" "48355" "48439" "48453"
+[190] "49011" "49035" "51059" "51087" "51710" "53011" "53033" "53053" "53063"
+[199] "53067" "54039" "55009" "55025" "55079" "55133"
+> x <- try( dbFetch(db, "01073") )
 trying URL 'http://www.biostat.jhsph.edu/MCAPS/data//data/01073.1'
 Content type 'text/plain; charset=UTF-8' length 25588 bytes
 opened URL
@@ -86,6 +87,7 @@ opened URL
 ==================================================
 downloaded 40 bytes
 
+> str(x)
 'data.frame':	1461 obs. of  6 variables:
  $ date     :Class 'Date'  num [1:1461] 10592 10593 10594 10595 10596 ...
  $ pm25tmean: num  17.8 10.5 10.5  9.0 10.2 ...
@@ -93,11 +95,32 @@ downloaded 40 bytes
  $ dptp     : num  27.7 41 14.7 8.9 6.6 21.8 47.3 50.6 30.7 16.2 ...
  $ rmtmpd   : num    NA   NA   NA 37.2 30.8 ...
  $ rmdptp   : num    NA   NA   NA 27.8 21.5 ...
+> 
+> try( dbFetch(db, "01004") )
 Error in dbFetch(db, "01004") : key '01004' not in database
+> try( dbDelete(db,"01073") )
 Error in dbDelete(db, "01073") : cannot delete from a 'remoteDB' database
+> try( dbInsert(db,key = "01004", value = 1) )
 Error in dbInsert(db, key = "01004", value = 1) : 
 	cannot insert into a 'remoteDB' database
+> 
+> try( dbSync(db) )
+> dir(file.path(db@dir, "data"))
+[1] "01073.1"     "01073.1.SIG"
+> 
+> try( dbSync(db, key = "01073") )
+> dir(file.path(db@dir, "data"))
+[1] "01073.1"     "01073.1.SIG"
+> 
+> try( dbSync(db, key = c("01004","01073")) )
 Error in .local(db, ...) : not all files referenced in the 'key' vector were previously downloaded, no files updated
+> dir(file.path(db@dir, "data"))
+[1] "01073.1"     "01073.1.SIG"
+> try( dbExists(db,c("01073", "01004","55079")) )
+[1]  TRUE FALSE  TRUE
+> 
+> ## remove db@dir directory ##
+> unlink(db@dir, recursive = TRUE)
 > 
 > ##########################################################################
 > ## Test objects of class 'localDB'

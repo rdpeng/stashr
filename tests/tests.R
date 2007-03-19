@@ -10,44 +10,40 @@ dir <- file.path(wd,"testDir")
 ## Test objects of class 'remoteDB'
 ## Only run these tests if Internet connectivity is available
 
-if(!is.null(nsl("www.biostat.jhsph.edu"))) {
-    myurl <- "http://www.biostat.jhsph.edu/MCAPS/data/"
+myurl <- "http://www.biostat.jhsph.edu/MCAPS/data/"
 
-    ## create a 'remoteDB' object ##
-    db <- new("remoteDB", url= myurl, dir = dir, name= "MCAPS")
-    show(db)
-    show(class(db))
-    show(db@url)
-    show(db@dir)
+## create a 'remoteDB' object ##
+db <- new("remoteDB", url= myurl, dir = dir, name= "MCAPS")
+show(db)
+show(class(db))
+show(db@url)
+show(db@dir)
 
 
-    ## other prelim steps necessary ##
-    ## dbCreate(db)
+## other prelim steps necessary ##
+## dbCreate(db)
 
-    ## test the methods ##
-    dbList(db)
-    x <- dbFetch(db, "01073")
-    str(x)
+## test the methods ##
+try( dbList(db) )
+x <- try( dbFetch(db, "01073") )
+str(x)
 
-    try( dbFetch(db, "01004") )
-    try( dbDelete(db,"01073") )
-    try( dbInsert(db,key = "01004", value = 1) )
+try( dbFetch(db, "01004") )
+try( dbDelete(db,"01073") )
+try( dbInsert(db,key = "01004", value = 1) )
 
-    dbSync(db)
-    dir(file.path(db@dir, "data"))
+try( dbSync(db) )
+dir(file.path(db@dir, "data"))
 
-    dbSync(db, key = "01073")
-    dir(file.path(db@dir, "data"))
+try( dbSync(db, key = "01073") )
+dir(file.path(db@dir, "data"))
 
-    try( dbSync(db, key = c("01004","01073")) )
-    dir(file.path(db@dir, "data"))
-    dbExists(db,c("01073", "01004","55079"))
+try( dbSync(db, key = c("01004","01073")) )
+dir(file.path(db@dir, "data"))
+try( dbExists(db,c("01073", "01004","55079")) )
 
-    ## remove db@dir directory ##
-    unlink(db@dir, recursive = TRUE)
-} else {
-    cat("UNABLE TO CONNECT TO www.biostat.jhsph.edu\n")
-}
+## remove db@dir directory ##
+unlink(db@dir, recursive = TRUE)
 
 ##########################################################################
 ## Test objects of class 'localDB'
