@@ -37,7 +37,7 @@ setMethod("dbCreate",
                   db@dir <- sub("/$","", db@dir)
               if (length(grep("/$", db@url, perl = TRUE)) > 0)
                   db@url <- sub("/$","", db@url)
-
+              
               createLocalDir(db)
  
               ## save url in the R workspace format in the main directory ##
@@ -51,6 +51,9 @@ setMethod("dbCreate",
               ## remove trailing "/" on dir ##
               if (length(grep("/$", db@dir, perl = TRUE)) > 0)
                   db@dir <- sub("/$","", db@dir)
+              if (length(db@name) == 0)
+                  db@name <- basename(db@dir)
+              
               createLocalDir(db)
 
               if(!file.exists(versionFile(db)))
