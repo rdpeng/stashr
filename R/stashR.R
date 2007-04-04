@@ -117,7 +117,8 @@ setMethod("dbInsert",
           })
 
 readRemoteSIG <- function(db, key) {
-    con <- url(file.path(db@url, "data", paste(key, "SIG", sep = ".")))
+    SIGfile <- basename(local.file.path.SIG(db, key))
+    con <- url(file.path(db@url, "data", SIGfile))
     open(con, "r")  ## SIG files are text
     on.exit(close(con))
 
