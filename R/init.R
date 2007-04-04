@@ -51,8 +51,6 @@ setMethod("dbCreate",
               ## remove trailing "/" on dir ##
               if (length(grep("/$", db@dir, perl = TRUE)) > 0)
                   db@dir <- sub("/$","", db@dir)
-              if (length(db@name) == 0)
-                  db@name <- basename(db@dir)
               
               createLocalDir(db)
 
