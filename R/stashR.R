@@ -43,11 +43,11 @@ setMethod("dbInsert",
               ## update the 'version' file ##
               updateVersion(db,key)
               
-              con <- gzfile(local.file.path(db,key,vn), "wb")
+              con <- gzfile(local.file.path(db, key, vn), "wb")
               on.exit(close(con))
               serialize(value, con)
 
-              s <- unname(md5sum(local.file.path(db,key,vn)))
+              s <- unname(md5sum(local.file.path(db, key, vn)))
               s2 <- paste(s, key, vn, sep="  ")
               writeLines(s2, con = local.file.path.SIG(db,key,vn))
           })
@@ -275,7 +275,7 @@ setMethod("versionFile", "localDB",
 ## Return the URL for the 'version' file
 setMethod("versionFile", "remoteDB",
           function(db, ...) {
-              file.path(db@url, "version")
+              paste(db@url, "version", sep = "/")
           })
           
 
@@ -283,8 +283,8 @@ setMethod("versionFile", "remoteDB",
 ## 'db@reposVersion', returns as character string
 
 readVersionFileLine <- function(db) {
-    ## Note:  'file' takes complete URLs as well as file paths
-    con <- file(versionFile(db), "r") ## 'version' is a text file
+    ## 'version' is a text file
+    con <- file(file.path(db@dir, "version"), "r") 
     on.exit(close(con))
                   
     VerList <- readLines(con)
@@ -485,6 +485,9 @@ updateVersion <- function(db,key, keepKey = TRUE){
 ###############################
 ## local.file.path ############  Creates a file path in the local data  
 ###############################  directory (to be used internally).	
+
+mangleName <- filehash:::mangleName
+unMangleName <- filehash:::unMangleName
 
 local.file.path <- function(db, key, objVerNum = objectVersion(db, key)) {
     file.path(db@dir, "data", paste(key, objVerNum, sep="."))
