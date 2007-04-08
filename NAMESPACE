@@ -31,4 +31,3 @@ export("stashROption")
 ## Imports
 importFrom(tools, md5sum)
 import(filehash)
-
