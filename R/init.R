@@ -4,14 +4,14 @@
 setMethod("initialize", "remoteDB",
           function(.Object, ...) {
               .Object <- callNextMethod()
-              dbCreate(.Object)
+              .Object <- dbCreate(.Object)
               .Object
           })
 
 setMethod("initialize", "localDB",
           function(.Object, ...) {
               .Object <- callNextMethod()
-              dbCreate(.Object)
+              .Object <- dbCreate(.Object)
               .Object
           })
 
@@ -33,29 +33,28 @@ setMethod("dbCreate",
           signature(db = "remoteDB"),
           function(db, ...) {
               ## remove trailing "/" on dir and url ##
-              if (length(grep("/$", db@dir, perl = TRUE)) > 0)
-                  db@dir <- sub("/$","", db@dir)
-              if (length(grep("/$", db@url, perl = TRUE)) > 0)
-                  db@url <- sub("/$","", db@url)
+              db@dir <- sub("\\/$","", db@dir, perl = TRUE)
+              db@url <- sub("\\/$","", db@url, perl = TRUE)
               
               createLocalDir(db)
  
               ## save url in the R workspace format in the main directory ##
               myurl <- db@url 
-              save(myurl, file = file.path(db@dir,"url"))
+              save(myurl, file = file.path(db@dir, "url"))
+              invisible(db)
           })
 
 setMethod("dbCreate",
           signature(db = "localDB"),
           function(db, ...) {
               ## remove trailing "/" on dir ##
-              if (length(grep("/$", db@dir, perl = TRUE)) > 0)
-                  db@dir <- sub("/$","", db@dir)
-              
+              db@dir <- sub("\\/$","", db@dir, perl = TRUE)
+
               createLocalDir(db)
 
               if(!file.exists(versionFile(db)))
                   file.create(versionFile(db))
+              invisible(db)
           })
 
 
