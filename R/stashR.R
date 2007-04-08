@@ -42,7 +42,8 @@ setMethod("dbInsert",
               
               ## update the 'version' file ##
               updateVersion(db,key)
-              
+
+              ## write out 'value' to a file
               con <- gzfile(local.file.path(db, key, vn), "wb")
               on.exit(close(con))
               serialize(value, con)
@@ -69,7 +70,7 @@ setMethod("dbDelete", signature(db = "localDB", key = "character"),
               if(!(key %in% dbList(db)))
                   stop(gettextf("key '%s' not in current version", key))
               
-              updateVersion(db,key, keepKey = FALSE)
+              updateVersion(db, key, keepKey = FALSE)
           })
 
 
@@ -486,19 +487,24 @@ updateVersion <- function(db,key, keepKey = TRUE){
 ## local.file.path ############  Creates a file path in the local data  
 ###############################  directory (to be used internally).	
 
-mangleName <- filehash:::mangleName
-unMangleName <- filehash:::unMangleName
+key2filename <- function(key) {
+    if(!is.character(key))
+        stop("'key' should be character")
+    digest(key, serialize = FALSE)
+}
 
 local.file.path <- function(db, key, objVerNum = objectVersion(db, key)) {
-    file.path(db@dir, "data", paste(key, objVerNum, sep="."))
+    key.filename <- paste(key2filename(key), objVerNum, sep = ".")
+    file.path(db@dir, "data", key.filename)
 }
 
 ###############################
 ## local.file.path.SIG ######## Creates a file path in the local data  
 ############################### directory (to be used internally) for the SIG files.	
 
-local.file.path.SIG <- function(db, key, objVerNum = objectVersion(db, key)){
-    file.path(db@dir, "data", paste(key, objVerNum, "SIG", sep = "."))
+local.file.path.SIG <- function(db, key, objVerNum = objectVersion(db, key)) {
+    key.SIGfilename <- paste(key2filename(key), objVerNum, "SIG", sep = ".")
+    file.path(db@dir, "data", key.SIGfilename)
 }
 
 
@@ -512,7 +518,7 @@ checkLocal <- function(db, key){
     
     if(!file.exists(datadir))
         stop("local data directory does not exist")
-    file.exists(local.file.path(db,key))      ## returns a vector of T/F
+    file.exists(local.file.path(db, key))      ## returns a vector of T/F
 }
 
 
@@ -522,25 +528,35 @@ checkLocal <- function(db, key){
 ## getdata ######### downloads the key & the SIG file
 ####################
 
-getdata <- function(db,key){
+remote.file.path <- function(db, key) {
+    key.filename <- paste(key2filename(key), objectVersion(db, key),
+                          sep = ".")
+    file.path(db@url, "data", key.filename)
+}
+
+remote.file.path.SIG <- function(db, key) {
+    key.SIGfilename <- paste(key2filename(key), object.Version(db, key), "SIG",
+                             sep = ".")
+    file.path(db@url, "data", key.SIGfilename)
+}
+
+getdata <- function(db, key) {
     localFiles <- c(data = local.file.path(db, key),
                     sig = local.file.path.SIG(db, key))
 
     handler <- function(cond) {
         ## If a condition is thrown (e.g. error or interrupt), delete
         ## whatever was downloaded
-        ex <- file.exists(localFiles)
-        file.remove(localFiles[ex])
+        file.remove(localFiles)
         cond
     }
+
     status <- tryCatch({
-        remotePath <- file.path(db@url, "data",
-                                paste(key, objectVersion(db, key), sep="."))
+        remotePath <- remote.file.path(db, key)
         download.file(remotePath, localFiles["data"], mode = "wb",
                       cacheOK = FALSE, quiet = stashROption("quietDownload"))
 
-        remoteSIGPath <- file.path(db@url, "data",
-                                   paste(key, objectVersion(db,key),"SIG",sep="."))
+        remoteSIGPath <- remote.file.path.SIG(db, key)
         download.file(remoteSIGPath, localFiles["sig"], mode = "wb",
                       cacheOK = FALSE, quiet = stashROption("quietDownload"))
     }, error = handler, interrupt = handler)
