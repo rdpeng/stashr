@@ -165,11 +165,10 @@ outOfDate <- function(db, key) {
 }
 
 setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
-          function(db, key, ...){
-              if(!(key %in% dbList(db)))
-                  stop(gettextf("key '%s' not in database", key))
-
-              ## downloads new key's files if key version has changed
+          function(db, key, ...) {
+              ## downloads new key's files if key version has changed.
+              ## 'checkLocal' implicitly compares the cached version
+              ## with the latest version.
               if(!checkLocal(db, key))	
                   getdata(db,key)
               read(db, key)
@@ -284,7 +283,7 @@ setMethod("versionFile", "remoteDB",
 ## 'db@reposVersion', returns as character string
 
 readVersionFileLine <- function(db) {
-    ## 'version' is a text file
+    ## Always read the local copy of the version file
     con <- file(file.path(db@dir, "version"), "r") 
     on.exit(close(con))
                   
@@ -576,7 +575,7 @@ getdata <- function(db, key) {
 
 read <- function(db, key){
     if(!checkLocal(db,key))
-        stop(gettextf("data for key '%s' not yet downloaded", key))
+        stop(gettextf("data for key '%s' not available", key))
     con <- gzfile(local.file.path(db, key), "rb")
     on.exit(close(con))
     unserialize(con) 
