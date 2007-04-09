@@ -36,7 +36,7 @@ setMethod("dbInsert",
           function(db, key, value, ...) {
               if(db@reposVersion != -1) 
                   stop("inserting key into pervious version not allowed")
-                  
+              
               ## update the data files ##
               vn <- objectVersion(db,key) + 1
               
@@ -194,8 +194,22 @@ setMethod("dbExists", signature(db = "remoteDB", key = "character"),
               key %in% dbList(db)  ## returns a vector of TRUE/FALSE
           })
 
-stripVersion <- function(key.v) {
-    gsub("\\.[0-9]+", "", key.v)
+
+removeCruft <- function(db, keys) {
+    keyfiles <- sapply(keys, function(key) local.file.path(db, key))
+    sigfiles <- sapply(keys, function(keu) local.file.path.SIG(db, key))
+    keepFiles <- c(keyfiles, sigfiles)
+   
+    fileList <- dir(file.path(db@dir, "data"), full.names = TRUE,
+                    all.files = TRUE)
+    ## exclude directories
+    use <- !file.info(fileList)$isdir
+    fileList <- basename(fileList[use])
+    removeList <- setdiff(fileList, keepFiles)
+
+    for(filename in removeList) 
+        file.remove(file.path(db@dir, "data", filename))
+    invisible()
 }
 
 setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
@@ -206,50 +220,22 @@ setMethod("dbSync", signature(db = "remoteDB"),
               if(db@reposVersion != -1)
                   stop("no synchronization for a 'remoteDB' object ",
                        "with a fixed version")
-              if(!is.null(key) && !all(checkLocal(db, key))) 
+              if(is.null(key))
+                  key <- dbList(db)
+              isLocal <- checkLocal(db, key)
+              
+              if(!is.null(key) && !all(isLocal))
                   stop("not all files referenced in the 'key' vector were ",
                        "previously downloaded, no files updated")
-              
-              list.local.files <- list.files(file.path(db@dir, "data"),
-                                             full.names = TRUE, all.files = TRUE)
-              ## exclude directories (causes error?)                      
-              use <- !file.info(list.local.files)$isdir  
-              list.local.files <- basename(list.local.files[use])
-              dontuse <- grep("\\.SIG$", list.local.files)
-              list.local.files <- list.local.files[-dontuse]
+              use <- which(isLocal)
+              key <- names(isLocal[use])
 
-              key <- if(is.null(key)) 
-                  list.local.files
-              else {
-                  use <- stripVersion(list.local.files) %in% key
-                  list.local.files[use]
-              }
-              ## see if the version of the repository has changed
-              ## still needs work!
-              
-              for (i in key){ 
-                  ## delete files associated with keys that have been deleted ## 
-                  if(!dbExists(db, stripVersion(i))) {
-                      ## delete the old data and .SIG file #
-                      file.remove(file.path(db@dir, "data", i),
-                                  file.path(db@dir, "data",
-                                            paste(i, "SIG", sep = ".")))
-                  }
-                  else {  ## key exists in database
-                      ## download new files when key is in latest
-                      ## repos version, but we don't the corresponding
-                      ## updated version of the key
-                      if(!checkRemote(db, i)) { 
-                          ## load updated data #
-                          getdata(db, stripVersion(i))
-                          
-                          ## delete the old data and .SIG file #
-                          file.remove(file.path(db@dir, "data", i),
-                                      file.path(db@dir, "data",
-                                                paste(i, "SIG", sep = ".")))
-                      }
-                  }
-              }	
+              ## Get the latest versions of all keys
+              for(i in seq(along = key)) 
+                  dbFetch(db, key[i])
+
+              ## Remove cruft from previous versions
+              removeCruft(db, key)
           })
 
 
@@ -272,7 +258,7 @@ setMethod("versionFile", "remoteDB",
           function(db, ...) {
               paste(db@url, "version", sep = "/")
           })
-          
+
 
 ## use readLines to find last line or the line corresponding to
 ## 'db@reposVersion', returns as character string
@@ -281,7 +267,7 @@ readVersionFileLine <- function(db) {
     ## Always read the local copy of the version file
     con <- file(file.path(db@dir, "version"), "r") 
     on.exit(close(con))
-                  
+    
     VerList <- readLines(con)
 
     if(length(VerList) > 0) {
@@ -506,12 +492,14 @@ local.file.path.SIG <- function(db, key, objVerNum = objectVersion(db, key)) {
 ## checkLocal ###### returns FALSE. We have 'key' allowed to be a character vector
 #################### with more than one key.
 
-checkLocal <- function(db, key){
+checkLocal <- function(db, key) {
     datadir <- file.path(db@dir, "data")
-    
+
     if(!file.exists(datadir))
         stop("local data directory does not exist")
-    file.exists(local.file.path(db, key))      ## returns a vector of T/F
+    val <- file.exists(local.file.path(db, key))      ## returns a vector of T/F
+    names(val) <- key
+    val
 }
 
 
