@@ -424,9 +424,8 @@ setMethod("objectVersion", "remoteDB",
 ## version by reading first integer of the last line of the version
 ## file
 
-latestReposVersionNum <- function(db){ 
-    info <- reposVersionInfo(db)
-    if(length(info)!=0){
+latestReposVersionNum <- function(info){ 
+    if(length(info) != 0) {
         as.numeric(strsplit(info, ":")[[1]][1])
     }
     else 0
@@ -440,10 +439,10 @@ latestReposVersionNum <- function(db){
 
 updatedReposVersionInfo <- function(db, key, keepKey = TRUE){
     ## find and remove key (for updating) from latest repository version info ##
-    reposV <- latestReposVersionNum(db)+1
     info <- reposVersionInfo(db)
+    reposV <- latestReposVersionNum(info) + 1
 
-    if(length(info)!=0){
+    if(length(info) != 0){
         keyFiles <- strsplit(info, ":")[[1]][2]
         keyFilesSep <- strsplit(keyFiles," ")[[1]]
         v <- grep(paste("^",key,"\\.[0-9]+$",sep=""),keyFilesSep)
