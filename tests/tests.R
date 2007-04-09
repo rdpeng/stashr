@@ -8,9 +8,10 @@ dir <- file.path(wd,"testDir")
 
 ##########################################################################
 ## Test objects of class 'remoteDB'
-## Only run these tests if Internet connectivity is available
+## These tests will fail (within a 'try()') if Internet connectivity
+## is not available
 
-myurl <- "http://www.biostat.jhsph.edu/MCAPS/data/"
+myurl <- "http://www.biostat.jhsph.edu/MCAPS/data_v0.3/"
 
 ## create a 'remoteDB' object ##
 db <- new("remoteDB", url= myurl, dir = dir, name= "MCAPS")
