@@ -197,9 +197,9 @@ setMethod("dbExists", signature(db = "remoteDB", key = "character"),
 
 removeCruft <- function(db, keys) {
     keyfiles <- sapply(keys, function(key) local.file.path(db, key))
-    sigfiles <- sapply(keys, function(keu) local.file.path.SIG(db, key))
-    keepFiles <- c(keyfiles, sigfiles)
-   
+    sigfiles <- sapply(keys, function(key) local.file.path.SIG(db, key))
+    keepFiles <- basename(c(keyfiles, sigfiles))
+
     fileList <- dir(file.path(db@dir, "data"), full.names = TRUE,
                     all.files = TRUE)
     ## exclude directories
@@ -215,22 +215,25 @@ removeCruft <- function(db, keys) {
 setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
 
 setMethod("dbSync", signature(db = "remoteDB"),
-          function(db, key = NULL, ...){
-              ## only update if reposVersion = -1 ##
+          function(db, key = NULL, ...) {
               if(db@reposVersion != -1)
                   stop("no synchronization for a 'remoteDB' object ",
                        "with a fixed version")
-              if(is.null(key))
+              if(!is.null(key)) {
+                  isLocal <- checkLocal(db, key)
+
+                  if(!all(isLocal))
+                      stop("not all files referenced in the 'key' vector were ",
+                           "previously downloaded, no files updated")
+              }
+              else {
                   key <- dbList(db)
-              isLocal <- checkLocal(db, key)
-              
-              if(!is.null(key) && !all(isLocal))
-                  stop("not all files referenced in the 'key' vector were ",
-                       "previously downloaded, no files updated")
+                  isLocal <- checkLocal(db, key)
+              }
               use <- which(isLocal)
               key <- names(isLocal[use])
 
-              ## Get the latest versions of all keys
+              ## Get the latest versions of all local keys
               for(i in seq(along = key)) 
                   dbFetch(db, key[i])
 
@@ -497,7 +500,10 @@ checkLocal <- function(db, key) {
 
     if(!file.exists(datadir))
         stop("local data directory does not exist")
-    val <- file.exists(local.file.path(db, key))      ## returns a vector of T/F
+    ## returns a vector of T/F    
+    val <- sapply(key, function(k) {
+        file.exists(local.file.path(db, k))
+    })
     names(val) <- key
     val
 }
