@@ -5,6 +5,7 @@ setMethod("initialize", "remoteDB",
           function(.Object, ...) {
               .Object <- callNextMethod()
               .Object <- dbCreate(.Object)
+              cacheVersionFile(.Object)
               .Object
           })
 

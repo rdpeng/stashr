@@ -212,6 +212,12 @@ removeCruft <- function(db, keys) {
     invisible()
 }
 
+cacheVersionFile <- function(db) {
+    rpath <- versionFile(db)
+    download.file(rpath, file.path(db@dir, "version"), mode = "w",
+                  cacheOK = FALSE, quiet = TRUE)
+}
+
 setGeneric("dbSync", function(db, ...) standardGeneric("dbSync"))
 
 setMethod("dbSync", signature(db = "remoteDB"),
@@ -219,6 +225,8 @@ setMethod("dbSync", signature(db = "remoteDB"),
               if(db@reposVersion != -1)
                   stop("no synchronization for a 'remoteDB' object ",
                        "with a fixed version")
+              cacheVersionFile(db)
+              
               if(!is.null(key)) {
                   isLocal <- checkLocal(db, key)
 
@@ -295,16 +303,12 @@ setMethod("reposVersionInfo", "localDB",
                   character(0)
           })
 
-cacheVersionFile <- function(db) {
-    rpath <- versionFile(db)
-    download.file(rpath, file.path(db@dir, "version"), mode = "w",
-                  cacheOK = FALSE, quiet = TRUE)
-}
-
 setMethod("reposVersionInfo", "remoteDB",
           function(db, ...) {
-              cacheVersionFile(db)
-              readVersionFileLine(db)
+              if(file.exists(file.path(db@dir, "version")))
+                  readVersionFileLine(db)
+              else
+                  character(0)
           })
 
 setAs("remoteDB", "localDB",
@@ -346,6 +350,24 @@ sortByVersionNumber <- function(keyFiles) {
     keyFiles[order(num, decreasing = FALSE)]
 }
 
+## For 'db@reposVersion == -1' in a 'localDB', figure out the latest
+## version number for an object
+
+calculateLatestObjectVersion <- function(db, key) {
+    keyFiles <- getKeyFiles(db)
+
+    use <- grep(paste("^", key, "\\.[0-9]+$", sep=""), keyFiles)
+    oFiles <- sortByVersionNumber(keyFiles[use])
+    latestFile <- oFiles[length(oFiles)]
+    
+    if(length(latestFile) != 0){
+        latestFileSplit <- strsplit(latestFile,".", fixed=TRUE)[[1]]
+        lastObjVer <- latestFileSplit[length(latestFileSplit)]
+        as.numeric(lastObjVer)
+    }
+    else
+        0
+}
 
 ## Get the version number for an object corresponding to
 ## 'db@reposVersion'
@@ -365,25 +387,6 @@ getSpecificObjectVersion <- function(db, key) {
             0
     }
     currNum
-}
-
-## For 'db@reposVersion == -1' in a 'localDB', figure out the latest
-## version number for an object
-
-calculateLatestObjectVersion <- function(db, key) {
-    keyFiles <- getKeyFiles(db)
-
-    use <- grep(paste("^", key, "\\.[0-9]+$", sep=""), keyFiles)
-    oFiles <- sortByVersionNumber(keyFiles[use])
-    latestFile <- oFiles[length(oFiles)]
-    
-    if(length(latestFile) != 0){
-        latestFileSplit <- strsplit(latestFile,".", fixed=TRUE)[[1]]
-        lastObjVer <- latestFileSplit[length(latestFileSplit)]
-        as.numeric(lastObjVer)
-    }
-    else
-        0
 }
 
 setGeneric("objectVersion", function(db, ...) standardGeneric("objectVersion"))
