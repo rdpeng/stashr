@@ -1,5 +1,5 @@
 
-R version 2.5.0 alpha (2007-04-05 r41063)
+R version 2.5.0 alpha (2007-04-09 r41097)
 Copyright (C) 2007 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -20,17 +20,19 @@ Type 'q()' to quit R.
 > 
 > library(stashR)
 Loading required package: filehash
-Simple key-value database (0.9-4 2007-03-31)
-A Set of Tools for Administering SHared Repositories (0.2-2 2007-04-04)
+Simple key-value database (0.9-4 2007-04-09)
+Loading required package: digest
+A Set of Tools for Administering SHared Repositories (0.3 2007-04-07)
 > 
 > wd <- getwd()
 > dir <- file.path(wd,"testDir")
 > 
 > ##########################################################################
 > ## Test objects of class 'remoteDB'
-> ## Only run these tests if Internet connectivity is available
+> ## These tests will fail (within a 'try()') if Internet connectivity
+> ## is not available
 > 
-> myurl <- "http://www.biostat.jhsph.edu/MCAPS/data/"
+> myurl <- "http://www.biostat.jhsph.edu/MCAPS/data_v0.3/"
 > 
 > ## create a 'remoteDB' object ##
 > db <- new("remoteDB", url= myurl, dir = dir, name= "MCAPS")
@@ -41,7 +43,7 @@ A Set of Tools for Administering SHared Repositories (0.2-2 2007-04-04)
 attr(,"package")
 [1] "stashR"
 > show(db@url)
-[1] "http://www.biostat.jhsph.edu/MCAPS/data"
+[1] "http://www.biostat.jhsph.edu/MCAPS/data_v0.3"
 > show(db@dir)
 [1] "/home/rpeng/projects/R-packages/stashR.Rcheck/tests/testDir"
 > 
@@ -75,17 +77,17 @@ attr(,"package")
 [190] "49011" "49035" "51059" "51087" "51710" "53011" "53033" "53053" "53063"
 [199] "53067" "54039" "55009" "55025" "55079" "55133"
 > x <- try( dbFetch(db, "01073") )
-trying URL 'http://www.biostat.jhsph.edu/MCAPS/data/data/01073.1'
-Content type 'text/plain; charset=UTF-8' length 25588 bytes
+trying URL 'http://www.biostat.jhsph.edu/MCAPS/data_v0.3/data/2960e42eb36dbb046a6ee3707bd2d290.1'
+Content type 'text/plain; charset=UTF-8' length 21284 bytes
 opened URL
 ==================================================
-downloaded 24Kb
+downloaded 20Kb
 
-trying URL 'http://www.biostat.jhsph.edu/MCAPS/data/data/01073.1.SIG'
-Content type 'text/plain; charset=UTF-8' length 40 bytes
+trying URL 'http://www.biostat.jhsph.edu/MCAPS/data_v0.3/data/2960e42eb36dbb046a6ee3707bd2d290.1.SIG'
+Content type 'text/plain; charset=UTF-8' length 43 bytes
 opened URL
 ==================================================
-downloaded 40 bytes
+downloaded 43 bytes
 
 > str(x)
 'data.frame':	1461 obs. of  6 variables:
@@ -97,7 +99,7 @@ downloaded 40 bytes
  $ rmdptp   : num    NA   NA   NA 27.8 21.5 ...
 > 
 > try( dbFetch(db, "01004") )
-trying URL 'http://www.biostat.jhsph.edu/MCAPS/data/data/01004.0'
+trying URL 'http://www.biostat.jhsph.edu/MCAPS/data_v0.3/data/573c3f05811ff95f12d3593bff4b34d5.0'
 Error in getdata(db, key) : problem downloading data for key '01004'
 In addition: Warning message:
 cannot open: HTTP status was '404 Not Found' 
@@ -109,16 +111,19 @@ Error in dbInsert(db, key = "01004", value = 1) :
 > 
 > try( dbSync(db) )
 > dir(file.path(db@dir, "data"))
-[1] "01073.1"     "01073.1.SIG"
+[1] "2960e42eb36dbb046a6ee3707bd2d290.1"    
+[2] "2960e42eb36dbb046a6ee3707bd2d290.1.SIG"
 > 
 > try( dbSync(db, key = "01073") )
 > dir(file.path(db@dir, "data"))
-[1] "01073.1"     "01073.1.SIG"
+[1] "2960e42eb36dbb046a6ee3707bd2d290.1"    
+[2] "2960e42eb36dbb046a6ee3707bd2d290.1.SIG"
 > 
 > try( dbSync(db, key = c("01004","01073")) )
 Error in .local(db, ...) : not all files referenced in the 'key' vector were previously downloaded, no files updated
 > dir(file.path(db@dir, "data"))
-[1] "01073.1"     "01073.1.SIG"
+[1] "2960e42eb36dbb046a6ee3707bd2d290.1"    
+[2] "2960e42eb36dbb046a6ee3707bd2d290.1.SIG"
 > try( dbExists(db,c("01073", "01004","55079")) )
 [1]  TRUE FALSE  TRUE
 > 
