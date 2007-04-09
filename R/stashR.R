@@ -159,11 +159,6 @@ checkRemote<- function(db, key.v){
         FALSE
 }
 
-outOfDate <- function(db, key) {
-    info <- reposVersionInfo(db)
-    objectVersion(db, key)
-}
-
 setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
           function(db, key, ...) {
               ## downloads new key's files if key version has changed.
