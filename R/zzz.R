@@ -14,11 +14,15 @@
     }
     if(!capabilities("http/ftp"))
         warning("'http/ftp' capabilities not available")
-    stashROption("quietDownload", FALSE)
-    stashROption("offline", FALSE)
 }    
 
-.stashROptions <- new.env()
+.stashROptions <- local({
+    ## Set defaults
+    env <- new.env(parent = emptyenv())
+    env$quietDownload <- FALSE
+    env$offline <- FALSE  ## not used yet
+    env
+})
 
 ## Valid options:
 ##
