@@ -1,5 +1,5 @@
 
-R version 2.4.1 Patched (2007-03-13 r40832)
+R version 2.5.0 alpha (2007-04-05 r41063)
 Copyright (C) 2007 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -20,8 +20,8 @@ Type 'q()' to quit R.
 > 
 > library(stashR)
 Loading required package: filehash
-Simple key-value database (0.9-2 2007-03-12)
-A Set of Tools for Administering SHared Repositories (0.2 2007-03-12)
+Simple key-value database (0.9-4 2007-03-31)
+A Set of Tools for Administering SHared Repositories (0.2-2 2007-04-04)
 > 
 > wd <- getwd()
 > dir <- file.path(wd,"testDir")
@@ -41,7 +41,7 @@ A Set of Tools for Administering SHared Repositories (0.2 2007-03-12)
 attr(,"package")
 [1] "stashR"
 > show(db@url)
-[1] "http://www.biostat.jhsph.edu/MCAPS/data/"
+[1] "http://www.biostat.jhsph.edu/MCAPS/data"
 > show(db@dir)
 [1] "/home/rpeng/projects/R-packages/stashR.Rcheck/tests/testDir"
 > 
@@ -75,13 +75,13 @@ attr(,"package")
 [190] "49011" "49035" "51059" "51087" "51710" "53011" "53033" "53053" "53063"
 [199] "53067" "54039" "55009" "55025" "55079" "55133"
 > x <- try( dbFetch(db, "01073") )
-trying URL 'http://www.biostat.jhsph.edu/MCAPS/data//data/01073.1'
+trying URL 'http://www.biostat.jhsph.edu/MCAPS/data/data/01073.1'
 Content type 'text/plain; charset=UTF-8' length 25588 bytes
 opened URL
 ==================================================
 downloaded 24Kb
 
-trying URL 'http://www.biostat.jhsph.edu/MCAPS/data//data/01073.1.SIG'
+trying URL 'http://www.biostat.jhsph.edu/MCAPS/data/data/01073.1.SIG'
 Content type 'text/plain; charset=UTF-8' length 40 bytes
 opened URL
 ==================================================
@@ -97,7 +97,10 @@ downloaded 40 bytes
  $ rmdptp   : num    NA   NA   NA 27.8 21.5 ...
 > 
 > try( dbFetch(db, "01004") )
-Error in dbFetch(db, "01004") : key '01004' not in database
+trying URL 'http://www.biostat.jhsph.edu/MCAPS/data/data/01004.0'
+Error in getdata(db, key) : problem downloading data for key '01004'
+In addition: Warning message:
+cannot open: HTTP status was '404 Not Found' 
 > try( dbDelete(db,"01073") )
 Error in dbDelete(db, "01073") : cannot delete from a 'remoteDB' database
 > try( dbInsert(db,key = "01004", value = 1) )
