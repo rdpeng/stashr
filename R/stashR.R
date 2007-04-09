@@ -528,7 +528,7 @@ remote.file.path <- function(db, key) {
 }
 
 remote.file.path.SIG <- function(db, key) {
-    key.SIGfilename <- paste(key2filename(key), object.Version(db, key), "SIG",
+    key.SIGfilename <- paste(key2filename(key), objectVersion(db, key), "SIG",
                              sep = ".")
     file.path(db@url, "data", key.SIGfilename)
 }
@@ -554,8 +554,9 @@ getdata <- function(db, key) {
                       cacheOK = FALSE, quiet = stashROption("quietDownload"))
     }, error = handler, interrupt = handler)
 
-    if(inherits(status, "condition"))
+    if(inherits(status, "condition")) 
         stop(gettextf("problem downloading data for key '%s'", key))
+    invisible(status)
 }
 
 
