@@ -14,8 +14,8 @@
     }
     if(!capabilities("http/ftp"))
         warning("'http/ftp' capabilities not available")
-    stashR::stashROption("quietDownload", FALSE)
-    stashR::stashROption("offline", FALSE)
+    stashROption("quietDownload", FALSE)
+    stashROption("offline", FALSE)
 }    
 
 .stashROptions <- new.env()
