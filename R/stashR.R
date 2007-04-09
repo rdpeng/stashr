@@ -502,6 +502,8 @@ checkLocal <- function(db, key) {
         stop("local data directory does not exist")
     ## returns a vector of T/F    
     val <- sapply(key, function(k) {
+        ## [FIXME] Currently this downloads the 'version' file every
+        ## time, which is bad.
         file.exists(local.file.path(db, k))
     })
     names(val) <- key
