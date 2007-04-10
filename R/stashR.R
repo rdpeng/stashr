@@ -56,7 +56,7 @@ setMethod("dbInsert",
 
 setMethod("dbFetch", signature(db = "localDB", key = "character"),
           function(db, key, ...) {
-              if(!checkLocal(db,key)) 
+              if(!checkLocal(db, key)) 
                   stop(gettextf("key '%s' not in database", key))
               read(db, key)
           })
@@ -146,9 +146,6 @@ checkSIG <- function(db, key) {
 
 setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
           function(db, key, ...) {
-              ## downloads new key's files if key version has changed.
-              ## 'checkLocal' implicitly compares the cached version
-              ## with the latest version.
               if(!checkLocal(db, key))	
                   getdata(db,key)
               read(db, key)
@@ -333,40 +330,44 @@ sortByVersionNumber <- function(keyFiles) {
 ## For 'db@reposVersion == -1' in a 'localDB', figure out the latest
 ## version number for an object
 
-calculateLatestObjectVersion <- function(db, key) {
+calculateLatestObjectVersion <- function(db, keyList) {
     keyFiles <- getKeyFiles(db)
 
-    use <- grep(paste("^", key, "\\.[0-9]+$", sep=""), keyFiles)
-    oFiles <- sortByVersionNumber(keyFiles[use])
-    latestFile <- oFiles[length(oFiles)]
-    
-    if(length(latestFile) != 0){
-        latestFileSplit <- strsplit(latestFile,".", fixed=TRUE)[[1]]
-        lastObjVer <- latestFileSplit[length(latestFileSplit)]
-        as.numeric(lastObjVer)
-    }
-    else
-        0
+    sapply(keyList, function(key) {
+        use <- grep(paste("^", key, "\\.[0-9]+$", sep = ""), keyFiles)
+        oFiles <- sortByVersionNumber(keyFiles[use])
+        latestFile <- oFiles[length(oFiles)]
+        
+        if(length(latestFile) != 0){
+            latestFileSplit <- strsplit(latestFile,".", fixed=TRUE)[[1]]
+            lastObjVer <- latestFileSplit[length(latestFileSplit)]
+            as.numeric(lastObjVer)
+        }
+        else
+            0
+    }, USE.NAMES = FALSE)
 }
 
 ## Get the version number for an object corresponding to
 ## 'db@reposVersion'
 
-getSpecificObjectVersion <- function(db, key) {
+getSpecificObjectVersion <- function(db, keyList) {
     info <- reposVersionInfo(db)
-    currNum <- 0
+    currNum <- numeric(length(keyList))
     
-    if(length(info) != 0){
-        keyFiles <- strsplit(info, ":")[[1]][2]
-        keyFilesSep <- strsplit(keyFiles, " ", fixed = TRUE)[[1]]
+    if(length(info) == 0) 
+        return(currNum)
+    keyFiles <- strsplit(info, ":")[[1]][2]
+    keyFilesSep <- strsplit(keyFiles, " ", fixed = TRUE)[[1]]
+
+    sapply(keyList, function(key) {
         v <- grep(paste("^", key, "\\.[0-9]+$", sep = ""),
                   keyFilesSep, value = TRUE)
-        currNum <- if(length(v) > 0)
+        if(length(v) > 0)
             as.numeric(substring(v, nchar(key) + 2))
         else
             0
-    }
-    currNum
+    }, USE.NAMES = FALSE)
 }
 
 setGeneric("objectVersion", function(db, ...) standardGeneric("objectVersion"))
@@ -374,14 +375,14 @@ setGeneric("objectVersion", function(db, ...) standardGeneric("objectVersion"))
 setMethod("objectVersion", "localDB",
           function(db, key, ...) {
               if(db@reposVersion == -1)
-                  sapply(key, function(x) calculateLatestObjectVersion(db, x))
+                  calculateLatestObjectVersion(db, key)
               else 
-                  sapply(key, function(x) getSpecificObjectVersion(db, x))
+                  getSpecificObjectVersion(db, key)
           })
 
 setMethod("objectVersion", "remoteDB",
           function(db, key, ...) {
-              sapply(key, function(x) getSpecificObjectVersion(db, x))
+              getSpecificObjectVersion(db, key)
           })
 
 
@@ -392,10 +393,10 @@ setMethod("objectVersion", "remoteDB",
 ## file
 
 latestReposVersionNum <- function(info){ 
-    if(length(info) != 0) {
+    if(length(info) != 0) 
         as.numeric(strsplit(info, ":")[[1]][1])
-    }
-    else 0
+    else
+        0
 }
 
 
@@ -455,7 +456,7 @@ updateVersion <- function(db,key, keepKey = TRUE){
 key2filename <- function(key) {
     if(!is.character(key))
         stop("'key' should be character")
-    digest(key, serialize = FALSE)
+    sapply(key, digest, serialize = FALSE, USE.NAMES = FALSE)
 }
 
 local.file.path <- function(db, key, objVerNum = objectVersion(db, key)) {
@@ -484,9 +485,7 @@ checkLocal <- function(db, key) {
     if(!file.exists(datadir))
         stop("local data directory does not exist")
     ## returns a vector of T/F    
-    val <- sapply(key, function(k) {
-        file.exists(local.file.path(db, k))
-    })
+    val <- file.exists(local.file.path(db, key))
     names(val) <- key
     val
 }
