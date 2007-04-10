@@ -194,9 +194,9 @@ removeCruft <- function(db, keys) {
     invisible()
 }
 
-cacheVersionFile <- function(db) {
-    rpath <- versionFile(db)
-    download.file(rpath, file.path(db@dir, "version"), mode = "w",
+cacheVersionFile <- function(db) {  ## 'db' is a 'remoteDB' here
+    rpath <- versionFile(db, where = "remote")
+    download.file(rpath, versionFile(db, where = "local"), mode = "w",
                   cacheOK = FALSE, quiet = TRUE)
 }
 
@@ -242,14 +242,25 @@ setGeneric("versionFile", function(db, ...) standardGeneric("versionFile"))
 
 ## Return the path for the 'version' file
 setMethod("versionFile", "localDB",
-          function(db, ...) {
-              file.path(db@dir, "version")
+          function(db, where = c("local", "remote"), ...) {
+              where <- match.arg(where)
+              switch(where,
+                     local = file.path(db@dir, "version"),
+                     remote = {
+                         stop("'localDB' databases do not have ",
+                              "remote version files")
+                     })
           })
 
 ## Return the URL for the 'version' file
 setMethod("versionFile", "remoteDB",
-          function(db, ...) {
-              paste(db@url, "version", sep = "/")
+          function(db, where = c("remote", "local"), ...) {
+              where <- match.arg(where)
+
+              switch(where,
+                     remote = paste(db@url, "version", sep = "/"),
+                     local = file.path(db@dir, "version")
+                     )
           })
 
 
@@ -257,21 +268,17 @@ setMethod("versionFile", "remoteDB",
 ## 'db@reposVersion', returns as character string
 
 readVersionFileLine <- function(db) {
-    ## Always read the local copy of the version file
-    con <- file(file.path(db@dir, "version"), "r") 
-    on.exit(close(con))
-    
-    VerList <- readLines(con)
+    ## Always read the local copy of the version file.  The number of
+    ## lines read is equal to the version of the repository.  If the
+    ## repository version is -1, then we read the whole file
+    vfile <- versionFile(db, where = "local")
 
-    if(length(VerList) > 0) {
-        rvn <- if(db@reposVersion == -1) 
-            length(VerList)
-        else
-            db@reposVersion
-        VerList[rvn]
-    }
-    else
+    tryCatch({
+        VerList <- readLines(vfile, n = db@reposVersion)
+        VerList[length(VerList)]
+    }, error = function(cond) {
         character(0)
+    })
 }
 
 setGeneric("reposVersionInfo",
@@ -279,18 +286,12 @@ setGeneric("reposVersionInfo",
 
 setMethod("reposVersionInfo", "localDB",
           function(db, ...) {
-              if(file.exists(versionFile(db))) 
-                  readVersionFileLine(db)
-              else
-                  character(0)
+              readVersionFileLine(db)
           })
 
 setMethod("reposVersionInfo", "remoteDB",
           function(db, ...) {
-              if(file.exists(file.path(db@dir, "version")))
-                  readVersionFileLine(db)
-              else
-                  character(0)
+              readVersionFileLine(db)
           })
 
 ## 'getKeyFiles' uses the 'version' file instead of reading the 'data'
@@ -306,6 +307,15 @@ setMethod("reposVersionInfo", "remoteDB",
 ## for remoteDB:
 ## read pertinent line of the version file from the internet ##
 
+sortByVersionNumber <- function(keyFiles) {
+    splitFiles <- strsplit(keyFiles, ".", fixed = TRUE)
+
+    ## The object version number is always at the end
+    num <- sapply(splitFiles, function(x) x[length(x)])
+    num <- as.numeric(num)
+    keyFiles[order(num, decreasing = FALSE)]
+}
+
 getKeyFiles <- function(db) {
     version <- readLines(versionFile(db))
 
@@ -316,15 +326,6 @@ getKeyFiles <- function(db) {
     if(is.null(keyFiles))
         keyFiles <- character(0)
     keyFiles
-}
-
-sortByVersionNumber <- function(keyFiles) {
-    splitFiles <- strsplit(keyFiles, ".", fixed = TRUE)
-
-    ## The object version number is always at the end
-    num <- sapply(splitFiles, function(x) x[length(x)])
-    num <- as.numeric(num)
-    keyFiles[order(num, decreasing = FALSE)]
 }
 
 ## For 'db@reposVersion == -1' in a 'localDB', figure out the latest
@@ -443,7 +444,7 @@ updatedReposVersionInfo <- function(db, key, keepKey = TRUE){
 
 
 ######### updating version file ########## 
-updateVersion <- function(db,key, keepKey = TRUE){
+updateVersion <- function(db, key, keepKey = TRUE){
     cat(updatedReposVersionInfo(db,key,keepKey),
         file = versionFile(db), sep = "\n", append = TRUE)
 }
