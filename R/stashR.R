@@ -311,11 +311,6 @@ setMethod("reposVersionInfo", "remoteDB",
                   character(0)
           })
 
-setAs("remoteDB", "localDB",
-      function(from) {
-          new("localDB", dir = from@dir, name = from@name)
-      })
-
 ## 'getKeyFiles' uses the 'version' file instead of reading the 'data'
 ## directory directly
 
