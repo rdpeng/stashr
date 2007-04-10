@@ -144,21 +144,6 @@ checkSIG <- function(db, key) {
 }
 
 
-## Returns TRUE if a specific version of a key's file is included in the 
-## relevant version of the repository stored on the specified URL
-
-checkRemote<- function(db, key.v){
-    info <- reposVersionInfo(db)
-
-    if(length(info) != 0){
-        keyFiles <- strsplit(info, ":", fixed = TRUE)[[1]][2]
-        keyFilesSep <- strsplit(keyFiles, " ", fixed = TRUE)[[1]]
-        key.v %in% keyFilesSep
-    }
-    else
-        FALSE
-}
-
 setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
           function(db, key, ...) {
               ## downloads new key's files if key version has changed.
