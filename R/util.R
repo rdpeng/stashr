@@ -87,5 +87,5 @@ validData <- function(db, key) {
         localSIG <- readLocalSIG(db, key)
         digest <- md5sum(local.file.path(db, key))
         digest <- as.character(digest)
-        isTRUE(digest == "localSIG")
+        isTRUE(digest == localSIG)
 }
