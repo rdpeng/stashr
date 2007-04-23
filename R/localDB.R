@@ -45,8 +45,10 @@ setMethod("dbInsert",
                   ## 'con' must be closed before taking the digest
                   
                   digest <- md5sum(local.file.path(db, key, vn))
-                  digestWithKey <- paste(as.character(s), key, vn, sep = "  ")
-                  writeLines(digestWithKey, con = local.file.path.SIG(db,key,vn))
+                  digestWithKey <- paste(as.character(digest), key, vn,
+                                         sep = "  ")
+                  writeLines(digestWithKey,
+                             con = local.file.path.SIG(db, key, vn))
           })
 
 
@@ -54,7 +56,7 @@ setMethod("dbFetch", signature(db = "localDB", key = "character"),
           function(db, key, ...) {
                   if(!dataFileExists(db, key)) 
                           stop(gettextf("key '%s' not in database", key))
-                  con <- gzfile(local.file.path(db, key), "wb")
+                  con <- gzfile(local.file.path(db, key), "rb")
                   on.exit(close(con))
                   unserialize(con)
           })
