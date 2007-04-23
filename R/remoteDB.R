@@ -13,46 +13,15 @@ setClass("remoteDB",
 
 
 
-######################################################################
+################################################################################
 ## Method definitions for 'remoteDB'
-
-## currently ignoring (but maintaining) .SIG files and the associated
-## utility functions readRemoteSIG, readLocalSIG and checkSIG
-######################################################################
-
+################################################################################
 
 setMethod("dbInsert",
           signature(db = "remoteDB", key = "character", value = "ANY"),
           function(db, key, value, ...) {
                   stop("cannot insert into a 'remoteDB' database")
           })
-
-readRemoteSIG <- function(db, key) {
-        SIGfile <- basename(local.file.path.SIG(db, key))
-        con <- url(file.path(db@url, "data", SIGfile))
-        open(con, "r")  ## SIG files are text
-        on.exit(close(con))
-
-        val <- scan(con, quiet = TRUE, what = "character", sep = " ")[1]
-        as.character(val)
-}
-
-readLocalSIG <- function(db, key) {
-        path <- local.file.path.SIG(db, key)
-        val <- scan(path, quiet = TRUE, what = "character", sep = " ")[1]
-        as.character(val)
-}
-
-
-## Return TRUE if local and remote SIGs are the same; FALSE otherwise
-
-checkSIG <- function(db, key) {
-        localSIG <- readLocalSIG(db, key)
-        remoteSIG <- readRemoteSIG(db, key)
-
-        isTRUE(localSIG == remoteSIG)
-}
-
 
 setMethod("dbFetch", signature(db = "remoteDB", key = "character"),
           function(db, key, ...) {
