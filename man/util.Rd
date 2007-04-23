@@ -47,7 +47,8 @@ reposVersion(db) <- value
 \details{
   Users obtaining \code{"remoteDB"} objects created on different
   machines may want to reset the directory specified for the local
-  cache.  This function is to be used for that purpose.
+  cache.  The \code{setDir} replacement function is to be used for that
+  purpose.
 
   Users generally will not call the \code{initialize} functions
   directly, but rather will call them indirectly via the \code{new}

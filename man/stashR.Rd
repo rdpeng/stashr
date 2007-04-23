@@ -47,15 +47,6 @@
 
 \section{Methods}{
   \describe{
-    \item{dbCreate}{\code{signature(db = "remoteDB")}: 
-	Calling \code{dbCreate} on a \code{remoteDB} object creates the 
-	local main directory and data sub-directory to in which to store the 
-	data files and saves the url associated with the \code{remoteDB}
-	object in the R workspace format in the local main directory.}
-    \item{dbCreate}{\code{signature(db = "localDB")}: 
-	Calling \code{dbCreate} on a \code{localDB} object creates the 
-	local main directory and data sub-directory to in which to store the 
-	data files.}
     \item{dbDelete}{\code{signature(db = "remoteDB", key = "character")}: 
 	Calling \code{dbDelete} on a \code{remoteDB} object returns an
 	error.}
@@ -63,25 +54,25 @@
 	Calling \code{dbDelete} on a \code{localDB} deletes the specified
 	key from the database and updates the repository version.}
     \item{dbExists}{\code{signature(db = "remoteDB", key = "character")}: 
-      For each element in \code{key}, \code{dbExists} returns TRUE if
+      For each element in the vector \code{key}, \code{dbExists} returns TRUE if
       the key is in the database and otherwise returns FALSE.}
     \item{dbExists}{\code{signature(db = "localDB", key = "character")}: 
-	For each element in \code{key}, \code{dbExists} returns TRUE if
+	For each element in the vector \code{key}, \code{dbExists} returns TRUE if
 	the key is in the database and otherwise returns FALSE.} 
     \item{dbFetch}{\code{signature(db = "remoteDB", key = "character")}: 
 	Checks if the provided character value \code{key} exists in the local 
-	directory and is up to date. If not, \code{dbFetch} downloads
-	the data files for the current version. Otherwise, \code{dbFetch} 
-	reads the file from the local directory. The function returns
-	the data object associated with the \code{key}.} 
+	directory. If not, \code{dbFetch} downloads the data files for
+	the current version. Otherwise, \code{dbFetch} reads the file
+	from the local directory. The function returns the data object
+	associated with the \code{key}.}
     \item{dbFetch}{\code{signature(db = "localDB", key = "character")}: 
 	Checks if the provided character value \code{key} exists in the local 
 	directory. If the \code{key} exists in the local directory, then 
 	\code{dbFetch} reads the file from the local directory. The function 
 	returns the data object associated with the \code{key}. }
-      \item{dbInsert}{\code{signature(db = "remoteDB", key = "character",
-	  value = "ANY")}: Calling \code{dbInsert} on a \code{remoteDB}
-      object returns an error.}
+      \item{dbInsert}{\code{signature(db = "remoteDB", key =
+	  "character",  value = "ANY")}: Calling \code{dbInsert} on a \code{remoteDB}
+	object returns an error.} 
       \item{dbInsert}{\code{signature(db = "localDB", key = "character", 
 	value = "ANY")}: Calling \code{dbInsert} on a \code{localDB}
       object writes the value to a file corresponding to the specified
@@ -100,6 +91,20 @@
       the specified key/data pairs (in which case, it first checks to
       ensure that all specified keys' files have been previously
       saved).} 
+    \item{dbCreate}{\code{signature(db = "remoteDB")}: 
+	Calling \code{dbCreate} on a \code{remoteDB} object creates the 
+	local main directory and data sub-directory for storing the 
+	data files and saves the url associated with the \code{remoteDB}
+	object in the R workspace format in the local main directory.
+	\code{dbCreate} is called implicitly when \code{new} is called
+	to create the \code{remoteDB} object so calling \code{dbCreate}
+	explicitly is usually not necessary.}
+    \item{dbCreate}{\code{signature(db = "localDB")}: 
+	Calling \code{dbCreate} on a \code{localDB} object creates the 
+	local main directory and data sub-directory to in which to store the 
+	data files.  \code{dbCreate} is called implicitly when
+	\code{new} is called to create the \code{localDB} object so
+	calling \code{dbCreate} explicitly is usually not necessary.}
   }
 }
 
