@@ -99,15 +99,12 @@ readLocalSIG <- function(db, key) {
         as.character(val)
 }
 
-
-## Return TRUE if local and remote SIGs are the same; FALSE otherwise
-
-checkSIG <- function(db, key) {
+validDataRemote <- function(db, key) {
         localSIG <- readLocalSIG(db, key)
         remoteSIG <- readRemoteSIG(db, key)
 
         isTRUE(localSIG == remoteSIG)
-}
+}        
 
 validDataInternal <- function(db, key) {
         localSIG <- readLocalSIG(db, key)
