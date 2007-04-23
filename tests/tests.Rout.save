@@ -1,5 +1,5 @@
 
-R version 2.5.0 alpha (2007-04-09 r41097)
+R version 2.5.0 RC (2007-04-23 r41283)
 Copyright (C) 2007 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -20,9 +20,9 @@ Type 'q()' to quit R.
 > 
 > library(stashR)
 Loading required package: filehash
-Simple key-value database (0.9-4 2007-04-09)
+Simple key-value database (1.0 2007-04-11)
 Loading required package: digest
-A Set of Tools for Administering SHared Repositories (0.3 2007-04-07)
+A Set of Tools for Administering SHared Repositories (0.3 2007-04-23)
 > 
 > wd <- getwd()
 > dir <- file.path(wd,"testDir")
@@ -206,4 +206,14 @@ Error in dbDelete(dbLocal, "01004") : key '01004' not in current version
 > 
 > 
 > dbUnlink(dbLocal)
+> 
+> ################################################################################
+> ## Test MD5 digests
+> 
+> db <- new("localDB", dir = "testMD5", name = "testMD5")
+> dbInsert(db, "obj", rnorm(100))
+> 
+> stopifnot(stashR:::validDataInternal(db, "obj"))
+> 
+> dbUnlink(db)
 > 

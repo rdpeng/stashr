@@ -106,3 +106,5 @@ db <- new("localDB", dir = "testMD5", name = "testMD5")
 dbInsert(db, "obj", rnorm(100))
 
 stopifnot(stashR:::validDataInternal(db, "obj"))
+
+dbUnlink(db)
