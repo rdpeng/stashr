@@ -98,3 +98,11 @@ dbFetch(dbLocal, "x.2")
 
 
 dbUnlink(dbLocal)
+
+################################################################################
+## Test MD5 digests
+
+db <- new("localDB", dir = "testMD5", name = "testMD5")
+dbInsert(db, "obj", rnorm(100))
+
+stopifnot(stashR:::validData(db, "obj"))
