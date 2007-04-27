@@ -1,5 +1,5 @@
 
-R version 2.5.0 RC (2007-04-23 r41283)
+R version 2.5.0 (2007-04-23)
 Copyright (C) 2007 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -20,9 +20,9 @@ Type 'q()' to quit R.
 > 
 > library(stashR)
 Loading required package: filehash
-Simple key-value database (1.0 2007-04-11)
+Simple key-value database (1.0 2007-04-27)
 Loading required package: digest
-A Set of Tools for Administering SHared Repositories (0.3 2007-04-23)
+A Set of Tools for Administering SHared Repositories (0.3 2007-04-27)
 > 
 > wd <- getwd()
 > dir <- file.path(wd,"testDir")
