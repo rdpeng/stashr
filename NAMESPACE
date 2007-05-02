@@ -29,6 +29,22 @@ export("stashROption")
 
 
 ## Imports
-importFrom(tools, md5sum)
-import(filehash)
-import(digest)
+importFrom(tools, "md5sum")
+importFrom(digest, "digest")
+
+## filehash
+importClassesFrom(filehash,
+                  "filehash",
+                  "filehashRDS",
+                  "filehashDB1"
+                  )
+importFrom(filehash,
+           "dbInsert",
+           "dbFetch",
+           "dbExists",
+           "dbList",
+           "dbDelete",
+           "dbUnlink",
+           "dbCreate"
+           )
+           
