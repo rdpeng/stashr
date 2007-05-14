@@ -1,5 +1,5 @@
 .onAttach <- function(lib, pkg) {
-        if(!require(filehash))
+        if(!suppressMessages(require(filehash)))
                 stop("'filehash' package required")
         dcf <- read.dcf(file.path(lib, pkg, "DESCRIPTION"))
         msg <- gettextf("%s (%s %s)", dcf[, "Title"],
