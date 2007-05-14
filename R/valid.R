@@ -10,7 +10,7 @@ setValidity("remoteDB",
             })
 
 validURL <- function(URL) {
-    if(length(grep("^http://", URL, fixed = TRUE, perl = TRUE)) > 0)
+    if(length(grep("^http://", URL)) > 0)
         TRUE
     else
         FALSE
