@@ -17,7 +17,6 @@
         if(!capabilities("http/ftp"))
                 warning("'http/ftp' capabilities not available")
         stashROption("quietDownload", FALSE)
-        stashROption("offline", FALSE)
 }
 
 .stashROptions <- new.env()
@@ -25,7 +24,6 @@
 ## Valid options:
 ##
 ## quietDownload:  Should download progress be shown?
-## offline:  Are we connected to the Internet [not yet implemented]
 
 stashROption <- function(name, value) {
         if(missing(name))
