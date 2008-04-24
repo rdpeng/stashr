@@ -1,6 +1,6 @@
 
-R version 2.5.0 (2007-04-23)
-Copyright (C) 2007 The R Foundation for Statistical Computing
+R version 2.7.0 (2008-04-22)
+Copyright (C) 2008 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -19,10 +19,7 @@ Type 'q()' to quit R.
 > ##########################################################################
 > 
 > library(stashR)
-Loading required package: filehash
-Simple key-value database (1.0 2007-04-27)
-Loading required package: digest
-A Set of Tools for Administering SHared Repositories (0.3 2007-04-27)
+A Set of Tools for Administering SHared Repositories (0.3-2 2008-04-24)
 > 
 > wd <- getwd()
 > dir <- file.path(wd,"testDir")
@@ -78,10 +75,10 @@ attr(,"package")
 [199] "53067" "54039" "55009" "55025" "55079" "55133"
 > x <- try( dbFetch(db, "01073") )
 trying URL 'http://www.biostat.jhsph.edu/MCAPS/data_v0.3/data/2960e42eb36dbb046a6ee3707bd2d290.1'
-Content type 'text/plain; charset=UTF-8' length 21284 bytes
+Content type 'text/plain; charset=UTF-8' length 21284 bytes (20 Kb)
 opened URL
 ==================================================
-downloaded 20Kb
+downloaded 20 Kb
 
 trying URL 'http://www.biostat.jhsph.edu/MCAPS/data_v0.3/data/2960e42eb36dbb046a6ee3707bd2d290.1.SIG'
 Content type 'text/plain; charset=UTF-8' length 43 bytes
@@ -101,13 +98,16 @@ downloaded 43 bytes
 > try( dbFetch(db, "01004") )
 trying URL 'http://www.biostat.jhsph.edu/MCAPS/data_v0.3/data/573c3f05811ff95f12d3593bff4b34d5.0'
 Error in getdata(db, key) : problem downloading data for key '01004'
-In addition: Warning message:
-cannot open: HTTP status was '404 Not Found' 
+In addition: Warning messages:
+1: In download.file(remotePath, localFiles["data"], mode = "wb", cacheOK = FALSE,  :
+  cannot open: HTTP status was '404 Not Found'
+2: In file.remove(localFiles) :
+  cannot remove file '/home/rpeng/projects/R-packages/stashR.Rcheck/tests/testDir/data/573c3f05811ff95f12d3593bff4b34d5.0.SIG', reason 'No such file or directory'
 > try( dbDelete(db,"01073") )
 Error in dbDelete(db, "01073") : cannot delete from a 'remoteDB' database
 > try( dbInsert(db,key = "01004", value = 1) )
 Error in dbInsert(db, key = "01004", value = 1) : 
-	cannot insert into a 'remoteDB' database
+  cannot insert into a 'remoteDB' database
 > 
 > try( dbSync(db) )
 > dir(file.path(db@dir, "data"))
@@ -120,7 +120,8 @@ Error in dbInsert(db, key = "01004", value = 1) :
 [2] "2960e42eb36dbb046a6ee3707bd2d290.1.SIG"
 > 
 > try( dbSync(db, key = c("01004","01073")) )
-Error in .local(db, ...) : not all files referenced in the 'key' vector were previously downloaded, no files updated
+Error in .local(db, ...) : 
+  not all files referenced in the 'key' vector were previously downloaded, no files updated
 > dir(file.path(db@dir, "data"))
 [1] "2960e42eb36dbb046a6ee3707bd2d290.1"    
 [2] "2960e42eb36dbb046a6ee3707bd2d290.1.SIG"
@@ -164,9 +165,11 @@ attr(,"package")
 > try( dbFetch(dbLocal, "01005") )
 Error in dbFetch(dbLocal, "01005") : key '01005' not in database
 > try( dbDelete(dbLocal, "01004") )
-Error in dbDelete(dbLocal, "01004") : deleting key from previous version not allowed
+Error in dbDelete(dbLocal, "01004") : 
+  deleting key from previous version not allowed
 > try( dbInsert(dbLocal, "01005", 1))
-Error in dbInsert(dbLocal, "01005", 1) : inserting key into pervious version not allowed
+Error in dbInsert(dbLocal, "01005", 1) : 
+  inserting key into pervious version not allowed
 > 
 > reposVersion(dbLocal) <- -1
 > dbList(dbLocal)
