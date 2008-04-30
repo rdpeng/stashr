@@ -19,7 +19,7 @@ Type 'q()' to quit R.
 > ##########################################################################
 > 
 > library(stashR)
-A Set of Tools for Administering SHared Repositories (0.3-2 2008-04-24)
+A Set of Tools for Administering SHared Repositories (0.3-2 2008-04-30)
 > 
 > wd <- getwd()
 > dir <- file.path(wd,"testDir")
