@@ -1,9 +1,8 @@
 Package:  stashR
-Version:  0.3-2
+Version:  0.3-3
 Date:  2008-04-30
-Depends:  R (>= 2.7.0), methods
-Imports:  tools, filehash, digest
-Suggests:  filehash
+Depends:  R (>= 2.8.0), methods, filehash
+Imports:  tools, digest
 LazyLoad:  yes
 Collate:  remoteDB.R localDB.R init.R util.R valid.R zzz.R
 Title:  A Set of Tools for Administering SHared Repositories
