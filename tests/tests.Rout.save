@@ -1,6 +1,6 @@
 
-R version 2.7.0 (2008-04-22)
-Copyright (C) 2008 The R Foundation for Statistical Computing
+R version 2.10.0 Under development (unstable) (--)
+Copyright (C)  The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -19,6 +19,8 @@ Type 'q()' to quit R.
 > ##########################################################################
 > 
 > library(stashR)
+Loading required package: filehash
+filehash: Simple key-value database (2.0-1 2008-12-19)
 A Set of Tools for Administering SHared Repositories (0.3-2 2008-04-30)
 > 
 > wd <- getwd()
@@ -42,7 +44,7 @@ attr(,"package")
 > show(db@url)
 [1] "http://www.biostat.jhsph.edu/MCAPS/data_v0.3"
 > show(db@dir)
-[1] "/home/rpeng/projects/R-packages/stashR.Rcheck/tests/testDir"
+[1] "/Users/rdpeng/projects/R-packages/stashR.Rcheck/tests/testDir"
 > 
 > 
 > ## other prelim steps necessary ##
@@ -89,11 +91,11 @@ downloaded 43 bytes
 > str(x)
 'data.frame':	1461 obs. of  6 variables:
  $ date     :Class 'Date'  num [1:1461] 10592 10593 10594 10595 10596 ...
- $ pm25tmean: num  17.8 10.5 10.5  9.0 10.2 ...
- $ tmpd     : num  41.2 43.8 26.8 22.0 21.9 ...
+ $ pm25tmean: num  17.8 10.5 10.5 9 10.2 ...
+ $ tmpd     : num  41.2 43.8 26.8 22 21.9 ...
  $ dptp     : num  27.7 41 14.7 8.9 6.6 21.8 47.3 50.6 30.7 16.2 ...
- $ rmtmpd   : num    NA   NA   NA 37.2 30.8 ...
- $ rmdptp   : num    NA   NA   NA 27.8 21.5 ...
+ $ rmtmpd   : num  NA NA NA 37.2 30.8 ...
+ $ rmdptp   : num  NA NA NA 27.8 21.5 ...
 > 
 > try( dbFetch(db, "01004") )
 trying URL 'http://www.biostat.jhsph.edu/MCAPS/data_v0.3/data/573c3f05811ff95f12d3593bff4b34d5.0'
@@ -102,7 +104,7 @@ In addition: Warning messages:
 1: In download.file(remotePath, localFiles["data"], mode = "wb", cacheOK = FALSE,  :
   cannot open: HTTP status was '404 Not Found'
 2: In file.remove(localFiles) :
-  cannot remove file '/home/rpeng/projects/R-packages/stashR.Rcheck/tests/testDir/data/573c3f05811ff95f12d3593bff4b34d5.0.SIG', reason 'No such file or directory'
+  cannot remove file '/Users/rdpeng/projects/R-packages/stashR.Rcheck/tests/testDir/data/573c3f05811ff95f12d3593bff4b34d5.0.SIG', reason 'No such file or directory'
 > try( dbDelete(db,"01073") )
 Error in dbDelete(db, "01073") : cannot delete from a 'remoteDB' database
 > try( dbInsert(db,key = "01004", value = 1) )
@@ -146,7 +148,7 @@ Error in .local(db, ...) :
 attr(,"package")
 [1] "stashR"
 > show(dbLocal@dir)
-[1] "/home/rpeng/projects/R-packages/stashR.Rcheck/tests/testDir"
+[1] "/Users/rdpeng/projects/R-packages/stashR.Rcheck/tests/testDir"
 > 
 > ## test the methods  ##
 > dbInsert(dbLocal,key = "01004", value = 1:10)
