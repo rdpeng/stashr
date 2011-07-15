@@ -1,7 +1,8 @@
 
-R version 2.10.0 Under development (unstable) (--)
-Copyright (C)  The R Foundation for Statistical Computing
+R version 2.13.1 Patched (2011-07-13 r56380)
+Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin10.7.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -20,8 +21,8 @@ Type 'q()' to quit R.
 > 
 > library(stashR)
 Loading required package: filehash
-filehash: Simple key-value database (2.0-1 2008-12-19)
-A Set of Tools for Administering SHared Repositories (0.3-2 2008-04-30)
+filehash: Simple key-value database (2.1-1 2010-10-04)
+A Set of Tools for Administering SHared Repositories (0.3-3 2009-03-26)
 > 
 > wd <- getwd()
 > dir <- file.path(wd,"testDir")
@@ -90,7 +91,7 @@ downloaded 43 bytes
 
 > str(x)
 'data.frame':	1461 obs. of  6 variables:
- $ date     :Class 'Date'  num [1:1461] 10592 10593 10594 10595 10596 ...
+ $ date     : Date, format: "1999-01-01" "1999-01-02" ...
  $ pm25tmean: num  17.8 10.5 10.5 9 10.2 ...
  $ tmpd     : num  41.2 43.8 26.8 22 21.9 ...
  $ dptp     : num  27.7 41 14.7 8.9 6.6 21.8 47.3 50.6 30.7 16.2 ...
