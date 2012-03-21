@@ -1,6 +1,4 @@
 .onAttach <- function(lib, pkg) {
-        if(!suppressMessages(require(filehash)))
-                stop("'filehash' package required")
         dcf <- read.dcf(file.path(lib, pkg, "DESCRIPTION"))
         msg <- gettextf("%s (%s %s)", dcf[, "Title"],
                         as.character(dcf[, "Version"]), dcf[, "Date"])
@@ -8,12 +6,6 @@
 }
 
 .onLoad <- function(lib, pkg) {
-        pkgList <- c("methods")
-
-        for(package in pkgList) {
-                if(!require(package, quietly = TRUE, character.only = TRUE))
-                        stop(gettextf("'%s' package required", package))
-        }
         if(!capabilities("http/ftp"))
                 warning("'http/ftp' capabilities not available")
         stashROption("quietDownload", FALSE)
