@@ -1,8 +1,8 @@
 
-R version 2.13.1 Patched (2011-07-13 r56380)
-Copyright (C) 2011 The R Foundation for Statistical Computing
+R version 2.15.0 beta (2012-03-20 r58793)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
-Platform: x86_64-apple-darwin10.7.0 (64-bit)
+Platform: x86_64-apple-darwin11.3.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -21,8 +21,8 @@ Type 'q()' to quit R.
 > 
 > library(stashR)
 Loading required package: filehash
-filehash: Simple key-value database (2.1-1 2010-10-04)
-A Set of Tools for Administering SHared Repositories (0.3-3 2009-03-26)
+filehash: Simple key-value database (2.2-1 2012-03-12)
+A Set of Tools for Administering SHared Repositories (0.3-5 2012-03-21)
 > 
 > wd <- getwd()
 > dir <- file.path(wd,"testDir")
@@ -223,3 +223,6 @@ Error in dbDelete(dbLocal, "01004") : key '01004' not in current version
 > 
 > dbUnlink(db)
 > 
+> proc.time()
+   user  system elapsed 
+  0.837   0.097   2.422 
