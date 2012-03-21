@@ -1,7 +1,7 @@
 Package:  stashR
-Version:  0.3-4
-Date:  2011-07-15
-Depends:  R (>= 2.13.0), methods, filehash
+Version:  0.3-5
+Date:  2012-03-21
+Depends:  R (>= 2.14.0), methods, filehash
 Imports:  tools, digest
 LazyLoad:  yes
 Collate:  remoteDB.R localDB.R init.R util.R valid.R zzz.R
