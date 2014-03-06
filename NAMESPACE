@@ -31,6 +31,7 @@ export("stashROption")
 ## Imports
 importFrom(tools, "md5sum")
 importFrom(digest, "digest")
+import(methods)
 
 ## filehash
 importClassesFrom(filehash,
