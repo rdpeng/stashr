@@ -1,8 +1,7 @@
 
-R version 2.15.0 beta (2012-03-20 r58793)
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
-Platform: x86_64-apple-darwin11.3.0 (64-bit)
+R version 3.0.3 Patched (2014-03-06 r65133) -- "Warm Puppy"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin13.1.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -19,10 +18,7 @@ Type 'q()' to quit R.
 > ## Tests for Regression testing ##########################################
 > ##########################################################################
 > 
-> library(stashR)
-Loading required package: filehash
-filehash: Simple key-value database (2.2-1 2012-03-12)
-A Set of Tools for Administering SHared Repositories (0.3-5 2012-03-21)
+> suppressPackageStartupMessages(library(stashR))
 > 
 > wd <- getwd()
 > dir <- file.path(wd,"testDir")
@@ -225,4 +221,4 @@ Error in dbDelete(dbLocal, "01004") : key '01004' not in current version
 > 
 > proc.time()
    user  system elapsed 
-  0.837   0.097   2.422 
+  0.907   0.070   1.170 

@@ -1,7 +1,7 @@
 ## Tests for Regression testing ##########################################
 ##########################################################################
 
-library(stashR)
+suppressPackageStartupMessages(library(stashR))
 
 wd <- getwd()
 dir <- file.path(wd,"testDir")
