@@ -1,11 +1,13 @@
 
-R version 3.0.3 Patched (2014-03-06 r65133) -- "Warm Puppy"
-Copyright (C) 2014 The R Foundation for Statistical Computing
-Platform: x86_64-apple-darwin13.1.0 (64-bit)
+R Under development (unstable) (2019-09-11 r77169) -- "Unsuffered Consequences"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -28,107 +30,40 @@ Type 'q()' to quit R.
 > ## These tests will fail (within a 'try()') if Internet connectivity
 > ## is not available
 > 
-> myurl <- "http://www.biostat.jhsph.edu/MCAPS/data_v0.3/"
+> ## myurl <- "http://www.biostat.jhsph.edu/MCAPS/data_v0.3/"
 > 
-> ## create a 'remoteDB' object ##
-> db <- new("remoteDB", url= myurl, dir = dir, name= "MCAPS")
-> show(db)
-'remoteDB' database 'MCAPS'
-> show(class(db))
-[1] "remoteDB"
-attr(,"package")
-[1] "stashR"
-> show(db@url)
-[1] "http://www.biostat.jhsph.edu/MCAPS/data_v0.3"
-> show(db@dir)
-[1] "/Users/rdpeng/projects/R-packages/stashR.Rcheck/tests/testDir"
+> ## ## create a 'remoteDB' object ##
+> ## db <- new("remoteDB", url= myurl, dir = dir, name= "MCAPS")
+> ## show(db)
+> ## show(class(db))
+> ## show(db@url)
+> ## show(db@dir)
 > 
 > 
-> ## other prelim steps necessary ##
-> ## dbCreate(db)
+> ## ## other prelim steps necessary ##
+> ## ## dbCreate(db)
 > 
-> ## test the methods ##
-> try( dbList(db) )
-  [1] "01073" "01089" "01097" "01101" "02020" "04013" "04019" "05119" "06001"
- [10] "06013" "06019" "06029" "06037" "06065" "06067" "06071" "06073" "06075"
- [19] "06077" "06081" "06085" "06099" "08001" "08005" "08031" "09001" "09003"
- [28] "09009" "10003" "11001" "12001" "12011" "12031" "12033" "12057" "12071"
- [37] "12073" "12081" "12086" "12095" "12099" "12103" "12117" "12127" "13051"
- [46] "13063" "13067" "13089" "13121" "15003" "16001" "17031" "17043" "17089"
- [55] "17097" "17111" "17119" "17163" "17197" "17201" "18003" "18097" "18141"
- [64] "19153" "20091" "20173" "21067" "21111" "22017" "22033" "22051" "22071"
- [73] "23005" "24003" "24005" "24031" "24033" "24510" "25005" "25009" "25013"
- [82] "25017" "25021" "25023" "25025" "25027" "26049" "26065" "26081" "26099"
- [91] "26125" "26139" "26145" "26161" "26163" "27037" "27053" "27123" "27137"
-[100] "28049" "29095" "29189" "29510" "32003" "32031" "33011" "33015" "34003"
-[109] "34007" "34013" "34015" "34017" "34023" "34027" "34031" "34039" "35001"
-[118] "36001" "36005" "36007" "36029" "36047" "36055" "36059" "36061" "36063"
-[127] "36065" "36067" "36081" "36085" "36103" "36119" "37021" "37063" "37067"
-[136] "37081" "37119" "37183" "39017" "39035" "39049" "39061" "39085" "39093"
-[145] "39095" "39099" "39113" "39151" "39153" "39155" "40109" "40143" "41039"
-[154] "41051" "41067" "42003" "42011" "42041" "42043" "42045" "42049" "42069"
-[163] "42071" "42095" "42101" "42133" "44007" "45019" "45045" "45063" "45079"
-[172] "45083" "47037" "47093" "47157" "48029" "48061" "48085" "48113" "48141"
-[181] "48167" "48201" "48215" "48245" "48309" "48339" "48355" "48439" "48453"
-[190] "49011" "49035" "51059" "51087" "51710" "53011" "53033" "53053" "53063"
-[199] "53067" "54039" "55009" "55025" "55079" "55133"
-> x <- try( dbFetch(db, "01073") )
-trying URL 'http://www.biostat.jhsph.edu/MCAPS/data_v0.3/data/2960e42eb36dbb046a6ee3707bd2d290.1'
-Content type 'text/plain; charset=UTF-8' length 21284 bytes (20 Kb)
-opened URL
-==================================================
-downloaded 20 Kb
-
-trying URL 'http://www.biostat.jhsph.edu/MCAPS/data_v0.3/data/2960e42eb36dbb046a6ee3707bd2d290.1.SIG'
-Content type 'text/plain; charset=UTF-8' length 43 bytes
-opened URL
-==================================================
-downloaded 43 bytes
-
-> str(x)
-'data.frame':	1461 obs. of  6 variables:
- $ date     : Date, format: "1999-01-01" "1999-01-02" ...
- $ pm25tmean: num  17.8 10.5 10.5 9 10.2 ...
- $ tmpd     : num  41.2 43.8 26.8 22 21.9 ...
- $ dptp     : num  27.7 41 14.7 8.9 6.6 21.8 47.3 50.6 30.7 16.2 ...
- $ rmtmpd   : num  NA NA NA 37.2 30.8 ...
- $ rmdptp   : num  NA NA NA 27.8 21.5 ...
+> ## ## test the methods ##
+> ## try( dbList(db) )
+> ## x <- try( dbFetch(db, "01073") )
+> ## str(x)
 > 
-> try( dbFetch(db, "01004") )
-trying URL 'http://www.biostat.jhsph.edu/MCAPS/data_v0.3/data/573c3f05811ff95f12d3593bff4b34d5.0'
-Error in getdata(db, key) : problem downloading data for key '01004'
-In addition: Warning messages:
-1: In download.file(remotePath, localFiles["data"], mode = "wb", cacheOK = FALSE,  :
-  cannot open: HTTP status was '404 Not Found'
-2: In file.remove(localFiles) :
-  cannot remove file '/Users/rdpeng/projects/R-packages/stashR.Rcheck/tests/testDir/data/573c3f05811ff95f12d3593bff4b34d5.0.SIG', reason 'No such file or directory'
-> try( dbDelete(db,"01073") )
-Error in dbDelete(db, "01073") : cannot delete from a 'remoteDB' database
-> try( dbInsert(db,key = "01004", value = 1) )
-Error in dbInsert(db, key = "01004", value = 1) : 
-  cannot insert into a 'remoteDB' database
+> ## try( dbFetch(db, "01004") )
+> ## try( dbDelete(db,"01073") )
+> ## try( dbInsert(db,key = "01004", value = 1) )
 > 
-> try( dbSync(db) )
-> dir(file.path(db@dir, "data"))
-[1] "2960e42eb36dbb046a6ee3707bd2d290.1"    
-[2] "2960e42eb36dbb046a6ee3707bd2d290.1.SIG"
+> ## try( dbSync(db) )
+> ## dir(file.path(db@dir, "data"))
 > 
-> try( dbSync(db, key = "01073") )
-> dir(file.path(db@dir, "data"))
-[1] "2960e42eb36dbb046a6ee3707bd2d290.1"    
-[2] "2960e42eb36dbb046a6ee3707bd2d290.1.SIG"
+> ## try( dbSync(db, key = "01073") )
+> ## dir(file.path(db@dir, "data"))
 > 
-> try( dbSync(db, key = c("01004","01073")) )
-Error in .local(db, ...) : 
-  not all files referenced in the 'key' vector were previously downloaded, no files updated
-> dir(file.path(db@dir, "data"))
-[1] "2960e42eb36dbb046a6ee3707bd2d290.1"    
-[2] "2960e42eb36dbb046a6ee3707bd2d290.1.SIG"
-> try( dbExists(db,c("01073", "01004","55079")) )
-[1]  TRUE FALSE  TRUE
+> ## try( dbSync(db, key = c("01004","01073")) )
+> ## dir(file.path(db@dir, "data"))
+> ## try( dbExists(db,c("01073", "01004","55079")) )
 > 
-> ## remove db@dir directory ##
-> unlink(db@dir, recursive = TRUE)
+> ## ## remove db@dir directory ##
+> ## unlink(db@dir, recursive = TRUE)
 > 
 > ##########################################################################
 > ## Test objects of class 'localDB'
@@ -145,7 +80,7 @@ Error in .local(db, ...) :
 attr(,"package")
 [1] "stashR"
 > show(dbLocal@dir)
-[1] "/Users/rdpeng/projects/R-packages/stashR.Rcheck/tests/testDir"
+[1] "/home/marcle/src/R/stashr/tests/testDir"
 > 
 > ## test the methods  ##
 > dbInsert(dbLocal,key = "01004", value = 1:10)
@@ -162,13 +97,8 @@ attr(,"package")
 > dbList(dbLocal)
 [1] "01004"
 > try( dbFetch(dbLocal, "01005") )
-Error in dbFetch(dbLocal, "01005") : key '01005' not in database
 > try( dbDelete(dbLocal, "01004") )
-Error in dbDelete(dbLocal, "01004") : 
-  deleting key from previous version not allowed
 > try( dbInsert(dbLocal, "01005", 1))
-Error in dbInsert(dbLocal, "01005", 1) : 
-  inserting key into pervious version not allowed
 > 
 > reposVersion(dbLocal) <- -1
 > dbList(dbLocal)
@@ -179,14 +109,12 @@ Error in dbInsert(dbLocal, "01005", 1) :
 > dbFetch(dbLocal, "01004")  
  [1]  1  2  3  4  5  6  7  8  9 10
 > try( dbFetch(dbLocal, "01073") )
-Error in dbFetch(dbLocal, "01073") : key '01073' not in database
 > dbFetch(dbLocal, "01005")
  [1] 5 5 5 5 5 5 5 5 5 5
 > dbDelete(dbLocal,"01004")
 > dbList(dbLocal)	
 [1] "01005" "01006"
 > try( dbDelete(dbLocal,"01004") )
-Error in dbDelete(dbLocal, "01004") : key '01004' not in current version
 > dbDelete(dbLocal,"01005")
 > dbList(dbLocal)
 [1] "01006"
@@ -219,6 +147,3 @@ Error in dbDelete(dbLocal, "01004") : key '01004' not in current version
 > 
 > dbUnlink(db)
 > 
-> proc.time()
-   user  system elapsed 
-  0.907   0.070   1.170 
